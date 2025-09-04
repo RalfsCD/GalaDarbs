@@ -12,9 +12,9 @@
         @include('layouts.navigation') {{-- navbar --}}
         <header>{{ $header ?? '' }}</header>
 
-        <main class="py-6 px-4 sm:px-6 lg:px-8">
-            @yield('content')
-        </main>
+       <main class="py-6 px-4 sm:px-6 lg:px-8 mt-16">
+    @yield('content')
+</main>
     </div>
 </body>
 </html>
