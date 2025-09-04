@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Redirect;
 
 class ProfileController extends Controller
 {
-    public function edit(): View
-    {
-        return view('profile.profile');
+    public function show() {
+        $user = Auth::user();
+        $followers = $user->followers()->count();
+        $following = $user->following()->count();
+
+        return view('profile.profile', compact('user', 'followers', 'following'));
     }
 
-    public function update(Request $request): RedirectResponse
-    {
+    public function settings() {
+        return view('profile.settings', ['user' => Auth::user()]);
+    }
+
+    public function update(Request $request) {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'name' => 'required|string|max:255',
+            'profile_photo' => 'nullable|image|max:2048',
         ]);
 
         $user = $request->user();
@@ -36,27 +40,24 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'Profile updated.');
+        return Redirect::route('profile.settings')->with('status', 'Profile updated!');
     }
 
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+    public function destroy(Request $request) {
+        $request->validate(['password' => ['required', 'current_password']]);
 
         $user = $request->user();
+        Auth::logout();
 
         if ($user->profile_photo_path) {
             Storage::disk('public')->delete($user->profile_photo_path);
         }
 
-        Auth::logout();
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/')->with('status', 'Account deleted.');
+        return Redirect::to('/');
     }
 }

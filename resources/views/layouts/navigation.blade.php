@@ -19,7 +19,7 @@
                             ['name' => 'Groups', 'route' => 'groups'],
                             ['name' => 'News', 'route' => 'news'],
                             ['name' => 'About', 'route' => 'about'],
-                            ['name' => 'Profile', 'route' => 'profile.edit'],
+                            ['name' => 'Profile', 'route' => 'profile.show'],
                         ];
                     @endphp
 

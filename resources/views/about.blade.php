@@ -54,10 +54,9 @@
             </ul>
         </section>
 
-        <!-- Closing -->
-        <p class="text-lg italic text-white">
-            Join us in building a vibrant, welcoming space where conversations never stop.
-        </p>
+       <p class="text-lg italic text-yellow-400">
+    Join us in building a vibrant, welcoming space where conversations never stop.
+</p>
     </div>
 </main>
 
