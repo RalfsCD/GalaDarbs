@@ -4,19 +4,20 @@
 <main class="bg-black min-h-screen pt-6 pl-6">
     <div class="max-w-4xl space-y-10">
 
-        <!-- Header + Add News button -->
         <div class="flex justify-between items-center">
             <h1 class="text-4xl font-extrabold text-white">
                 Latest 
                 <span class="inline-block animate-shake text-yellow-400">News</span>
             </h1>
-            <a href="{{ route('news.create') }}" 
-               class="bg-yellow-400 text-black px-4 py-2 rounded font-bold hover:bg-yellow-300">
-                + Add News
-            </a>
+
+            @if(auth()->user() && auth()->user()->role === 'admin')
+                <a href="{{ route('news.create') }}" 
+                   class="bg-yellow-400 text-black px-4 py-2 rounded font-bold hover:bg-yellow-300">
+                    + Add News
+                </a>
+            @endif
         </div>
 
-        <!-- News list -->
         @forelse ($news as $item)
             <div class="space-y-4">
                 @if($item->image)
