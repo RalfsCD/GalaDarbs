@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -16,8 +17,10 @@ Route::get('/dashboard', function () { return view('dashboard'); })
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/topics', [PageController::class, 'topics'])->name('topics');
     Route::get('/groups', [PageController::class, 'groups'])->name('groups');
-    Route::get('/news', [PageController::class, 'news'])->name('news');
-    Route::get('/about', [PageController::class, 'about'])->name('about');
+    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+    Route::get('/about', [PageController::class, 'about'])->name('about'); // ✅ Added back
 });
 
 // Profile routes
@@ -30,4 +33,3 @@ Route::middleware(['auth'])->group(function () {
 
 // Auth routes
 require __DIR__.'/auth.php';
-

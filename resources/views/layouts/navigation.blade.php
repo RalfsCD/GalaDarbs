@@ -11,13 +11,13 @@
                 </div>
 
                 <!-- Navigation Links (Desktop) -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex items-center">
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">
                     @php
                         $links = [
                             ['name' => 'Home', 'route' => 'dashboard'],
                             ['name' => 'Topics', 'route' => 'topics'],
                             ['name' => 'Groups', 'route' => 'groups'],
-                            ['name' => 'News', 'route' => 'news'],
+                            ['name' => 'News', 'route' => 'news.index'],
                             ['name' => 'About', 'route' => 'about'],
                             ['name' => 'Profile', 'route' => 'profile.show'],
                         ];
@@ -47,7 +47,7 @@
             </div>
 
             <!-- Hamburger (Mobile) -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <div class="-mr-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 focus:text-white transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
