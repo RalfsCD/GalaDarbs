@@ -7,16 +7,21 @@
         <!-- Profile title and info -->
         <div class="flex items-center space-x-6">
 
-
             <!-- Profile picture -->
             <div class="w-28 h-28 rounded-full overflow-hidden border-2 border-yellow-400">
                 <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=000&color=fff' }}" 
                      alt="Profile Picture" class="w-full h-full object-cover">
             </div>
 
-            <!-- Name and stats -->
+            <!-- Name, role, and stats -->
             <div>
                 <p class="text-white text-2xl font-semibold">{{ $user->name }}</p>
+                
+                <!-- Display role -->
+                <p class="text-yellow-400 font-medium capitalize">
+                    {{ $user->role ?? 'user' }}
+                </p>
+
                 <p class="text-gray-300">{{ $user->email }}</p>
 
                 <div class="flex space-x-6 mt-1">

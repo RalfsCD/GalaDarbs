@@ -10,7 +10,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'profile_photo_path',
+        'name', 'email', 'password', 'profile_photo_path', 'role',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -24,5 +24,11 @@ class User extends Authenticatable
 
     public function following() {
         return $this->belongsToMany(User::class, 'followers', 'follower_id', 'followed_id');
+    }
+
+    // Check if user is admin
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }
