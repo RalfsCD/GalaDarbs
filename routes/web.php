@@ -23,9 +23,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
 });
 
-// Admin-only News routes
-Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-});
 
 // Profile routes
 Route::middleware(['auth'])->group(function () {
