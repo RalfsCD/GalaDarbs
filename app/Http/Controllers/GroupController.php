@@ -21,27 +21,35 @@ class GroupController extends Controller
     }
 
     public function store(Request $request)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'topics' => 'nullable|array',
+        'topics.*' => 'exists:topics,id',
+    ]);
+
+    $group = Group::create([
+        'name' => $data['name'],
+        'description' => $data['description'] ?? '',
+        'creator_id' => auth()->id(),
+    ]);
+
+    // Correctly sync multiple topics
+    if (!empty($data['topics'])) {
+        $group->topics()->sync($data['topics']); // Laravel will insert one row per topic automatically
+    }
+
+    // Add creator as first member
+    $group->members()->attach(auth()->id());
+
+    return redirect()->route('groups.index')->with('success', 'Group created successfully!');
+}
+
+    public function show(Group $group)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'topics' => 'nullable|array',
-            'topics.*' => 'exists:topics,id',
-        ]);
-
-        $group = Group::create([
-            'name' => $data['name'],
-            'description' => $data['description'] ?? '',
-            'creator_id' => auth()->id(),
-        ]);
-
-        if (!empty($data['topics'])) {
-            $group->topics()->sync($data['topics']);
-        }
-
-        $group->members()->attach(auth()->id());
-
-        return redirect()->route('groups.index')->with('success', 'Group created successfully!');
+        $group->load('creator', 'members', 'topics', 'posts.user', 'posts.comments.user', 'posts.likes');
+        return view('groups.show', compact('group'));
     }
 
     public function join(Group $group)
@@ -54,35 +62,5 @@ class GroupController extends Controller
     {
         $group->members()->detach(auth()->id());
         return back();
-    }
-
-    // Show group with posts (AJAX sort support)
-    public function show(Request $request, Group $group)
-    {
-        $sort = $request->get('sort', 'newest');
-
-        $postsQuery = $group->posts()->with('user','comments.user','likes');
-
-        if($sort === 'newest') {
-            $postsQuery->latest();
-        } elseif($sort === 'oldest') {
-            $postsQuery->oldest();
-        } elseif($sort === 'most_liked') {
-            $postsQuery->withCount('likes')->orderByDesc('likes_count');
-        }
-
-        $posts = $postsQuery->get();
-
-        if($request->ajax()){
-            $html = '';
-            foreach($posts as $post){
-                $html .= view('partials.post', ['post' => $post])->render();
-            }
-            return response()->json(['html' => $html]);
-        }
-
-        $group->load('creator','members','topics','posts.user','posts.comments.user','posts.likes');
-
-        return view('groups.show', compact('group'));
     }
 }
