@@ -25,19 +25,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Groups (user-created groups)
-Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/groups',[GroupController::class,'index'])->name('groups.index');
-    Route::get('/groups/create',[GroupController::class,'create'])->name('groups.create');
-    Route::post('/groups',[GroupController::class,'store'])->name('groups.store');
-    Route::get('/groups/{group}',[GroupController::class,'show'])->name('groups.show');
-    Route::post('/groups/{group}/join',[GroupController::class,'join'])->name('groups.join');
-    Route::post('/groups/{group}/leave',[GroupController::class,'leave'])->name('groups.leave');
+// Groups (authenticated)
+Route::middleware(['auth', 'verified'])->group(function () {
 
+    Route::get('/groups', [GroupController::class,'index'])->name('groups.index');
+    Route::get('/groups/create', [GroupController::class,'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class,'store'])->name('groups.store');
+    Route::get('/groups/{group}', [GroupController::class,'show'])->name('groups.show');
+    Route::post('/groups/{group}/join', [GroupController::class,'join'])->name('groups.join');
+    Route::post('/groups/{group}/leave', [GroupController::class,'leave'])->name('groups.leave');
+
+    // Posts inside groups
     Route::post('/groups/{group}/posts', [PostController::class,'store'])->name('posts.store');
-Route::post('/posts/{post}/like', [PostController::class,'like'])->name('posts.like');
-Route::post('/posts/{post}/comment', [PostController::class,'comment'])->name('posts.comment');
+    Route::post('/posts/{post}/like', [PostController::class,'like'])->name('posts.like');
+    Route::post('/posts/{post}/comment', [PostController::class,'comment'])->name('posts.comment');
+    Route::delete('/posts/{post}', [PostController::class,'destroy'])->name('posts.destroy');
 });
-
 // News
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
@@ -53,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 // Auth routes
 require __DIR__.'/auth.php';
