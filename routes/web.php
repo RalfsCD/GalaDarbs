@@ -34,14 +34,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // News
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+     Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
     Route::get('/about', [PageController::class, 'about'])->name('about');
 });
 
-// Admin-only News routes
-Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
-    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
-});
+
 
 // Profile
 Route::middleware(['auth'])->group(function () {
