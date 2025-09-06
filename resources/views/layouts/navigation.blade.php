@@ -1,6 +1,6 @@
 <nav x-data="{ open: false }" class="bg-black border-b border-gray-700 fixed top-0 left-0 w-full z-50">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
@@ -15,8 +15,8 @@
                     @php
                         $links = [
                             ['name' => 'Home', 'route' => 'dashboard'],
-                            ['name' => 'Topics', 'route' => 'topics'],
-                            ['name' => 'Groups', 'route' => 'groups'],
+                            ['name' => 'Topics', 'route' => 'topics.index'],
+                            ['name' => 'Groups', 'route' => 'groups.index'],
                             ['name' => 'News', 'route' => 'news.index'],
                             ['name' => 'About', 'route' => 'about'],
                             ['name' => 'Profile', 'route' => 'profile.show'],
