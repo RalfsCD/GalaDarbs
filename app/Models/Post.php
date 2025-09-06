@@ -3,25 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Post extends Model
 {
-    protected $fillable = ['title','content','user_id','group_id','image'];
+    use HasFactory;
 
-    public function user() {
+    protected $fillable = ['group_id', 'user_id', 'title', 'content', 'image'];
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function group() {
-        return $this->belongsTo(Group::class, 'group_id');
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
     }
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
-    }
-
-    public function likes() {
-        // Specify the pivot table name 'likes'
-        return $this->belongsToMany(User::class, 'likes', 'post_id', 'user_id');
     }
 }

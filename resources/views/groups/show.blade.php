@@ -15,7 +15,7 @@
             @csrf
             <input type="text" name="title" placeholder="Post title..." class="w-full p-2 mb-2 rounded bg-black text-yellow-400 border-2 border-yellow-400">
             <textarea name="content" rows="3" placeholder="Content..." class="w-full p-2 mb-2 rounded bg-black text-yellow-400 border-2 border-yellow-400"></textarea>
-            <input type="file" name="media" class="mb-2">
+            <input type="file" name="image" class="mb-2">
             <button class="bg-yellow-400 text-black px-4 py-2 rounded font-bold">Post</button>
         </form>
     </div>
@@ -26,8 +26,9 @@
             <p class="text-white font-bold">{{ $post->user->name }}</p>
             <p class="text-yellow-400 font-semibold">{{ $post->title }}</p>
             <p class="text-gray-300">{{ $post->content }}</p>
-            @if($post->media_path)
-                <img src="{{ asset('storage/'.$post->media_path) }}" class="w-full rounded">
+
+            @if($post->image)
+                <img src="{{ asset('storage/' . $post->image) }}" alt="Post Image" class="w-full rounded mb-2">
             @endif
 
             <!-- Likes / Comments -->

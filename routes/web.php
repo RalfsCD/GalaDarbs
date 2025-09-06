@@ -33,9 +33,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/groups/{group}/join',[GroupController::class,'join'])->name('groups.join');
     Route::post('/groups/{group}/leave',[GroupController::class,'leave'])->name('groups.leave');
 
-    Route::post('/groups/{group}/posts',[PostController::class,'store'])->name('posts.store');
-    Route::post('/posts/{post}/like',[PostController::class,'like'])->name('posts.like');
-    Route::post('/posts/{post}/comment',[PostController::class,'comment'])->name('posts.comment');
+    Route::post('/groups/{group}/posts', [PostController::class,'store'])->name('posts.store');
+Route::post('/posts/{post}/like', [PostController::class,'like'])->name('posts.like');
+Route::post('/posts/{post}/comment', [PostController::class,'comment'])->name('posts.comment');
 });
 
 // News

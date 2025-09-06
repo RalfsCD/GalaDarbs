@@ -23,7 +23,8 @@ class Group extends Model
         return $this->belongsToMany(Topic::class, 'group_topic', 'group_id', 'topic_id');
     }
 
-    public function posts() {
-        return $this->hasMany(Post::class);
-    }
+   public function posts()
+{
+    return $this->hasMany(Post::class);
+}
 }

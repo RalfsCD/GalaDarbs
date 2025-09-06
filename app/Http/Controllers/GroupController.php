@@ -38,10 +38,11 @@ class GroupController extends Controller
         return redirect()->route('groups.index')->with('success','Group created!');
     }
 
-    public function show(Group $group) {
-        $group->load('creator','members','topics','posts.user','posts.comments.user','posts.likes');
-        return view('groups.show',compact('group'));
-    }
+    public function show(Group $group)
+{
+    $group->load('creator','members','topics','posts.user','posts.comments.user','posts.likes');
+    return view('groups.show', compact('group'));
+}
 
     public function join(Group $group){
         $group->members()->syncWithoutDetaching(auth()->id());
