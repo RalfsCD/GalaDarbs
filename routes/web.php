@@ -5,6 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\PostController; // <-- Add this
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -24,20 +25,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Groups (user-created groups)
-Route::middleware(['auth', 'verified'])->group(function () {
-    // List all groups
-    Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+Route::middleware(['auth','verified'])->group(function () {
+    Route::get('/groups',[GroupController::class,'index'])->name('groups.index');
+    Route::get('/groups/create',[GroupController::class,'create'])->name('groups.create');
+    Route::post('/groups',[GroupController::class,'store'])->name('groups.store');
+    Route::get('/groups/{group}',[GroupController::class,'show'])->name('groups.show');
+    Route::post('/groups/{group}/join',[GroupController::class,'join'])->name('groups.join');
+    Route::post('/groups/{group}/leave',[GroupController::class,'leave'])->name('groups.leave');
 
-    // Create group
-    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
-    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-
-    // Show individual group (must be after 'create' route)
-    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
-
-    // Join / Leave
-    Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
-    Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+    Route::post('/groups/{group}/posts',[PostController::class,'store'])->name('posts.store');
+    Route::post('/posts/{post}/like',[PostController::class,'like'])->name('posts.like');
+    Route::post('/posts/{post}/comment',[PostController::class,'comment'])->name('posts.comment');
 });
 
 // News

@@ -2,28 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
-    use HasFactory;
+    // Explicitly set table name
+    protected $table = 'user_groups';
 
-    protected $table = 'user_groups'; // <-- avoid reserved keyword
     protected $fillable = ['name', 'description', 'creator_id'];
 
-    public function creator()
-    {
+    public function creator() {
         return $this->belongsTo(User::class, 'creator_id');
     }
 
-    public function members()
-    {
+    public function members() {
         return $this->belongsToMany(User::class, 'group_user', 'group_id', 'user_id');
     }
 
-    public function topics()
-    {
+    public function topics() {
         return $this->belongsToMany(Topic::class, 'group_topic', 'group_id', 'topic_id');
+    }
+
+    public function posts() {
+        return $this->hasMany(Post::class);
     }
 }
