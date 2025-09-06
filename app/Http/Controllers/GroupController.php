@@ -8,17 +8,22 @@ use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
-    public function index()
-    {
-        $groups = Group::with('creator', 'members', 'topics')->get();
-        return view('groups.index', compact('groups'));
+   public function index(Request $request)
+{
+    $topics = Topic::all();
+
+    $groups = Group::with('creator', 'members', 'topics');
+
+    if ($request->has('topic') && $request->topic) {
+        $groups->whereHas('topics', function($q) use ($request) {
+            $q->where('topics.id', $request->topic);
+        });
     }
 
-    public function create()
-    {
-        $topics = Topic::all();
-        return view('groups.create', compact('topics'));
-    }
+    $groups = $groups->get();
+
+    return view('groups.index', compact('groups', 'topics'));
+}
 
     public function store(Request $request)
 {
