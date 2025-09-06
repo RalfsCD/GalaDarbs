@@ -22,11 +22,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
 });
+
 // Groups (user-created groups)
 Route::middleware(['auth', 'verified'])->group(function () {
+    // List all groups
     Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+
+    // Create group
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+
+    // Show individual group (must be after 'create' route)
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+
+    // Join / Leave
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
 });
@@ -34,12 +43,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // News
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
-     Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
     Route::get('/about', [PageController::class, 'about'])->name('about');
 });
-
-
 
 // Profile
 Route::middleware(['auth'])->group(function () {

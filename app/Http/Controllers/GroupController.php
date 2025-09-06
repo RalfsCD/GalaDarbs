@@ -39,7 +39,6 @@ class GroupController extends Controller
             $group->topics()->sync($data['topics']);
         }
 
-        // Add creator as first member
         $group->members()->attach(auth()->id());
 
         return redirect()->route('groups.index')->with('success', 'Group created successfully!');
@@ -55,5 +54,12 @@ class GroupController extends Controller
     {
         $group->members()->detach(auth()->id());
         return back();
+    }
+
+    // New show method
+    public function show(Group $group)
+    {
+        $group->load('creator', 'members', 'topics'); // eager load relationships
+        return view('groups.show', compact('group'));
     }
 }

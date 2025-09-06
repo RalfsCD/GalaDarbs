@@ -1,29 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-6 space-y-6">
+<div class="max-w-3xl mx-auto p-6 space-y-6">
     <h1 class="text-3xl font-bold text-yellow-400">{{ $group->name }}</h1>
     <p class="text-gray-300">{{ $group->description }}</p>
+    <p class="text-sm text-gray-400">Created by: {{ $group->creator->name }}</p>
+    <p class="text-sm text-yellow-400">Topics: {{ $group->topics->pluck('name')->join(', ') }}</p>
+    <p class="text-sm text-gray-300">Members: {{ $group->members->count() }}</p>
 
-    <p class="text-gray-400">Topic: <span class="text-white">{{ $group->topic->name }}</span></p>
-    <p class="text-gray-400">Created by: <span class="text-white">{{ $group->owner->name }}</span></p>
-
-    <h2 class="text-2xl font-semibold text-white mt-4">Members ({{ $group->users->count() }})</h2>
-    <ul class="list-disc pl-6 text-gray-300">
-        @foreach($group->users as $user)
-            <li>{{ $user->name }}</li>
-        @endforeach
-    </ul>
-
-    @if(!$group->users->contains(auth()->user()))
-        <form method="POST" action="{{ route('groups.join', $group) }}">
+    <!-- Join / Leave Button -->
+    @if($group->members->contains(auth()->id()))
+        <form action="{{ route('groups.leave', $group) }}" method="POST">
             @csrf
-            <button type="submit" class="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-300 mt-4">
-                Join Group
-            </button>
+            <button class="bg-red-500 px-4 py-2 text-white rounded mt-4">Leave Group</button>
         </form>
     @else
-        <p class="text-green-400 mt-4">You are a member of this group ✅</p>
+        <form action="{{ route('groups.join', $group) }}" method="POST">
+            @csrf
+            <button class="bg-green-500 px-4 py-2 text-white rounded mt-4">Join Group</button>
+        </form>
     @endif
+
+    <!-- List of members -->
+    <div class="mt-6">
+        <h2 class="text-xl font-bold text-yellow-400 mb-2">Members</h2>
+        <ul class="list-disc list-inside text-gray-300">
+            @foreach($group->members as $member)
+                <li>{{ $member->name }}</li>
+            @endforeach
+        </ul>
+    </div>
 </div>
 @endsection
