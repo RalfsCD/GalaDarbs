@@ -5,16 +5,22 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostLikeController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 
-// Root: redirect to dashboard if logged in, welcome if not
-// routes/web.php
-Route::get('/', [PageController::class, 'dashboard'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
+// Root (avoid duplicate 'dashboard' name with /dashboard)
+Route::get('/', [PageController::class, 'dashboard'])->name('home');
 
-// Authenticated routes
-Route::middleware(['auth', 'verified'])->group(function () {
+// Authenticated routes (NO 'verified' middleware anymore)
+Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
 
@@ -28,15 +34,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show'); // supports ?sort=
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
 
-    // Posts
-    Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('posts.store');
-    Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
-    Route::post('/posts/{post}/comment', [PostController::class, 'comment'])->name('posts.comment');
+    // Posts (AJAX endpoints)
+    Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('groups.posts.store');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    // Likes & Comments (AJAX endpoints)
+    Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
+    Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
+
+    // Optional details page
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
     // News
@@ -54,5 +64,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Auth routes (Laravel Breeze, Jetstream, or default)
-require __DIR__.'/auth.php';
+// Auth routes (Breeze/Jetstream/default)
+require __DIR__ . '/auth.php';

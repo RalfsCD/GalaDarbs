@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\Topic;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,14 +11,14 @@ class GroupController extends Controller
 {
     public function index(Request $request)
     {
-        $groups = Group::with('topics')->get();
+        $topicId = $request->query('topic');
 
-        // If there is a topic filter
-        if ($request->has('topic')) {
-            $groups = $groups->filter(function ($group) use ($request) {
-                return $group->topics->pluck('id')->contains($request->topic);
-            });
-        }
+        $groups = Group::query()
+            ->with('topics')
+            ->when($topicId, fn($q) =>
+                $q->whereHas('topics', fn($qq) => $qq->where('topics.id', $topicId))
+            )
+            ->get();
 
         $topics = Topic::all();
 
@@ -28,40 +27,63 @@ class GroupController extends Controller
 
     public function create()
     {
-        $topics = Topic::all(); // Assuming you have topics to select from
+        $topics = Topic::all();
         return view('groups.create', compact('topics'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'topics' => 'required|array'
+            'topics'      => 'required|array',
+            'topics.*'    => 'exists:topics,id',
         ]);
 
         $group = Group::create([
-            'name' => $request->name,
+            'name'        => $request->name,
             'description' => $request->description,
-            'creator_id' => Auth::id(),
+            'creator_id'  => Auth::id(),
         ]);
 
-        $group->topics()->attach($request->topics); // Attach selected topics
-
-        // Add the creator to the group
-        $group->members()->attach(Auth::id());
+        $group->topics()->attach($request->topics);
+        $group->members()->syncWithoutDetaching([Auth::id()]);
 
         return redirect()->route('groups.show', $group);
     }
 
-    public function show(Group $group)
+    public function show(Request $request, Group $group)
     {
-        return view('groups.show', compact('group'));
+        $sort = $request->get('sort', 'newest');
+
+        $query = $group->posts()
+            ->with(['user', 'comments.user', 'likes'])
+            ->withCount(['likes', 'comments']);
+
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'most_liked':
+                $query->orderByDesc('likes_count')->latest();
+                break;
+            default:
+                $query->latest();
+        }
+
+        $posts = $query->get();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $html = view('partials.posts', compact('posts'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        return view('groups.show', compact('group', 'posts'));
     }
 
     public function join(Group $group)
     {
-        $group->members()->attach(Auth::id());
+        $group->members()->syncWithoutDetaching([Auth::id()]);
         return redirect()->route('groups.show', $group);
     }
 

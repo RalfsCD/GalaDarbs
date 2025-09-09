@@ -1,4 +1,4 @@
-<div class="p-2 border-t border-gray-700 text-gray-300">
-    <span class="font-bold text-yellow-400">{{ $comment->user->name }}:</span>
-    {{ $comment->content }}
+<div class="comment text-gray-200">
+    <span class="font-semibold text-yellow-400">{{ $comment->user->name ?? 'User' }}</span>
+    <span class="ml-2">{{ $comment->content }}</span>
 </div>

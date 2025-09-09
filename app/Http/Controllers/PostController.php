@@ -5,64 +5,56 @@ namespace App\Http\Controllers;
 use App\Models\Group;
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+        use AuthorizesRequests;
     public function store(Request $request, Group $group)
     {
-        $data = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'content' => 'required|string',
-            'media' => 'nullable|image|max:2048',
+        $validated = $request->validate([
+            'title'   => ['required', 'string', 'max:255'],
+            'content' => ['nullable', 'string'],
+            'media'   => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,webp,mp4,mp3,pdf', 'max:20480'],
         ]);
 
-        $data['user_id'] = auth()->id();
+        $path = $request->file('media')
+            ? $request->file('media')->store('posts', 'public')
+            : null;
 
-        if ($request->hasFile('media')) {
-            $data['image'] = $request->file('media')->store('posts', 'public');
-        }
+        $post = $group->posts()->create([
+            'user_id'    => $request->user()->id,
+            'title'      => $validated['title'],
+            'content'    => $validated['content'] ?? null,
+            'media_path' => $path,
+        ]);
 
-        $post = $group->posts()->create($data);
+        $post->load(['user', 'comments.user', 'likes'])->loadCount(['likes', 'comments']);
 
-        $post->load('user','likes','comments.user');
-
-        // Return JSON with rendered HTML partial
         $html = view('partials.post', compact('post'))->render();
-        return response()->json(['html' => $html]);
-    }
 
-    public function like(Post $post)
-    {
-        $user = auth()->user();
-
-        if ($post->likes()->where('user_id', $user->id)->exists()) {
-            $post->likes()->detach($user->id);
-        } else {
-            $post->likes()->attach($user->id);
-        }
-
-        return response()->json(['likes' => $post->likes()->count()]);
-    }
-
-    public function comment(Request $request, Post $post)
-    {
-        $data = $request->validate(['content' => 'required|string|max:1000']);
-        $data['user_id'] = auth()->id();
-        $comment = $post->comments()->create($data);
-        $comment->load('user');
-
-        $html = view('partials.comment', compact('comment'))->render();
-
-        return response()->json([
-            'html' => $html,
-            'comment_count' => $post->comments()->count(),
-        ]);
+        return response()->json(['html' => $html], 201);
     }
 
     public function show(Post $post)
     {
-        $post->load('user','group','likes','comments.user');
-        return view('posts.show', compact('post'));
+        $post->load(['user', 'comments.user', 'likes'])->loadCount(['likes', 'comments']);
+        return view('posts.show', compact('post')); // optional
     }
-} // <-- This closing brace was missing
+
+    public function destroy(Post $post, Request $request)
+{
+    if ($post->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    $groupId = $request->input('group_id');
+    $post->delete();
+
+    // Redirect to group page
+    return redirect("/groups/{$groupId}")
+        ->with('success', 'Post deleted successfully.');
+}
+
+}

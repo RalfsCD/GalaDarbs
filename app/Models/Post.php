@@ -4,50 +4,65 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Group;
+use Illuminate\Support\Facades\Storage; // ⬅️ add this
 
 class Post extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'group_id',
-        'title',
-        'content',
-        'image',
+        'group_id', 'user_id', 'title', 'content', 'media_path',
     ];
 
-    /**
-     * The user who created the post
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * The group the post belongs to
-     */
     public function group()
     {
         return $this->belongsTo(Group::class);
     }
 
-    /**
-     * Likes for this post
-     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
+
     public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->belongsToMany(User::class, 'post_likes')->withTimestamps();
     }
 
     /**
-     * Comments on the post
+     * Normalized media URL for the /storage symlink.
+     * Handles values like:
+     *  - "posts/file.png"
+     *  - "public/posts/file.png"
+     *  - "storage/posts/file.png"
+     *  - Windows backslashes "posts\file.png"
      */
-    public function comments()
+    public function getMediaUrlAttribute(): ?string
     {
-        return $this->hasMany(Comment::class);
+        if (empty($this->media_path)) {
+            return null;
+        }
+
+        // Normalize directory separators
+        $path = str_replace('\\', '/', (string) $this->media_path);
+        $path = ltrim($path, '/');
+
+        // If already "storage/...", return as-is (prefixed with /)
+        if (str_starts_with($path, 'storage/')) {
+            return '/' . $path;
+        }
+
+        // If "public/...", strip the prefix and convert to "/storage/..."
+        if (str_starts_with($path, 'public/')) {
+            $path = substr($path, 7); // drop "public/"
+        }
+
+        // Otherwise it's most likely "posts/filename.ext"
+        return Storage::url($path);  // -> "/storage/posts/filename.ext"
     }
 }
