@@ -4,70 +4,65 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\Post;
-use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     public function store(Request $request, Group $group)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'content' => 'required|string',
             'media' => 'nullable|image|max:2048',
         ]);
 
-        if($request->hasFile('media')){
-            $data['image'] = $request->file('media')->store('posts','public');
+        $data['user_id'] = auth()->id();
+
+        if ($request->hasFile('media')) {
+            $data['image'] = $request->file('media')->store('posts', 'public');
         }
 
-        $post = $group->posts()->create([
-            'user_id' => auth()->id(),
-            'title' => $data['title'],
-            'content' => $data['content'],
-            'image' => $data['image'] ?? null,
-        ]);
+        $post = $group->posts()->create($data);
 
-        $post->load('user','comments.user','likes');
+        $post->load('user','likes','comments.user');
 
-        $html = view('partials.post', ['post' => $post])->render();
-
+        // Return JSON with rendered HTML partial
+        $html = view('partials.post', compact('post'))->render();
         return response()->json(['html' => $html]);
     }
 
     public function like(Post $post)
     {
-        $post->likes()->syncWithoutDetaching(auth()->id());
+        $user = auth()->user();
+
+        if ($post->likes()->where('user_id', $user->id)->exists()) {
+            $post->likes()->detach($user->id);
+        } else {
+            $post->likes()->attach($user->id);
+        }
+
         return response()->json(['likes' => $post->likes()->count()]);
     }
 
     public function comment(Request $request, Post $post)
     {
-        $data = $request->validate(['content'=>'required|string|max:1000']);
-
-        $comment = $post->comments()->create([
-            'user_id' => auth()->id(),
-            'content' => $data['content'],
-        ]);
-
+        $data = $request->validate(['content' => 'required|string|max:1000']);
+        $data['user_id'] = auth()->id();
+        $comment = $post->comments()->create($data);
         $comment->load('user');
 
-        $html = view('partials.comment', ['comment' => $comment])->render();
+        $html = view('partials.comment', compact('comment'))->render();
 
         return response()->json([
             'html' => $html,
-            'comment_count' => $post->comments()->count()
+            'comment_count' => $post->comments()->count(),
         ]);
     }
 
-    public function destroy(Post $post)
+    public function show(Post $post)
     {
-        if($post->user_id !== auth()->id()){
-            return response()->json(['error'=>'Unauthorized'],403);
-        }
-
-        $post->delete();
-
-        return response()->json(['success'=>true]);
+        $post->load('user','group','likes','comments.user');
+        return view('posts.show', compact('post'));
     }
-}
+} // <-- This closing brace was missing

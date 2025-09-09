@@ -2,30 +2,50 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Group;
 
 class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['group_id', 'user_id', 'title', 'content', 'image'];
+    protected $fillable = [
+        'user_id',
+        'group_id',
+        'title',
+        'content',
+        'image',
+    ];
 
-    public function group()
-    {
-        return $this->belongsTo(Group::class);
-    }
-
+    /**
+     * The user who created the post
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function likes()
+    /**
+     * The group the post belongs to
+     */
+    public function group()
     {
-        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
+        return $this->belongsTo(Group::class);
     }
 
+    /**
+     * Likes for this post
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Comments on the post
+     */
     public function comments()
     {
         return $this->hasMany(Comment::class);

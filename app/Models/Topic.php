@@ -13,3 +13,4 @@ class Topic extends Model
         return $this->belongsToMany(Group::class, 'group_topic');
     }
 }
+

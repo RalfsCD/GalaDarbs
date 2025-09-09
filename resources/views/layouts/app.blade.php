@@ -6,20 +6,26 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
     @vite('resources/css/app.css')
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="//unpkg.com/alpinejs" defer></script>
-
+    <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 <body class="bg-black text-white">
-    <div class="min-h-screen">
-        @include('layouts.navigation') {{-- navbar --}}
-        <header>{{ $header ?? '' }}</header>
+    {{-- Navbar (always visible, fixed at top) --}}
+    @include('layouts.navigation')
 
-        <main class="py-6 px-4 sm:px-6 lg:px-8 mt-16">
+    <div class="min-h-screen flex">
+        {{-- Sidebar (optional, only if section exists) --}}
+        @hasSection('sidebar')
+            <aside class="hidden sm:block fixed top-16 left-0 w-56 h-full bg-gray-900 border-r border-gray-700">
+                @yield('sidebar')
+            </aside>
+        @endif
+
+        {{-- Main content (with dynamic left margin) --}}
+        <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8 pt-16 @yield('main-classes')">
             @yield('content')
         </main>
     </div>
 
-    {{-- Page-specific scripts --}}
     @yield('scripts')
 </body>
 </html>
