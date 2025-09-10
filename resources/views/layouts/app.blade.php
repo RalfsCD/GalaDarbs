@@ -8,20 +8,21 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<body class="bg-black text-white">
-    {{-- Navbar (always visible, fixed at top) --}}
+<body class="bg-gray-100 text-gray-900">
+
+    {{-- Navbar --}}
     @include('layouts.navigation')
 
     <div class="min-h-screen flex">
-        {{-- Sidebar (optional, only if section exists) --}}
+        {{-- Sidebar (optional) --}}
         @hasSection('sidebar')
-            <aside class="hidden sm:block fixed top-16 left-0 w-56 h-full bg-gray-900 border-r border-gray-700">
+            <aside class="hidden sm:block fixed top-16 left-0 w-56 h-full bg-gray-50 border-r border-gray-200">
                 @yield('sidebar')
             </aside>
         @endif
 
-        {{-- Main content (with dynamic left margin) --}}
-        <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8 pt-16 @yield('main-classes')">
+        {{-- Main content --}}
+        <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8 pt-16">
             @yield('content')
         </main>
     </div>

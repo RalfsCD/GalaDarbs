@@ -1,71 +1,93 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-6 space-y-6">
+<div class="min-h-screen bg-gray-100 flex justify-center p-6">
 
-    <h1 class="text-3xl font-bold text-white">Settings</h1>
+    <!-- Settings Panel -->
+    <div class="w-full max-w-3xl bg-white/50 backdrop-blur-md border border-gray-200 rounded-3xl p-8 space-y-8">
 
-    @if(session('status'))
-        <p class="text-yellow-400">{{ session('status') }}</p>
-    @endif
+        <!-- Page Header -->
+        <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
 
-    {{-- Update Profile --}}
-    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-4 mt-6">
-        @csrf
-        @method('patch')
+        @if(session('status'))
+            <p class="text-green-600 font-medium">{{ session('status') }}</p>
+        @endif
 
-        <div>
-            <x-input-label for="name" value="Name" class="text-white"/>
-            <x-text-input id="name" name="name" value="{{ old('name', $user->name) }}" class="mt-1 block w-full"/>
-            <x-input-error :messages="$errors->get('name')" class="mt-2 text-yellow-400"/>
+        {{-- Update Profile --}}
+        <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+            @method('patch')
+
+            <div>
+                <x-input-label for="name" value="Name" class="text-gray-900"/>
+                <x-text-input id="name" name="name" value="{{ old('name', $user->name) }}" 
+                              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"/>
+                <x-input-error :messages="$errors->get('name')" class="mt-1 text-red-500 text-sm"/>
+            </div>
+
+            <div>
+                <x-input-label for="profile_photo" value="Profile Photo" class="text-gray-900"/>
+                <input type="file" name="profile_photo" id="profile_photo" 
+                       class="mt-1 block w-full text-gray-700 border border-gray-300 rounded-lg px-3 py-2"/>
+                <x-input-error :messages="$errors->get('profile_photo')" class="mt-1 text-red-500 text-sm"/>
+            </div>
+
+            <button type="submit" 
+                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                Update Profile
+            </button>
+        </form>
+
+        {{-- Delete Account --}}
+        <div x-data="{ open: false }" class="space-y-4">
+            <!-- Warning Text -->
+            <p class="text-gray-700 font-medium">
+                Warning: Deleting your account is permanent and cannot be undone. 
+                All your posts, comments, and data will be permanently removed.
+            </p>
+
+            <button @click="open = true" 
+                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                Delete Account
+            </button>
+
+            <!-- Modal -->
+            <div x-show="open" x-transition class="fixed inset-0 flex items-center justify-center z-50">
+                <!-- Blurry backdrop -->
+                <div class="fixed inset-0 bg-white/20 backdrop-blur-md" @click="open = false"></div>
+
+                <!-- Modal Panel -->
+                <form method="POST" action="{{ route('profile.destroy') }}" 
+                      class="bg-white/70 backdrop-blur-md rounded-2xl p-6 relative z-50 w-full max-w-lg space-y-4 border border-gray-200">
+                    @csrf
+                    @method('delete')
+
+                    <h2 class="text-2xl font-bold text-gray-900">Confirm Account Deletion</h2>
+                    <p class="text-gray-700">Enter your password to confirm deletion.</p>
+
+                    <div>
+                        <input type="password" name="password" placeholder="Password" 
+                               class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300"/>
+                        @error('password')
+                            <p class="text-red-500 mt-1 text-sm">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <button type="button" @click="open = false" 
+                                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                            Cancel
+                        </button>
+
+                        <button type="submit" 
+                                class="px-4 py-2 rounded-full border-2 border-red-500 bg-red-500 text-white font-bold hover:bg-red-600 transition">
+                            Delete Account
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div>
-            <x-input-label for="profile_photo" value="Profile Photo" class="text-white"/>
-            <input type="file" name="profile_photo" id="profile_photo" class="mt-1 block w-full text-white"/>
-            <x-input-error :messages="$errors->get('profile_photo')" class="mt-2 text-yellow-400"/>
-        </div>
-
-        <x-primary-button class="bg-yellow-400 text-black hover:bg-yellow-300">
-            Update Profile
-        </x-primary-button>
-    </form>
-
-    {{-- Delete Account --}}
-    <div x-data="{ open: false }" class="mt-6">
-        <button @click="open = true" class="bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-2 rounded">
-            Delete Account
-        </button>
-
-        <div x-show="open" x-transition class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="fixed inset-0 bg-black bg-opacity-50" @click="open = false"></div>
-
-            <form method="POST" action="{{ route('profile.destroy') }}" class="bg-black bg-opacity-90 text-white rounded-2xl p-6 relative z-50 max-w-lg w-full space-y-4">
-                @csrf
-                @method('delete')
-
-                <h2 class="text-2xl font-bold">Are you sure you want to delete your account?</h2>
-                <p class="text-gray-300">This action is permanent. Enter your password to confirm.</p>
-
-                <div>
-                    <input type="password" name="password" placeholder="Password" class="w-full p-2 rounded text-black"/>
-                    @error('password')
-                        <p class="text-yellow-400 mt-1 text-sm">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="flex justify-end space-x-3">
-                    <button type="button" @click="open = false" class="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500">
-                        Cancel
-                    </button>
-
-                    <button type="submit" class="px-4 py-2 rounded bg-yellow-400 hover:bg-yellow-300 text-black">
-                        Delete Account
-                    </button>
-                </div>
-            </form>
-        </div>
     </div>
-
 </div>
 @endsection

@@ -3,9 +3,13 @@
 @section('content')
 <div class="max-w-3xl mx-auto p-6 space-y-6">
 
-    <div class="post-item bg-gray-900 p-4 rounded-2xl shadow-lg" id="post-{{ $post->id }}">
-        <h1 class="text-2xl text-yellow-400 font-bold">{{ $post->title }}</h1>
-        <p class="text-gray-300 mt-1">{{ $post->content }}</p>
+    <div class="post-item p-4 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm"
+         id="post-{{ $post->id }}">
+
+        <h1 class="text-2xl font-bold text-gray-900">{{ $post->title }}</h1>
+        <p class="text-gray-600 mt-1">{{ $post->content }}</p>
 
         @if($post->media_path)
             <img src="{{ asset('storage/' . $post->media_path) }}" 
@@ -13,7 +17,7 @@
                  class="rounded-lg mt-3 max-w-full h-auto">
         @endif
 
-        <p class="text-gray-400 mt-2 text-sm">
+        <p class="text-gray-500 mt-2 text-sm">
             Posted by {{ $post->user->name }} in {{ $post->group->name }}
         </p>
 
@@ -28,7 +32,7 @@
             <button type="button" class="like-btn flex items-center gap-1" data-post="{{ $post->id }}">
                 <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
                      alt="Like" class="w-6 h-6 inline-block">
-                <span class="like-count text-yellow-400 font-bold">
+                <span class="like-count text-gray-700 font-semibold">
                     {{ $post->likes_count ?? $post->likes->count() }}
                 </span>
             </button>
@@ -36,7 +40,7 @@
             {{-- Comments --}}
             <div class="flex items-center gap-1">
                 <img src="{{ asset('icons/comment.svg') }}" alt="Comments" class="w-6 h-6">
-                <span class="comment-count text-yellow-400 font-bold">
+                <span class="comment-count text-gray-700 font-semibold">
                     {{ $post->comments_count ?? $post->comments->count() }}
                 </span>
             </div>
@@ -66,7 +70,7 @@
         <form class="comment-form mt-3" data-post="{{ $post->id }}">
             @csrf
             <input name="content" required
-                   class="w-full p-2 rounded bg-black text-yellow-400 border-2 border-yellow-400"
+                   class="w-full p-2 rounded bg-white text-gray-900 border-2 border-gray-300"
                    placeholder="Write a comment...">
         </form>
     </div>

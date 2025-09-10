@@ -4,16 +4,20 @@
     $liked = auth()->check() && $post->likes->contains(auth()->id());
 @endphp
 
-<div class="post-item bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition" id="post-{{ $post->id }}">
+<div class="post-item p-4 rounded-2xl 
+            bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+            backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition"
+     id="post-{{ $post->id }}">
+
     <div class="flex justify-between items-center">
-        <p class="text-yellow-400 font-bold">{{ $post->user->name }}</p>
-        <span class="text-gray-400 text-sm">{{ $post->created_at->diffForHumans() }}</span>
+        <p class="text-gray-900 font-bold">{{ $post->user->name }}</p>
+        <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
     </div>
 
-    <h3 class="text-xl font-semibold text-white mt-2">{{ $post->title }}</h3>
+    <h3 class="text-xl font-semibold text-gray-900 mt-2">{{ $post->title }}</h3>
 
     @if(filled($post->content))
-        <p class="text-gray-300 mt-1">{{ $post->content }}</p>
+        <p class="text-gray-600 mt-1">{{ $post->content }}</p>
     @endif
 
     @if($post->media_path)
@@ -30,7 +34,7 @@
         <button type="button" class="like-btn flex items-center gap-1" data-post="{{ $post->id }}">
             <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
                  alt="Like" class="w-6 h-6 inline-block">
-            <span class="like-count text-yellow-400 font-bold">
+            <span class="like-count text-gray-700 font-semibold">
                 {{ $post->likes_count ?? $post->likes->count() }}
             </span>
         </button>
@@ -38,7 +42,7 @@
         {{-- Comments --}}
         <div class="flex items-center gap-1">
             <img src="{{ asset('icons/comment.svg') }}" alt="Comments" class="w-6 h-6">
-            <span class="comment-count text-yellow-400 font-bold">
+            <span class="comment-count text-gray-700 font-semibold">
                 {{ $post->comments_count ?? $post->comments->count() }}
             </span>
         </div>
