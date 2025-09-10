@@ -8,7 +8,6 @@
 
     <div class="space-y-6 max-w-3xl mx-auto">
         @forelse($posts as $post)
-            {{-- Link to the group page instead of posts.show --}}
             <a href="{{ route('groups.show', $post->group) }}" class="block group">
                 <div class="p-5 bg-gray-900 rounded-2xl shadow-lg border border-gray-700 
                             group-hover:border-yellow-400 group-hover:bg-gray-800 transition">
@@ -29,7 +28,7 @@
                         </h2>
                     @endif
 
-                    {{-- Content preview (first ~200 chars) --}}
+                    {{-- Content preview --}}
                     @if($post->content)
                         <p class="text-gray-300 mb-3">
                             {{ \Illuminate\Support\Str::limit($post->content, 200) }}
@@ -37,22 +36,19 @@
                     @endif
 
                     {{-- Image preview --}}
-                    @if($post->media_url)
+                    @if($post->media_path)
                         <div class="mt-2">
-                            <img src="{{ asset('storage/' . $post->media_url) }}" 
-                                 alt="Post Image" 
-                                 class="rounded-lg max-h-64 w-full object-cover shadow-md">
+                            <img src="{{ Storage::url($post->media_path) }}" 
+                                 alt="Post image" 
+                                 class="rounded-lg max-h-64 w-full object-cover shadow-md"
+                                 onerror="this.style.display='none'">
                         </div>
                     @endif
 
-                    {{-- Footer: likes & comments --}}
+                    {{-- Footer --}}
                     <div class="flex justify-between items-center text-sm text-gray-400 mt-4">
-                        <span class="flex items-center gap-1">
-                            ❤️ <span>{{ $post->likes->count() }}</span>
-                        </span>
-                        <span class="flex items-center gap-1">
-                            💬 <span>{{ $post->comments->count() }}</span>
-                        </span>
+                        <span class="flex items-center gap-1">❤️ {{ $post->likes->count() }}</span>
+                        <span class="flex items-center gap-1">💬 {{ $post->comments->count() }}</span>
                     </div>
                 </div>
             </a>
