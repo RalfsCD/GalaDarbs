@@ -10,17 +10,11 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// Root (avoid duplicate 'dashboard' name with /dashboard)
+// Root
 Route::get('/', [PageController::class, 'dashboard'])->name('home');
 
-// Authenticated routes (NO 'verified' middleware anymore)
 Route::middleware(['auth'])->group(function () {
+
     // Dashboard
     Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
 
@@ -38,16 +32,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
 
-    // Posts (AJAX endpoints)
-    Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('groups.posts.store');
+    // Posts
+    Route::get('/groups/{group}/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    // Likes & Comments (AJAX endpoints)
+    // Likes & Comments
     Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
-
-    // Optional details page
-    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
     // News
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
@@ -64,5 +57,4 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Auth routes (Breeze/Jetstream/default)
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

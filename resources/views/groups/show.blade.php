@@ -3,24 +3,22 @@
 @section('content')
 <div class="max-w-4xl mx-auto p-6 space-y-6">
 
+    {{-- Group Info --}}
     <div class="bg-gray-900 border border-gray-700 p-5 rounded-2xl shadow-lg">
         <h1 class="text-3xl text-yellow-400 font-bold">{{ $group->name }}</h1>
         <p class="text-gray-300 mt-1">{{ $group->description }}</p>
     </div>
 
-    <div class="bg-gray-800 p-4 rounded-xl shadow border border-gray-700">
-        <form id="create-post-form" enctype="multipart/form-data">
-            @csrf
-            <input type="text" name="title" placeholder="Post title..." 
-                   class="w-full p-2 mb-2 rounded bg-black text-yellow-400 border-2 border-yellow-400" required>
-            <textarea name="content" rows="3" placeholder="Content..." 
-                      class="w-full p-2 mb-2 rounded bg-black text-yellow-400 border-2 border-yellow-400"></textarea>
-            <input type="file" name="media" class="mb-2">
-            <button class="bg-yellow-400 text-black px-4 py-2 rounded font-bold">Post</button>
-        </form>
+    {{-- Create Post button --}}
+    <div class="mt-4">
+        <a href="{{ route('posts.create', $group) }}" 
+           class="bg-yellow-400 text-black px-4 py-2 rounded font-bold hover:bg-yellow-300">
+           Create Post
+        </a>
     </div>
 
-    <div class="flex justify-end mb-2">
+    {{-- Sort Posts --}}
+    <div class="flex justify-end mt-4 mb-2">
         <select id="sort-posts" class="bg-gray-900 text-yellow-400 p-2 rounded border border-gray-700">
             <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
             <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
@@ -28,14 +26,40 @@
         </select>
     </div>
 
+    {{-- Posts Feed (Preview Only) --}}
     <div id="posts-container" class="space-y-6">
-        @foreach($posts as $post)
-            <a href="{{ route('posts.show', $post) }}" class="block group">
-                @include('partials.post', ['post' => $post])
+        @forelse($posts as $post)
+            <a href="{{ route('posts.show', $post) }}" class="block group no-underline">
+                <div class="post-item bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition">
+                    <div class="flex justify-between items-center">
+                        <p class="text-yellow-400 font-bold">{{ $post->user->name }}</p>
+                        <span class="text-gray-400 text-sm">{{ $post->created_at->diffForHumans() }}</span>
+                    </div>
+
+                    <h3 class="text-xl font-semibold text-white mt-2">{{ $post->title }}</h3>
+
+                    @if(filled($post->content))
+                        <p class="text-gray-300 mt-1">{{ $post->content }}</p>
+                    @endif
+
+                    @if($post->media_path)
+                        <div class="mt-3">
+                            <img src="{{ asset('storage/' . $post->media_path) }}" 
+                                 alt="Post Image" 
+                                 class="rounded-lg max-w-full h-auto">
+                        </div>
+                    @endif
+
+                    <div class="mt-3 flex items-center gap-4">
+                        <span class="text-yellow-400">❤️ {{ $post->likes_count ?? $post->likes->count() }}</span>
+                        <span class="text-gray-400">{{ $post->comments_count ?? $post->comments->count() }} {{ ($post->comments_count ?? $post->comments->count()) === 1 ? 'comment' : 'comments' }}</span>
+                    </div>
+                </div>
             </a>
-        @endforeach
+        @empty
+            <p class="text-gray-400">No posts yet in this group.</p>
+        @endforelse
     </div>
 </div>
 
-@include('partials.post-scripts', ['groupId' => $group->id])
 @endsection

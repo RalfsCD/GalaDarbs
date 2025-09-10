@@ -10,20 +10,25 @@ use Illuminate\Support\Facades\Auth;
 class GroupController extends Controller
 {
     public function index(Request $request)
-    {
-        $topicId = $request->query('topic');
+{
+    $topicId = $request->query('topic');
+    $search  = $request->query('search');
 
-        $groups = Group::query()
-            ->with('topics')
-            ->when($topicId, fn($q) =>
-                $q->whereHas('topics', fn($qq) => $qq->where('topics.id', $topicId))
-            )
-            ->get();
+    $groups = Group::query()
+        ->with(['topics', 'creator', 'members'])
+        ->when($topicId, fn($q) =>
+            $q->whereHas('topics', fn($qq) => $qq->where('topics.id', $topicId))
+        )
+        ->when($search, fn($q) =>
+            $q->where('name', 'like', '%' . $search . '%')
+        )
+        ->get();
 
-        $topics = Topic::all();
+    $topics = Topic::all();
 
-        return view('groups.index', compact('groups', 'topics'));
-    }
+    return view('groups.index', compact('groups', 'topics'));
+}
+
 
     public function create()
     {
