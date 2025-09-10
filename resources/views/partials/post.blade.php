@@ -1,7 +1,37 @@
-
 @php
     /** @var \App\Models\Post $post */
     $isOwner  = auth()->check() && (int) auth()->id() === (int) $post->user_id;
+
+    // make Storage and Str available in this template
+    use Illuminate\Support\Facades\Storage;
+    use Illuminate\Support\Str;
+
+    // Compute a robust URL for the media file.
+    $mediaUrl = null;
+    if (!empty($post->media_url)) {
+        // raw value as saved in DB
+        $raw = $post->media_url;
+
+        // Normalize common prefixes that may have been stored accidentally
+        // e.g. "storage/posts/...", "public/posts/...", "/storage/posts/..."
+        $normalized = preg_replace('#^/+|^storage/|^public/#i', '', $raw);
+
+        // If file exists on the public disk at normalized path, use Storage::url()
+        if ($normalized && Storage::disk('public')->exists($normalized)) {
+            $mediaUrl = Storage::url($normalized); // e.g. /storage/posts/filename.jpg
+        } else {
+            // If the DB value is already a full URL or absolute path, try to use it directly
+            if (Str::startsWith($raw, ['http://', 'https://'])) {
+                $mediaUrl = $raw;
+            } elseif (Str::startsWith($raw, ['/'])) {
+                // absolute path — use as-is (browser resolves it)
+                $mediaUrl = $raw;
+            } else {
+                // As a last fallback, try asset('storage/...') — covers cases where media_url is "posts/..."
+                $mediaUrl = asset('storage/' . ltrim($raw, '/'));
+            }
+        }
+    }
 @endphp
 
 <div class="post-item bg-gray-800 p-4 rounded mb-4" id="post-{{ $post->id }}">
@@ -30,13 +60,17 @@
         <p class="text-gray-300 mt-1">{{ $post->content }}</p>
     @endif
 
-    @if($post->media_url)
+    {{-- Image (if available) --}}
+    @if($mediaUrl)
     <div class="mt-3">
-        <img src="{{ asset('storage/' . $post->media_url) }}" 
-             alt="Post image" 
+        {{-- loading="lazy" and hide element on error to avoid showing the alt text when src is broken --}}
+        <img src="{{ $mediaUrl }}"
+             alt="Post image"
+             loading="lazy"
+             onerror="this.style.display='none'"
              class="rounded-lg max-w-full h-auto">
     </div>
-@endif
+    @endif
 
     <div class="mt-3 flex items-center gap-4">
         <button type="button"
