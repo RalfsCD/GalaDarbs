@@ -4,7 +4,6 @@
 @endphp
 
 <div class="post-item p-5 bg-gray-900 rounded-2xl shadow-lg border border-gray-700 mb-6" id="post-{{ $post->id }}">
-    {{-- Header --}}
     <div class="flex justify-between items-center mb-3">
         <div>
             <p class="text-yellow-400 font-bold">{{ $post->user->name ?? 'Unknown' }}</p>
@@ -13,17 +12,14 @@
         <span class="text-gray-500 text-xs">{{ $post->created_at->diffForHumans() }}</span>
     </div>
 
-    {{-- Title --}}
     @if($post->title)
         <h3 class="text-xl font-semibold text-white mb-2">{{ $post->title }}</h3>
     @endif
 
-    {{-- Content --}}
     @if(filled($post->content))
         <p class="text-gray-300 mb-3">{{ $post->content }}</p>
     @endif
 
-    {{-- Media --}}
     @if($post->media_path)
         <div class="mt-2">
             <img src="{{ Storage::url($post->media_path) }}" 
@@ -33,7 +29,6 @@
         </div>
     @endif
 
-    {{-- Footer --}}
     <div class="mt-4 flex items-center gap-6">
         <button type="button"
                 class="like-btn text-yellow-400 hover:text-yellow-300 {{ auth()->check() && $post->likes->contains(auth()->id()) ? 'liked' : '' }}"
@@ -47,14 +42,12 @@
         </span>
     </div>
 
-    {{-- Comments --}}
     <div class="comments-container mt-4 space-y-2">
         @foreach($post->comments as $comment)
             @include('partials.comment', ['comment' => $comment])
         @endforeach
     </div>
 
-    {{-- Comment form --}}
     <form class="comment-form mt-3" data-post="{{ $post->id }}">
         @csrf
         <input name="content" required
@@ -62,7 +55,6 @@
                placeholder="Write a comment...">
     </form>
 
-    {{-- Delete button --}}
     @if($isOwner)
     <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
           onsubmit="return confirm('Delete this post?');"

@@ -8,11 +8,10 @@
 
     <div class="space-y-6 max-w-3xl mx-auto">
         @forelse($posts as $post)
-            <a href="{{ route('groups.show', $post->group) }}" class="block group">
+            <a href="{{ route('posts.show', $post) }}" class="block group">
                 <div class="p-5 bg-gray-900 rounded-2xl shadow-lg border border-gray-700 
                             group-hover:border-yellow-400 group-hover:bg-gray-800 transition">
 
-                    {{-- Header --}}
                     <div class="flex justify-between items-center mb-3">
                         <div>
                             <p class="text-yellow-400 font-bold">{{ $post->user->name }}</p>
@@ -21,21 +20,18 @@
                         <span class="text-gray-500 text-xs">{{ $post->created_at->diffForHumans() }}</span>
                     </div>
 
-                    {{-- Title --}}
                     @if($post->title)
                         <h2 class="text-xl font-bold text-white mb-2 group-hover:text-yellow-300">
                             {{ $post->title }}
                         </h2>
                     @endif
 
-                    {{-- Content preview --}}
                     @if($post->content)
                         <p class="text-gray-300 mb-3">
                             {{ \Illuminate\Support\Str::limit($post->content, 200) }}
                         </p>
                     @endif
 
-                    {{-- Image preview --}}
                     @if($post->media_path)
                         <div class="mt-2">
                             <img src="{{ Storage::url($post->media_path) }}" 
@@ -45,7 +41,6 @@
                         </div>
                     @endif
 
-                    {{-- Footer --}}
                     <div class="flex justify-between items-center text-sm text-gray-400 mt-4">
                         <span class="flex items-center gap-1">❤️ {{ $post->likes->count() }}</span>
                         <span class="flex items-center gap-1">💬 {{ $post->comments->count() }}</span>
