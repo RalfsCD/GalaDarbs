@@ -50,9 +50,24 @@
                         </div>
                     @endif
 
-                    <div class="mt-3 flex items-center gap-4">
-                        <span class="text-yellow-400">❤️ {{ $post->likes_count ?? $post->likes->count() }}</span>
-                        <span class="text-gray-400">{{ $post->comments_count ?? $post->comments->count() }} {{ ($post->comments_count ?? $post->comments->count()) === 1 ? 'comment' : 'comments' }}</span>
+           {{-- Likes & Comments --}}
+<div class="mt-3 flex items-center gap-4">
+    {{-- Like --}}
+    <div class="flex items-center gap-1">
+        @php
+            $liked = auth()->check() && $post->likes->contains(auth()->id());
+        @endphp
+        <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
+             alt="Like" class="w-5 h-5">
+        <span class="text-yellow-400">{{ $post->likes_count ?? $post->likes->count() }}</span>
+    </div>
+
+    {{-- Comments --}}
+    <div class="flex items-center gap-1">
+        <img src="{{ asset('icons/comment.svg') }}" alt="Comment" class="w-5 h-5">
+        <span class="text-gray-400">{{ $post->comments_count ?? $post->comments->count() }}</span>
+    </div>
+</div>
                     </div>
                 </div>
             </a>
@@ -61,5 +76,4 @@
         @endforelse
     </div>
 </div>
-
 @endsection

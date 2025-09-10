@@ -13,32 +13,43 @@
                  class="rounded-lg mt-3 max-w-full h-auto">
         @endif
 
-        <p class="text-gray-400 mt-2 text-sm">Posted by {{ $post->user->name }} in {{ $post->group->name }}</p>
+        <p class="text-gray-400 mt-2 text-sm">
+            Posted by {{ $post->user->name }} in {{ $post->group->name }}
+        </p>
 
-        {{-- Likes and Comments --}}
         @php
-            $isOwner  = auth()->check() && auth()->id() === $post->user_id;
+            $isOwner = auth()->check() && auth()->id() === $post->user_id;
+            $liked = auth()->check() && $post->likes->contains(auth()->id());
         @endphp
-        <div class="flex items-center gap-4 mt-3">
-            <button type="button"
-                    class="like-btn text-yellow-400 hover:text-yellow-300 {{ auth()->check() && $post->likes->contains(auth()->id()) ? 'liked' : '' }}"
-                    data-post="{{ $post->id }}">
-                ❤️ <span class="like-count">{{ $post->likes_count ?? $post->likes->count() }}</span>
+
+        {{-- Likes / Comments / Delete --}}
+        <div class="flex items-center gap-6 mt-3">
+            {{-- Like --}}
+            <button type="button" class="like-btn flex items-center gap-1" data-post="{{ $post->id }}">
+                <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
+                     alt="Like" class="w-6 h-6 inline-block">
+                <span class="like-count text-yellow-400 font-bold">
+                    {{ $post->likes_count ?? $post->likes->count() }}
+                </span>
             </button>
 
-            <span class="text-gray-400 comment-count">
-                {{ $post->comments_count ?? $post->comments->count() }}
-                {{ ($post->comments_count ?? $post->comments->count()) === 1 ? 'comment' : 'comments' }}
-            </span>
+            {{-- Comments --}}
+            <div class="flex items-center gap-1">
+                <img src="{{ asset('icons/comment.svg') }}" alt="Comments" class="w-6 h-6">
+                <span class="comment-count text-yellow-400 font-bold">
+                    {{ $post->comments_count ?? $post->comments->count() }}
+                </span>
+            </div>
 
+            {{-- Delete --}}
             @if($isOwner)
                 <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
                       onsubmit="return confirm('Are you sure you want to delete this post?');">
                     @csrf
                     @method('DELETE')
                     <input type="hidden" name="group_id" value="{{ $post->group_id }}">
-                    <button type="submit" class="text-red-500 hover:text-red-700">
-                        Delete
+                    <button type="submit">
+                        <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-6 h-6">
                     </button>
                 </form>
             @endif

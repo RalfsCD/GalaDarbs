@@ -8,7 +8,7 @@
 
     <div class="space-y-6 max-w-3xl mx-auto">
         @forelse($posts as $post)
-            <a href="{{ route('posts.show', $post) }}" class="block">
+            <a href="{{ route('posts.show', $post) }}" class="block no-underline">
                 <div class="p-4 bg-gray-800 rounded-lg shadow hover:bg-gray-700 transition">
                     <div class="flex justify-between items-center mb-2">
                         <div>
@@ -28,9 +28,22 @@
                         <img src="{{ asset('storage/' . $post->media_path) }}" alt="Post Image" class="rounded-lg mb-2">
                     @endif
 
-                    <div class="flex justify-between items-center text-sm text-gray-400 mt-3">
-                        <span>{{ $post->likes->count() }} Likes</span>
-                        <span>{{ $post->comments->count() }} Comments</span>
+                    {{-- Likes & Comments --}}
+                    <div class="flex items-center gap-4 mt-3">
+                        {{-- Like --}}
+                        @php
+                            $liked = auth()->check() && $post->likes->contains(auth()->id());
+                        @endphp
+                        <div class="flex items-center gap-1">
+                            <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
+                                 alt="Like" class="w-5 h-5">
+                            <span class="text-yellow-400">{{ $post->likes_count ?? $post->likes->count() }}</span>
+                        </div>
+
+                        {{-- Comment --}}
+                        <div class="flex items-center gap-1">
+                            <img src="{{ asset('icons/comment.svg') }}" alt="Comment" class="w-5 h-5">
+<span class="text-yellow-400">{{ $post->comments_count ?? $post->comments->count() }}</span>                        </div>
                     </div>
                 </div>
             </a>

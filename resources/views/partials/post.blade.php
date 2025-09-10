@@ -1,25 +1,13 @@
 @php
     /** @var \App\Models\Post $post */
-    $isOwner  = auth()->check() && (int) auth()->id() === (int) $post->user_id;
+    $isOwner  = auth()->check() && auth()->id() === $post->user_id;
+    $liked = auth()->check() && $post->likes->contains(auth()->id());
 @endphp
 
-<div class="post-item bg-gray-800 p-4 rounded-lg" id="post-{{ $post->id }}">
+<div class="post-item bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition" id="post-{{ $post->id }}">
     <div class="flex justify-between items-center">
-        <div class="text-yellow-400 font-bold">
-            {{ $post->user->name ?? 'Unknown' }}
-        </div>
-
-        @if($isOwner)
-            <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
-                  onsubmit="return confirm('Are you sure you want to delete this post?');">
-                @csrf
-                @method('DELETE')
-                <input type="hidden" name="group_id" value="{{ $post->group_id }}">
-                <button type="submit" class="text-red-500 hover:text-red-700">
-                    Delete
-                </button>
-            </form>
-        @endif
+        <p class="text-yellow-400 font-bold">{{ $post->user->name }}</p>
+        <span class="text-gray-400 text-sm">{{ $post->created_at->diffForHumans() }}</span>
     </div>
 
     <h3 class="text-xl font-semibold text-white mt-2">{{ $post->title }}</h3>
@@ -31,34 +19,41 @@
     @if($post->media_path)
         <div class="mt-3">
             <img src="{{ asset('storage/' . $post->media_path) }}" 
-                 alt="Post image" 
+                 alt="Post Image" 
                  class="rounded-lg max-w-full h-auto">
         </div>
     @endif
 
-    <div class="mt-3 flex items-center gap-4">
-        <button type="button"
-                class="like-btn text-yellow-400 hover:text-yellow-300 {{ auth()->check() && $post->likes->contains(auth()->id()) ? 'liked' : '' }}"
-                data-post="{{ $post->id }}">
-            ❤️ <span class="like-count">{{ $post->likes_count ?? $post->likes->count() }}</span>
+    {{-- Likes / Comments / Delete --}}
+    <div class="flex items-center gap-6 mt-3">
+        {{-- Like --}}
+        <button type="button" class="like-btn flex items-center gap-1" data-post="{{ $post->id }}">
+            <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
+                 alt="Like" class="w-6 h-6 inline-block">
+            <span class="like-count text-yellow-400 font-bold">
+                {{ $post->likes_count ?? $post->likes->count() }}
+            </span>
         </button>
 
-        <span class="text-gray-400 comment-count">
-            {{ $post->comments_count ?? $post->comments->count() }}
-            {{ ($post->comments_count ?? $post->comments->count()) === 1 ? 'comment' : 'comments' }}
-        </span>
-    </div>
+        {{-- Comments --}}
+        <div class="flex items-center gap-1">
+            <img src="{{ asset('icons/comment.svg') }}" alt="Comments" class="w-6 h-6">
+            <span class="comment-count text-yellow-400 font-bold">
+                {{ $post->comments_count ?? $post->comments->count() }}
+            </span>
+        </div>
 
-    <div class="comments-container mt-3 space-y-2">
-        @foreach($post->comments as $comment)
-            @include('partials.comment', ['comment' => $comment])
-        @endforeach
+        {{-- Delete --}}
+        @if($isOwner)
+            <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this post?');">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="group_id" value="{{ $post->group_id }}">
+                <button type="submit">
+                    <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-6 h-6">
+                </button>
+            </form>
+        @endif
     </div>
-
-    <form class="comment-form mt-3" data-post="{{ $post->id }}">
-        @csrf
-        <input name="content" required
-               class="w-full p-2 rounded bg-black text-yellow-400 border-2 border-yellow-400"
-               placeholder="Write a comment...">
-    </form>
 </div>
