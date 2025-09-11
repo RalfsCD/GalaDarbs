@@ -52,8 +52,10 @@ class TopicController extends Controller
      * Display a single topic with its groups.
      */
     public function show(Topic $topic)
-    {
-        $topic->load('groups.users'); // eager load groups and their members
-        return view('topics.show', compact('topic'));
-    }
+{
+    // Load groups and their members
+    $topic->load('groups.members', 'groups.topics', 'groups.creator');
+
+    return view('topics.show', compact('topic'));
+}
 }

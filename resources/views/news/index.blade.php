@@ -9,11 +9,12 @@
             <h1 class="text-3xl font-bold text-gray-900">Latest News</h1>
 
             @if(auth()->user() && auth()->user()->role === 'admin')
-                <a href="{{ route('news.create') }}" 
-                   class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
-                    + Add News
-                </a>
-            @endif
+    <a href="{{ route('news.create') }}" 
+       class="inline-flex items-center px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+        <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5 mr-2">
+        Add News
+    </a>
+@endif
         </div>
 
         <!-- News List -->

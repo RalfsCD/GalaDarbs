@@ -7,8 +7,9 @@
     <div class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-gray-900">Groups</h1>
         <a href="{{ route('groups.create') }}" 
-           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
-            + Create Group
+           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition flex items-center gap-2">
+            <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5">
+            <span>Create Group</span>
         </a>
     </div>
 
@@ -58,27 +59,12 @@
                     <p class="text-sm text-gray-500">Members: {{ $group->members->count() }}</p>
                 </a>
 
-                <!-- Join/Leave Buttons -->
-                <div class="mt-3 flex gap-2">
+                <!-- Joined Text -->
+                @auth
                     @if($group->members->contains(auth()->id()))
-                        <form action="{{ route('groups.leave', $group) }}" method="POST"
-                              onsubmit="return confirm('Are you sure you want to leave this group?');">
-                            @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 transition">
-                                Joined
-                            </button>
-                        </form>
-                    @else
-                        <form action="{{ route('groups.join', $group) }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
-                                Join
-                            </button>
-                        </form>
+                        <p class="mt-3 text-sm font-semibold text-gray-700">Joined</p>
                     @endif
-                </div>
+                @endauth
             </div>
         @empty
             <p class="text-gray-500">No groups yet. Be the first to create one!</p>
