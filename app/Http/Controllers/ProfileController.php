@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -10,12 +12,18 @@ use Illuminate\Support\Facades\Redirect;
 class ProfileController extends Controller
 {
     public function show() {
-        $user = Auth::user();
-        $followers = $user->followers()->count();
-        $following = $user->following()->count();
+    $user = Auth::user();
+    $followers = $user->followers()->count();
+    $following = $user->following()->count();
 
-        return view('profile.profile', compact('user', 'followers', 'following'));
-    }
+    // Get all posts by this user
+    $posts = Post::where('user_id', $user->id)
+                 ->latest()
+                 ->paginate(5);
+
+    return view('profile.profile', compact('user', 'followers', 'following', 'posts'));
+}
+
 
     public function settings() {
         return view('profile.settings', ['user' => Auth::user()]);

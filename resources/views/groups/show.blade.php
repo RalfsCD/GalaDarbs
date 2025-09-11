@@ -14,15 +14,15 @@
     {{-- Create Post button --}}
     <div class="mt-4">
         <a href="{{ route('posts.create', $group) }}" 
-           class="bg-gray-200 text-gray-900 px-4 py-2 rounded font-bold hover:bg-gray-300 transition">
-           Create Post
+           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+           + Create Post
         </a>
     </div>
 
     {{-- Sort Posts --}}
     <div class="flex justify-end mt-4 mb-2">
         <select id="sort-posts" 
-                class="bg-white text-gray-800 p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer">
             <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
             <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
             <option value="most_liked" {{ request('sort') === 'most_liked' ? 'selected' : '' }}>Most Liked</option>

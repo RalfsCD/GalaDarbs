@@ -1,55 +1,36 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('content')
-<div class="max-w-2xl mx-auto p-6 space-y-6">
+<main class="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50">
 
-    <!-- Page Header -->
-    <div class="p-5 rounded-2xl bg-white/30 backdrop-blur-sm border border-gray-200 shadow-sm hover:shadow-md transition">
-        <h1 class="text-3xl font-bold text-gray-900">Create Post in {{ $group->name }}</h1>
+    <!-- Container -->
+    <div class="w-full max-w-3xl bg-white/50 backdrop-blur-md border border-gray-200 rounded-3xl p-8 shadow-sm space-y-6">
+
+        <!-- Logo -->
+        <div class="flex justify-center">
+            <img src="{{ asset('images/logo.jpg') }}" alt="PostPit Logo" class="h-32 w-auto">
+        </div>
+
+        <!-- Welcome Text -->
+        <h1 class="text-3xl font-bold text-gray-900 text-center">
+    Welcome to PostPit
+</h1>
+
+        <p class="text-gray-700 text-center max-w-xl mx-auto">
+            Connect, share, and explore communities with PostPit. Join discussions, create posts, and discover new topics!
+        </p>
+
+        <!-- Buttons -->
+        <div class="flex justify-center gap-6 mt-4">
+            <a href="{{ route('login') }}" 
+               class="px-6 py-3 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 transition border-2 border-gray-300">
+                Log In
+            </a>
+            <a href="{{ route('register') }}" 
+               class="px-6 py-3 bg-gray-200 text-gray-900 font-bold rounded-lg hover:bg-gray-300 transition border-2 border-gray-300">
+                Register
+            </a>
+        </div>
     </div>
-
-    <!-- Form -->
-    <form action="{{ route('posts.store', $group) }}" method="POST" enctype="multipart/form-data" 
-          class="p-6 rounded-2xl bg-white/30 backdrop-blur-sm border border-gray-200 shadow-sm hover:shadow-md transition space-y-4">
-
-        @csrf
-
-        <!-- Title -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-1">Title</label>
-            <input type="text" name="title" value="{{ old('title') }}" required
-                   class="w-full p-3 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400">
-            @error('title') <p class="text-red-500 mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <!-- Content -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-1">Content</label>
-            <textarea name="content" rows="5"
-                      class="w-full p-3 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400">{{ old('content') }}</textarea>
-            @error('content') <p class="text-red-500 mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <!-- Media -->
-        <div>
-            <label class="block text-gray-700 font-medium mb-1">Media</label>
-            <input type="file" name="media" class="mt-1">
-            @error('media') <p class="text-red-500 mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <!-- Submit Button -->
-        <div class="flex justify-end">
-            <button type="submit" 
-                    class="px-6 py-3 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 transition">
-                Create Post
-            </button>
-        </div>
-    </form>
-
-    <!-- Back Link -->
-    <div class="flex justify-start mt-4">
-        <a href="{{ route('groups.show', $group) }}" 
-           class="text-gray-500 hover:text-gray-900 transition">← Back to Group</a>
-    </div>
-</div>
+</main>
 @endsection

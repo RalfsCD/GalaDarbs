@@ -6,7 +6,7 @@
     <title>PostPit</title>
     @vite('resources/css/app.css')
 </head>
-<body class="bg-black text-white">
+<body class="bg-gray-100 text-gray-900">
 
     @yield('content')
 
