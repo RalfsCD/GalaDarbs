@@ -4,7 +4,7 @@
 <div class="flex h-screen gap-6 bg-gray-100">
 
     <!-- Feed Section -->
-    <div class="flex-1 overflow-y-auto px-6 py-4 space-y-6 scrollbar-hide">
+    <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-hide">
         <h2 class="text-2xl font-extrabold text-gray-900">Newest Posts</h2>
 
         @forelse($posts as $post)
@@ -55,23 +55,25 @@
     </div>
 
     <!-- Groups Section -->
-    <div class="w-80 overflow-y-auto px-6 py-4 space-y-6 border-l border-gray-300 scrollbar-hide">
+    <div class="w-80 overflow-y-auto px-6 py-6 space-y-6 border-l border-gray-300 scrollbar-hide">
         <h2 class="text-2xl font-extrabold text-gray-900">Your Groups</h2>
 
         @forelse($joinedGroups as $group)
-            <div class="p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
-                <h3 class="text-xl font-bold text-gray-900">{{ $group->name }}</h3>
-                <p class="text-gray-600 mt-1">{{ $group->description ?? 'No description.' }}</p>
-                <p class="text-sm text-gray-700 mt-2">
-                    Topics: {{ $group->topics->pluck('name')->join(', ') }}
-                </p>
+            <a href="{{ route('groups.show', $group) }}" class="block no-underline">
+                <div class="p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <h3 class="text-xl font-bold text-gray-900">{{ $group->name }}</h3>
+                    <p class="text-gray-600 mt-1">{{ $group->description ?? 'No description.' }}</p>
+                    <p class="text-sm text-gray-700 mt-2">
+                        Topics: {{ $group->topics->pluck('name')->join(', ') }}
+                    </p>
 
-                @if($group->members->contains(auth()->id()))
-                    <span class="mt-3 inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-sm">
-                        Joined
-                    </span>
-                @endif
-            </div>
+                    @if($group->members->contains(auth()->id()))
+                        <span class="mt-3 inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-sm">
+                            Joined
+                        </span>
+                    @endif
+                </div>
+            </a>
         @empty
             <p class="text-gray-500">You haven’t joined any groups yet.</p>
         @endforelse

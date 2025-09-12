@@ -4,16 +4,18 @@
 <div class="max-w-4xl mx-auto p-6">
     <h1 class="text-3xl font-bold text-gray-900 mb-6">Topics</h1>
 
-    @if(auth()->check() && auth()->user()->isAdmin())
+   @if(auth()->check() && auth()->user()->isAdmin())
+    <div class="flex justify-end mb-4">
         <a href="{{ route('topics.create') }}" 
-           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition mb-4 inline-flex items-center space-x-2">
+           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center space-x-2">
            
            <!-- Add icon -->
            <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5">
            
            <span>Add Topic</span>
         </a>
-    @endif
+    </div>
+@endif
 
     <div class="space-y-6">
         @forelse($topics as $topic)
