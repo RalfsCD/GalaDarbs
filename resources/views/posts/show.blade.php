@@ -45,6 +45,31 @@
                 </span>
             </div>
 
+ {{-- Success message --}}
+@if(session('success'))
+    <p class="text-green-600 font-semibold mt-2">{{ session('success') }}</p>
+@endif
+
+{{-- Report Post Form --}}
+<form action="{{ route('reports.store', $post->id) }}" method="POST" class="mt-4 border p-4 rounded-lg bg-gray-50">
+    @csrf
+    <label class="block mb-2 font-semibold text-gray-700">Report this post:</label>
+    <select name="reason" required class="border rounded p-2 w-full mb-2">
+        <option value="" disabled selected>Select a reason</option>
+        <option value="Spam">Spam</option>
+        <option value="Harassment">Harassment</option>
+        <option value="Inappropriate content">Inappropriate content</option>
+        <option value="Misinformation">Misinformation</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <textarea name="details" rows="3" placeholder="Additional details (optional)" class="border rounded p-2 w-full mb-2"></textarea>
+
+    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+        Submit Report
+    </button>
+</form>
+
             {{-- Delete --}}
 @if($isOwner || (auth()->check() && auth()->user()->isAdmin()))
     <form action="{{ route('posts.destroy', $post->id) }}" method="POST"

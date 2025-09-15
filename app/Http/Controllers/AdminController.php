@@ -3,24 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Report;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    // Show all users
+    // Main admin index - only unsolved reports
     public function index()
     {
-        $users = User::latest()->paginate(10);
-        return view('admin.index', compact('users'));
+        $unsolvedReports = Report::with(['post', 'reportedUser', 'reporter'])
+                            ->where('resolved', false)
+                            ->latest()
+                            ->get();
+
+        return view('admin.index', compact('unsolvedReports'));
     }
 
-    // Delete a user
-    public function destroy(User $user)
+    // All reports page
+    public function reports()
+    {
+        $reports = Report::with(['post', 'reportedUser', 'reporter'])
+                         ->latest()
+                         ->get();
+
+        return view('admin.reports', compact('reports'));
+    }
+
+    // Users page
+    public function users()
+{
+    // Eager load warnings for each user
+    $users = User::with('warnings')->get();
+    return view('admin.users', compact('users'));
+}
+
+    // Delete user
+    public function destroyUser(User $user)
     {
         if ($user->isAdmin()) {
-            return redirect()->back()->with('error', 'You cannot delete another admin.');
+            return back()->with('error', 'Cannot delete admin accounts.');
         }
 
         $user->delete();
-        return redirect()->route('admin.index')->with('success', 'User deleted successfully.');
+        return back()->with('success', 'User deleted successfully.');
     }
 }

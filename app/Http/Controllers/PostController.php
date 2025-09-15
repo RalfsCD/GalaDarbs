@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\Warning;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -48,14 +49,27 @@ class PostController extends Controller
     // Delete post
  
 
+
 public function destroy(Post $post)
 {
-    if (auth()->id() !== $post->user_id && !auth()->user()->isAdmin()) {
+    $isAdmin = auth()->check() && auth()->user()->isAdmin();
+
+    if (auth()->id() !== $post->user_id && !$isAdmin) {
         abort(403, 'Unauthorized');
+    }
+
+    if ($isAdmin && auth()->id() !== $post->user_id) {
+        // Create a warning for the user whose post is deleted
+        \App\Models\Warning::create([
+            'user_id' => $post->user_id,
+            'post_id' => $post->id,
+            'reason' => 'Post deleted by admin',
+        ]);
     }
 
     $post->delete();
 
     return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
 }
+
 }

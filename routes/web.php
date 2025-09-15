@@ -7,8 +7,10 @@ use App\Http\Controllers\TopicController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
 // Root
 Route::get('/', [PageController::class, 'dashboard'])->name('home');
@@ -28,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show'); // supports ?sort=
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
 
@@ -41,6 +43,9 @@ Route::middleware(['auth'])->group(function () {
     // Likes & Comments
     Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
+
+    // Report posts
+    Route::post('/posts/{post}/report', [ReportController::class, 'store'])->name('reports.store');
 
     // News
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
@@ -57,11 +62,21 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Admin Panel
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', [\App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
-    Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminController::class, 'destroy'])->name('admin.users.destroy');
-});
+    Route::prefix('admin')->group(function () {
 
+        // Dashboard shows unsolved reports
+        Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+
+        // Users management
+        Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
+
+        // Reports management
+        Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+
+        // Resolve report
+        Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
+    });
 });
 
 require __DIR__.'/auth.php';

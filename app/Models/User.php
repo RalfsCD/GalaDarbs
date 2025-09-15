@@ -41,4 +41,8 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+    public function warnings()
+{
+    return $this->hasMany(Warning::class);
+}
 }
