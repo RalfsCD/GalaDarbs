@@ -55,6 +55,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Admin Panel
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin', [\App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
+    Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminController::class, 'destroy'])->name('admin.users.destroy');
+});
+
 });
 
 require __DIR__.'/auth.php';

@@ -46,17 +46,16 @@ class PostController extends Controller
     }
 
     // Delete post
-    public function destroy(Post $post, Request $request)
-    {
-        if ($post->user_id !== auth()->id()) {
-            abort(403);
-        }
+ 
 
-        $groupId = $request->input('group_id') ?? $post->group_id;
-        $post->delete();
-
-        return redirect("/groups/{$groupId}")
-               ->with('success', 'Post deleted successfully.');
+public function destroy(Post $post)
+{
+    if (auth()->id() !== $post->user_id && !auth()->user()->isAdmin()) {
+        abort(403, 'Unauthorized');
     }
-}
 
+    $post->delete();
+
+    return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
+}
+}

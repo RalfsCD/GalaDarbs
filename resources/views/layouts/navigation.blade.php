@@ -11,16 +11,20 @@
 
                 <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">
-                    @php
-                        $links = [
-                            ['name' => 'Home', 'route' => 'dashboard'],
-                            ['name' => 'Topics', 'route' => 'topics.index'],
-                            ['name' => 'Groups', 'route' => 'groups.index'],
-                            ['name' => 'News', 'route' => 'news.index'],
-                            ['name' => 'About', 'route' => 'about'],
-                            ['name' => 'Profile', 'route' => 'profile.show'],
-                        ];
-                    @endphp
+                  @php
+    $links = [
+        ['name' => 'Home', 'route' => 'dashboard'],
+        ['name' => 'Topics', 'route' => 'topics.index'],
+        ['name' => 'Groups', 'route' => 'groups.index'],
+        ['name' => 'News', 'route' => 'news.index'],
+        ['name' => 'About', 'route' => 'about'],
+        ['name' => 'Profile', 'route' => 'profile.show'],
+    ];
+
+    if(auth()->check() && auth()->user()->isAdmin()) {
+        $links[] = ['name' => 'Admin', 'route' => 'admin.index'];
+    }
+@endphp
 
                     @foreach ($links as $link)
                         <x-nav-link 

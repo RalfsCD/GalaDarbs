@@ -46,17 +46,19 @@
             </div>
 
             {{-- Delete --}}
-            @if($isOwner)
-                <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
-                      onsubmit="return confirm('Are you sure you want to delete this post?');">
-                    @csrf
-                    @method('DELETE')
-                    <input type="hidden" name="group_id" value="{{ $post->group_id }}">
-                    <button type="submit">
-                        <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-6 h-6">
-                    </button>
-                </form>
-            @endif
+@if($isOwner || (auth()->check() && auth()->user()->isAdmin()))
+    <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
+      onsubmit="return confirm('Are you sure you want to delete this post?');">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="group_id" value="{{ $post->group_id }}">
+    {{-- Tell the controller "after deleting, go back to THIS page" --}}
+    <input type="hidden" name="redirect_to" value="{{ url()->current() }}">
+    <button type="submit">
+        <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-6 h-6">
+    </button>
+</form>
+@endif
         </div>
 
         {{-- Comments --}}
