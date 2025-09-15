@@ -26,8 +26,9 @@
             $liked = auth()->check() && $post->likes->contains(auth()->id());
         @endphp
 
-        {{-- Likes / Comments / Delete --}}
+        {{-- Likes / Comments / Delete / Report --}}
         <div class="flex items-center gap-6 mt-3">
+
             {{-- Like --}}
             <button type="button" class="like-btn flex items-center gap-1" data-post="{{ $post->id }}">
                 <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
@@ -45,45 +46,29 @@
                 </span>
             </div>
 
- {{-- Success message --}}
-@if(session('success'))
-    <p class="text-green-600 font-semibold mt-2">{{ session('success') }}</p>
+           @if(auth()->check() && !auth()->user()->isAdmin() && auth()->id() !== $post->user_id)
+    <button type="button" id="reportBtn" class="flex items-center gap-1">
+        <img src="{{ asset('icons/report.svg') }}" alt="Report" class="w-6 h-6">
+    </button>
 @endif
 
-{{-- Report Post Form --}}
-<form action="{{ route('reports.store', $post->id) }}" method="POST" class="mt-4 border p-4 rounded-lg bg-gray-50">
-    @csrf
-    <label class="block mb-2 font-semibold text-gray-700">Report this post:</label>
-    <select name="reason" required class="border rounded p-2 w-full mb-2">
-        <option value="" disabled selected>Select a reason</option>
-        <option value="Spam">Spam</option>
-        <option value="Harassment">Harassment</option>
-        <option value="Inappropriate content">Inappropriate content</option>
-        <option value="Misinformation">Misinformation</option>
-        <option value="Other">Other</option>
-    </select>
-
-    <textarea name="details" rows="3" placeholder="Additional details (optional)" class="border rounded p-2 w-full mb-2"></textarea>
-
-    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
-        Submit Report
-    </button>
-</form>
+            {{-- Success message --}}
+            @if(session('success'))
+                <p class="text-green-600 font-semibold mt-2">{{ session('success') }}</p>
+            @endif
 
             {{-- Delete --}}
-@if($isOwner || (auth()->check() && auth()->user()->isAdmin()))
-    <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
-      onsubmit="return confirm('Are you sure you want to delete this post?');">
-    @csrf
-    @method('DELETE')
-    <input type="hidden" name="group_id" value="{{ $post->group_id }}">
-    {{-- Tell the controller "after deleting, go back to THIS page" --}}
-    <input type="hidden" name="redirect_to" value="{{ url()->current() }}">
-    <button type="submit">
-        <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-6 h-6">
-    </button>
-</form>
-@endif
+            @if($isOwner || (auth()->check() && auth()->user()->isAdmin()))
+                <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
+                      onsubmit="return confirm('Are you sure you want to delete this post?');">
+                    @csrf
+                    @method('DELETE')
+                    <input type="hidden" name="group_id" value="{{ $post->group_id }}">
+                    <button type="submit">
+                        <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-6 h-6">
+                    </button>
+                </form>
+            @endif
         </div>
 
         {{-- Comments --}}
@@ -103,5 +88,37 @@
     </div>
 </div>
 
+{{-- Report Modal --}}
+<div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg max-w-md w-full relative">
+        <button id="closeModal" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">&times;</button>
+        <h2 class="text-xl font-bold mb-4">Report Post</h2>
+        <form action="{{ route('reports.store', $post->id) }}" method="POST">
+            @csrf
+            <label class="block mb-2 font-semibold text-gray-700">Reason:</label>
+            <select name="reason" required class="border rounded p-2 w-full mb-2">
+                <option value="" disabled selected>Select a reason</option>
+                <option value="Spam">Spam</option>
+                <option value="Harassment">Harassment</option>
+                <option value="Inappropriate content">Inappropriate content</option>
+                <option value="Misinformation">Misinformation</option>
+                <option value="Other">Other</option>
+            </select>
+            <textarea name="details" rows="3" placeholder="Additional details (optional)" class="border rounded p-2 w-full mb-2"></textarea>
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Submit Report</button>
+        </form>
+    </div>
+</div>
+
 @include('partials.post-scripts', ['groupId' => $post->group_id])
+
+{{-- Modal JS --}}
+<script>
+document.getElementById('reportBtn').addEventListener('click', function() {
+    document.getElementById('reportModal').classList.remove('hidden');
+});
+document.getElementById('closeModal').addEventListener('click', function() {
+    document.getElementById('reportModal').classList.add('hidden');
+});
+</script>
 @endsection
