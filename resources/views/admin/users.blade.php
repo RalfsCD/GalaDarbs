@@ -5,42 +5,76 @@
 
     <h1 class="text-2xl font-bold mb-6">User Management</h1>
 
-    <a href="{{ route('admin.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition mb-4 inline-block">
+    {{-- Back Button --}}
+    <a href="{{ route('admin.index') }}" 
+       class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center">
         Back to Admin Dashboard
     </a>
 
-    <table class="w-full border mt-2">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="p-2 text-left">ID</th>
-                <th class="p-2 text-left">Name</th>
-                <th class="p-2 text-left">Email</th>
-                <th class="p-2 text-left">Warnings</th>
-                <th class="p-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($users as $user)
-                <tr class="border-t">
-                    <td class="p-2">{{ $user->id }}</td>
-                    <td class="p-2">{{ $user->name }}</td>
-                    <td class="p-2">{{ $user->email }}</td>
-                    <td class="p-2">{{ $user->warnings->count() ?? 0 }}</td>
-                    <td class="p-2">
-                        @if(!$user->isAdmin())
-                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                                  onsubmit="return confirm('Delete user?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="px-3 py-1 bg-red-500 text-white rounded">Delete</button>
-                            </form>
-                        @else
-                            <span class="text-gray-500 font-semibold">Admin</span>
-                        @endif
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    {{-- Search & Sort --}}
+    <form method="GET" class="flex flex-col sm:flex-row gap-2 mb-4 items-start sm:items-center">
+        <input type="text" name="search" value="{{ request('search') }}" 
+               placeholder="Search by name or email..."
+               class="flex-1 px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+
+        <select name="sort" class="px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300">
+            <option value="">Sort By</option>
+            <option value="warnings_desc" {{ request('sort')=='warnings_desc' ? 'selected' : '' }}>Most Warnings</option>
+            <option value="warnings_asc" {{ request('sort')=='warnings_asc' ? 'selected' : '' }}>Least Warnings</option>
+            <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected' : '' }}>Name A-Z</option>
+            <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected' : '' }}>Name Z-A</option>
+        </select>
+
+        <button type="submit" 
+                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+            Apply
+        </button>
+    </form>
+
+    <div class="space-y-4">
+        @forelse($users as $user)
+            <div class="p-4 rounded-2xl 
+                        bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                        backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col sm:flex-row justify-between items-start sm:items-center">
+
+                {{-- User Info --}}
+                <div class="space-y-1">
+                    <p class="font-bold text-gray-900">{{ $user->name }}</p>
+                    <p class="text-gray-600 text-sm">{{ $user->email }}</p>
+                    <p class="text-gray-500 text-sm">
+                        Warnings: 
+                        <span class="@if($user->warnings->count() >= 3) text-red-600 font-bold 
+                                      @elseif($user->warnings->count() >= 1) text-yellow-600 font-semibold 
+                                      @else text-gray-500 @endif">
+                            {{ $user->warnings->count() ?? 0 }}
+                        </span>
+                    </p>
+                </div>
+
+                {{-- Actions --}}
+                <div class="mt-2 sm:mt-0 flex gap-2 items-center">
+                    @if(!$user->isAdmin())
+                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
+                              onsubmit="return confirm('Delete user?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="hover:opacity-70 transition">
+                                <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-5 h-5">
+                            </button>
+                        </form>
+                    @else
+                        <span class="text-gray-500 font-semibold">Admin</span>
+                    @endif
+                </div>
+            </div>
+        @empty
+            <p class="text-gray-500">No users found.</p>
+        @endforelse
+    </div>
+
+    {{-- Pagination --}}
+    <div class="mt-4">
+        {{ $users->appends(request()->query())->links() }}
+    </div>
 </div>
 @endsection

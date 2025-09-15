@@ -6,11 +6,13 @@
     <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
     {{-- Navigation Buttons --}}
-    <div class="flex space-x-4 mb-6">
-        <a href="{{ route('admin.reports') }}" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+    <div class="flex flex-wrap gap-2 mb-6">
+        <a href="{{ route('admin.reports') }}" 
+           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center">
             All Reports
         </a>
-        <a href="{{ route('admin.users') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+        <a href="{{ route('admin.users') }}" 
+           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center">
             Users
         </a>
     </div>
@@ -18,31 +20,40 @@
     {{-- Unsolved Reports --}}
     <h2 class="text-xl font-semibold mb-2">Unsolved Reports</h2>
 
-    @forelse($unsolvedReports as $report)
-        <div class="p-4 rounded-lg border bg-white shadow-sm mb-4">
-            <p><strong>Post:</strong>
-                @if($report->post && $report->post->id)
-                    <a href="{{ route('posts.show', $report->post->id) }}" class="text-blue-600 hover:underline">
-                        {{ Str::limit($report->post->title, 50) }}
-                    </a>
-                @else
-                    <span class="text-gray-500">[Deleted]</span>
-                @endif
-            </p>
-            <p><strong>Reported User:</strong> {{ $report->reportedUser->name }}</p>
-            <p><strong>Reporter:</strong> {{ $report->reporter->name }}</p>
-            <p><strong>Reason:</strong> {{ $report->reason }}</p>
-            <p><strong>Details:</strong> {{ $report->details ?? 'N/A' }}</p>
+    <div class="space-y-4">
+        @forelse($unsolvedReports as $report)
+            <div class="p-4 rounded-2xl 
+                        bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                        backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
 
-            {{-- Resolve Button --}}
-            <form action="{{ route('admin.reports.resolve', $report->id) }}" method="POST" class="mt-2">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Mark Resolved</button>
-            </form>
-        </div>
-    @empty
-        <p>No unsolved reports!</p>
-    @endforelse
+                <p><strong>Post:</strong>
+                    @if($report->post && $report->post->id)
+                        <a href="{{ route('posts.show', $report->post->id) }}" class="text-blue-600 hover:underline">
+                            {{ Str::limit($report->post->title, 50) }}
+                        </a>
+                    @else
+                        <span class="text-gray-500">[Deleted]</span>
+                    @endif
+                </p>
+
+                <p><strong>Reported User:</strong> {{ $report->reportedUser->name }}</p>
+                <p><strong>Reporter:</strong> {{ $report->reporter->name }}</p>
+                <p><strong>Reason:</strong> {{ $report->reason }}</p>
+                <p><strong>Details:</strong> {{ $report->details ?? 'N/A' }}</p>
+
+                {{-- Resolve Button --}}
+                <form action="{{ route('admin.reports.resolve', $report->id) }}" method="POST" class="mt-3">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" 
+                            class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                        Mark Resolved
+                    </button>
+                </form>
+            </div>
+        @empty
+            <p class="text-gray-500">No unsolved reports!</p>
+        @endforelse
+    </div>
 </div>
 @endsection

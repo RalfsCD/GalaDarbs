@@ -5,37 +5,52 @@
 
     <h1 class="text-2xl font-bold mb-6">All Reports</h1>
 
-    <a href="{{ route('admin.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition mb-4 inline-block">
+    {{-- Back Button --}}
+    <a href="{{ route('admin.index') }}" 
+       class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center mb-4">
         Back to Admin Dashboard
     </a>
 
-    @forelse($reports as $report)
-        <div class="p-4 rounded-lg border bg-white shadow-sm mb-4">
-            <p><strong>Post:</strong>
-                @if($report->post && $report->post->id)
-                    <a href="{{ route('posts.show', $report->post->id) }}" class="text-blue-600 hover:underline">
-                        {{ Str::limit($report->post->title, 50) }}
-                    </a>
-                @else
-                    <span class="text-gray-500">[Deleted]</span>
-                @endif
-            </p>
-            <p><strong>Reported User:</strong> {{ $report->reportedUser->name }}</p>
-            <p><strong>Reporter:</strong> {{ $report->reporter->name }}</p>
-            <p><strong>Reason:</strong> {{ $report->reason }}</p>
-            <p><strong>Details:</strong> {{ $report->details ?? 'N/A' }}</p>
-            <p><strong>Status:</strong> {{ $report->resolved ? 'Resolved' : 'Pending' }}</p>
+    <div class="space-y-4">
+        @forelse($reports as $report)
+            <div class="p-4 rounded-2xl 
+                        bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                        backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
 
-            @if(!$report->resolved)
-                <form action="{{ route('reports.resolve', $report->id) }}" method="POST" class="mt-2">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="px-3 py-1 bg-green-500 text-white rounded">Mark Resolved</button>
-                </form>
-            @endif
-        </div>
-    @empty
-        <p>No reports available.</p>
-    @endforelse
+                <p><strong>Post:</strong>
+                    @if($report->post && $report->post->id)
+                        <a href="{{ route('posts.show', $report->post->id) }}" class="text-blue-600 hover:underline">
+                            {{ Str::limit($report->post->title, 50) }}
+                        </a>
+                    @else
+                        <span class="text-gray-500">[Deleted]</span>
+                    @endif
+                </p>
+
+                <p><strong>Reported User:</strong> {{ $report->reportedUser->name }}</p>
+                <p><strong>Reporter:</strong> {{ $report->reporter->name }}</p>
+                <p><strong>Reason:</strong> {{ $report->reason }}</p>
+                <p><strong>Details:</strong> {{ $report->details ?? 'N/A' }}</p>
+                <p><strong>Status:</strong> 
+                    <span class="@if($report->resolved) text-green-600 font-semibold @else text-yellow-600 font-semibold @endif">
+                        {{ $report->resolved ? 'Resolved' : 'Pending' }}
+                    </span>
+                </p>
+
+                @if(!$report->resolved)
+                    <form action="{{ route('admin.reports.resolve', $report->id) }}" method="POST" class="mt-3">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" 
+                                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                            Mark Resolved
+                        </button>
+                    </form>
+                @endif
+            </div>
+        @empty
+            <p class="text-gray-500">No reports available.</p>
+        @endforelse
+    </div>
 </div>
 @endsection

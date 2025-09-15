@@ -30,12 +30,41 @@ class AdminController extends Controller
     }
 
     // Users page
-    public function users()
+    public function users(Request $request)
 {
-    // Eager load warnings for each user
-    $users = User::with('warnings')->get();
+    $query = User::with('warnings');
+
+    // Search
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('name', 'like', "%{$request->search}%")
+              ->orWhere('email', 'like', "%{$request->search}%");
+        });
+    }
+
+    // Sort
+    if ($request->sort) {
+        switch ($request->sort) {
+            case 'warnings_desc':
+                $query->withCount('warnings')->orderBy('warnings_count', 'desc');
+                break;
+            case 'warnings_asc':
+                $query->withCount('warnings')->orderBy('warnings_count', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+        }
+    }
+
+    $users = $query->paginate(10);
+
     return view('admin.users', compact('users'));
 }
+
 
     // Delete user
     public function destroyUser(User $user)

@@ -64,7 +64,7 @@ Route::middleware(['auth'])->group(function () {
     // Admin Panel
     Route::prefix('admin')->group(function () {
 
-        // Dashboard shows unsolved reports
+        // Admin Dashboard: shows unsolved reports
         Route::get('/', [AdminController::class, 'index'])->name('admin.index');
 
         // Users management
@@ -73,8 +73,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Reports management
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
-
-        // Resolve report
         Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
     });
 });
