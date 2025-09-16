@@ -68,7 +68,12 @@
     </div>
 </main>
 
-<!-- Shake animation -->
+<!-- Loading Screen -->
+<div id="loading-overlay" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-700">
+    <img src="{{ asset('images/logo.jpg') }}" alt="Loading Logo" class="h-32 w-auto animate-spin-slow">
+</div>
+
+<!-- Animations -->
 <style>
     @keyframes shake {
         0%, 100% { transform: translateX(0); }
@@ -81,5 +86,27 @@
         display: inline-block;
         animation: shake 0.6s ease-in-out infinite;
     }
+    @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+        animation: spin-slow 1.5s linear infinite;
+    }
 </style>
+
+<!-- Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const forms = document.querySelectorAll("form");
+        const overlay = document.getElementById("loading-overlay");
+
+        forms.forEach(form => {
+            form.addEventListener("submit", function() {
+                overlay.classList.remove("pointer-events-none");
+                overlay.classList.add("opacity-100");
+            });
+        });
+    });
+</script>
 @endsection
