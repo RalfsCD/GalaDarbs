@@ -7,11 +7,16 @@ use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
-    public function index()
-    {
-        $notifications = auth()->user()->notifications;
-        return view('notifications.index', compact('notifications'));
-    }
+   public function index()
+{
+    $user = auth()->user();
+
+    // Get all notifications and mark unread as read automatically
+    $notifications = $user->notifications()->latest()->get();
+    $user->unreadNotifications->markAsRead();
+
+    return view('notifications.index', compact('notifications'));
+}
 
     public function markAsRead(DatabaseNotification $notification)
     {

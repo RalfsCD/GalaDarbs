@@ -9,13 +9,13 @@ class PostLikedNotification extends Notification
 {
     use Queueable;
 
-    public $userName;
-    public $postTitle;
+    public $actor;
+    public $post;
 
-    public function __construct(string $userName, string $postTitle)
+    public function __construct($actor, $post)
     {
-        $this->userName = $userName;
-        $this->postTitle = $postTitle;
+        $this->actor = $actor;
+        $this->post = $post;
     }
 
     public function via($notifiable)
@@ -23,12 +23,14 @@ class PostLikedNotification extends Notification
         return ['database'];
     }
 
-    public function toDatabase($notifiable)
+    public function toArray($notifiable)
     {
         return [
             'type' => 'post_liked',
-            'user_name' => $this->userName,
-            'post_title' => $this->postTitle,
+            'user_id' => $this->actor->id,
+            'user_name' => $this->actor->name,
+            'post_id' => $this->post->id,
+            'post_title' => $this->post->title,
         ];
     }
 }
