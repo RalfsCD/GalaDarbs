@@ -3,22 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
-use App\Models\Warning;
 use App\Models\Post;
+use App\Models\Warning;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Notifications\PostDeletedNotification;
 
 class PostController extends Controller
 {
-    use AuthorizesRequests;
-
-    // Show create form
     public function create(Group $group)
     {
         return view('posts.create', compact('group'));
     }
 
-    // Store post and redirect back to group
     public function store(Request $request, Group $group)
     {
         $validated = $request->validate([
@@ -39,37 +35,34 @@ class PostController extends Controller
         return redirect()->route('groups.show', $group)->with('success', 'Post created successfully!');
     }
 
-    // Show single post
     public function show(Post $post)
     {
         $post->load(['user', 'group', 'comments.user', 'likes'])->loadCount(['likes','comments']);
         return view('posts.show', compact('post'));
     }
 
-    // Delete post
- 
+    public function destroy(Post $post)
+    {
+        $isAdmin = auth()->check() && auth()->user()->isAdmin();
 
+        if (auth()->id() !== $post->user_id && !$isAdmin) {
+            abort(403, 'Unauthorized');
+        }
 
-public function destroy(Post $post)
-{
-    $isAdmin = auth()->check() && auth()->user()->isAdmin();
+        if ($isAdmin && auth()->id() !== $post->user_id) {
+            // Create warning
+            Warning::create([
+                'user_id' => $post->user_id,
+                'post_id' => $post->id,
+                'reason' => 'Post deleted by admin',
+            ]);
 
-    if (auth()->id() !== $post->user_id && !$isAdmin) {
-        abort(403, 'Unauthorized');
+            // Notify post owner
+            $post->user->notify(new PostDeletedNotification($post->title));
+        }
+
+        $post->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
-
-    if ($isAdmin && auth()->id() !== $post->user_id) {
-        // Create a warning for the user whose post is deleted
-        \App\Models\Warning::create([
-            'user_id' => $post->user_id,
-            'post_id' => $post->id,
-            'reason' => 'Post deleted by admin',
-        ]);
-    }
-
-    $post->delete();
-
-    return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
-}
-
 }

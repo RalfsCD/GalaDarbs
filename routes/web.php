@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\NotificationController; // ✅ Add this
 
 // Root
 Route::get('/', [PageController::class, 'dashboard'])->name('home');
@@ -61,6 +62,10 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
     // Admin Panel
     Route::prefix('admin')->group(function () {
 
@@ -74,6 +79,7 @@ Route::middleware(['auth'])->group(function () {
         // Reports management
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
+
     });
 });
 

@@ -10,18 +10,25 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name','email','password','profile_photo_path','role'];
-    protected $hidden = ['password','remember_token'];
-    protected $casts = ['email_verified_at'=>'datetime'];
+    protected $fillable = [
+        'name', 'email', 'password', 'profile_photo_path', 'role',
+    ];
+
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
     // Groups created by this user
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'group_user');  // pivot table
+        return $this->belongsToMany(Group::class, 'group_user');
     }
 
-
-    // Groups this user joined
+    // Groups joined by this user
     public function joinedGroups()
     {
         return $this->belongsToMany(Group::class, 'group_user', 'user_id', 'group_id')->withTimestamps();
@@ -41,8 +48,15 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
     public function warnings()
-{
-    return $this->hasMany(Warning::class);
-}
+    {
+        return $this->hasMany(Warning::class);
+    }
+
+    // Helper to get unread notifications count
+    public function unreadNotificationsCount(): int
+    {
+        return $this->unreadNotifications()->count();
+    }
 }

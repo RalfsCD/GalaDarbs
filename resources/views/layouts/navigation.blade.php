@@ -11,20 +11,20 @@
 
                 <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">
-                  @php
-    $links = [
-        ['name' => 'Home', 'route' => 'dashboard'],
-        ['name' => 'Topics', 'route' => 'topics.index'],
-        ['name' => 'Groups', 'route' => 'groups.index'],
-        ['name' => 'News', 'route' => 'news.index'],
-        ['name' => 'About', 'route' => 'about'],
-        ['name' => 'Profile', 'route' => 'profile.show'],
-    ];
+                    @php
+                        $links = [
+                            ['name' => 'Home', 'route' => 'dashboard'],
+                            ['name' => 'Topics', 'route' => 'topics.index'],
+                            ['name' => 'Groups', 'route' => 'groups.index'],
+                            ['name' => 'News', 'route' => 'news.index'],
+                            ['name' => 'About', 'route' => 'about'],
+                            ['name' => 'Profile', 'route' => 'profile.show'],
+                        ];
 
-    if(auth()->check() && auth()->user()->isAdmin()) {
-        $links[] = ['name' => 'Admin', 'route' => 'admin.index'];
-    }
-@endphp
+                        if(auth()->check() && auth()->user()->isAdmin()) {
+                            $links[] = ['name' => 'Admin', 'route' => 'admin.index'];
+                        }
+                    @endphp
 
                     @foreach ($links as $link)
                         <x-nav-link 
@@ -36,6 +36,21 @@
                             {{ __($link['name']) }}
                         </x-nav-link>
                     @endforeach
+
+                    <!-- Notifications Button -->
+                    <a href="{{ route('notifications.index') }}" 
+                       class="relative inline-flex items-center justify-center p-2 rounded-full hover:bg-gray-100 transition">
+                        <img src="{{ asset('icons/notification.svg') }}" alt="Notifications" class="w-6 h-6">
+                        <!-- Optional: notification badge -->
+                        @php
+                            $unreadCount = auth()->user()->notifications()->whereNull('read_at')->count();
+                        @endphp
+                        @if($unreadCount > 0)
+                            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                                {{ $unreadCount }}
+                            </span>
+                        @endif
+                    </a>
 
                     <!-- Logout -->
                     <form method="POST" action="{{ route('logout') }}" class="inline-flex items-center m-0 p-0">
@@ -80,6 +95,18 @@
                     {{ __($link['name']) }}
                 </x-responsive-nav-link>
             @endforeach
+
+            <!-- Notifications Button Mobile -->
+            <a href="{{ route('notifications.index') }}" 
+               class="flex items-center p-2 hover:bg-gray-100 transition">
+                <img src="{{ asset('icons/notification.svg') }}" alt="Notifications" class="w-6 h-6 mr-2">
+                <span>Notifications</span>
+                @if($unreadCount > 0)
+                    <span class="ml-auto inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                        {{ $unreadCount }}
+                    </span>
+                @endif
+            </a>
 
             <!-- Logout -->
             <form method="POST" action="{{ route('logout') }}" class="inline-flex items-center m-0 p-0">
