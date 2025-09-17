@@ -8,21 +8,38 @@
                 bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                 backdrop-blur-md border border-gray-200 shadow-sm space-y-4">
 
-        <!-- Group Name & Description -->
-        <div class="space-y-1">
-            <h1 class="text-3xl font-bold text-gray-900">{{ $group->name }}</h1>
-            <p class="text-gray-600">{{ $group->description }}</p>
-            <p class="text-gray-500 text-sm">Members: {{ $group->members->count() }}</p>
+        <div class="flex justify-between items-start">
+            <!-- Group Name & Description -->
+            <div class="space-y-1">
+                <h1 class="text-3xl font-bold text-gray-900">{{ $group->name }}</h1>
+                <p class="text-gray-600">{{ $group->description }}</p>
+                <p class="text-gray-500 text-sm">Members: {{ $group->members->count() }}</p>
+            </div>
+
+            <!-- Delete Group button (creator/admin only) -->
+            @auth
+                @if(auth()->id() === $group->creator_id || auth()->user()->isAdmin())
+                    <form action="{{ route('groups.destroy', $group) }}" method="POST"
+                          onsubmit="return confirm('Are you sure you want to delete this group?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="px-4 py-2 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition">
+                            Delete Group
+                        </button>
+                    </form>
+                @endif
+            @endauth
         </div>
 
-        <!-- Join/Leave Section -->
+        {{-- Join/Leave Section --}}
         @auth
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2 mt-2">
                 @if($group->members->contains(auth()->id()))
                     <form action="{{ route('groups.leave', $group) }}" method="POST" class="flex-shrink-0">
                         @csrf
                         <button type="submit"
-                                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-100 transition">
+                                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-green-200 text-green-800 font-bold hover:bg-green-300 transition">
                             Joined
                         </button>
                     </form>
@@ -47,18 +64,15 @@
 
     {{-- Create Post + Sort --}}
     <div class="flex justify-between items-center mt-4 mb-2">
-        <!-- Create Post button -->
         <a href="{{ route('posts.create', $group) }}" 
            class="inline-flex items-center px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
             <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5 mr-2">
             Create Post
         </a>
 
-        <!-- Sort Posts -->
         <form method="GET" id="sort-posts-form" action="{{ route('groups.show', $group) }}">
-            <select name="sort" id="sort-posts" 
-                    onchange="this.form.submit()"
-                    class="appearance-none px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer pr-8 relative">
+            <select name="sort" id="sort-posts" onchange="this.form.submit()"
+                    class="appearance-none px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer pr-8">
                 <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
                 <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
                 <option value="most_liked" {{ request('sort') === 'most_liked' ? 'selected' : '' }}>Most Liked</option>
@@ -67,13 +81,8 @@
     </div>
 
     <style>
-        /* Remove default arrow in select for most browsers */
-        #sort-posts::-ms-expand { display: none; } /* IE10+ */
-        #sort-posts {
-            -webkit-appearance: none; /* Safari/Chrome */
-            -moz-appearance: none;    /* Firefox */
-            appearance: none;         /* Standard */
-        }
+        #sort-posts::-ms-expand { display: none; }
+        #sort-posts { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 
     {{-- Posts Feed --}}
@@ -86,13 +95,26 @@
 
                     {{-- Post Header --}}
                     <div class="flex justify-between items-center">
-                        <p class="text-gray-900 font-bold">{{ $post->user->name }}</p>
+                        <div class="flex items-center gap-2">
+                            @if($post->user->profile_photo_path)
+                                <img src="{{ asset('storage/' . $post->user->profile_photo_path) }}" 
+                                     alt="{{ $post->user->name }}" 
+                                     class="w-8 h-8 rounded-full object-cover shadow-sm">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                                    {{ strtoupper(substr($post->user->name, 0, 2)) }}
+                                </div>
+                            @endif
+                            <p class="text-gray-900 font-bold">{{ $post->user->name }}</p>
+                            <span class="text-gray-700 text-xs flex items-center">
+                                in <span class="ml-1 inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">{{ $post->group->name }}</span>
+                            </span>
+                        </div>
                         <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
                     </div>
 
                     {{-- Title & Content --}}
                     <h3 class="text-xl font-semibold text-gray-900 mt-2">{{ $post->title }}</h3>
-
                     @if(filled($post->content))
                         <p class="text-gray-600 mt-1">{{ $post->content }}</p>
                     @endif
@@ -108,19 +130,13 @@
 
                     {{-- Likes & Comments --}}
                     <div class="mt-3 flex items-center gap-4">
-                        {{-- Like --}}
+                        @php $liked = auth()->check() && $post->likes->contains(auth()->id()); @endphp
                         <div class="flex items-center gap-1">
-                            @php
-                                $liked = auth()->check() && $post->likes->contains(auth()->id());
-                            @endphp
-                            <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
-                                 alt="Like" class="w-5 h-5">
+                            <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" class="w-5 h-5">
                             <span class="text-gray-700">{{ $post->likes_count ?? $post->likes->count() }}</span>
                         </div>
-
-                        {{-- Comments --}}
                         <div class="flex items-center gap-1">
-                            <img src="{{ asset('icons/comment.svg') }}" alt="Comment" class="w-5 h-5">
+                            <img src="{{ asset('icons/comment.svg') }}" class="w-5 h-5">
                             <span class="text-gray-700">{{ $post->comments_count ?? $post->comments->count() }}</span>
                         </div>
                     </div>

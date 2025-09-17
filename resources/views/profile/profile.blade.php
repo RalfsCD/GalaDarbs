@@ -48,52 +48,52 @@
     </div>
 
     <!-- My Posts Card -->
-<!-- My Posts Card -->
-<div class="w-full max-w-4xl p-6 rounded-3xl 
-            bg-white/50 backdrop-blur-md border border-gray-200 shadow-sm
-            overflow-hidden">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4">My Posts</h2>
+    <div class="w-full max-w-4xl p-6 rounded-3xl 
+                bg-white/50 backdrop-blur-md border border-gray-200 shadow-sm
+                overflow-hidden">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">My Posts</h2>
 
-    @if($posts->count())
-        <div class="flex flex-wrap -mx-3">
-            @foreach($posts as $post)
-                <a href="{{ route('posts.show', $post) }}" class="w-full md:w-1/2 px-3 mb-6">
-                    <div class="p-4 rounded-2xl 
-                                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                                backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition
-                                flex flex-col h-full">
+  @if($posts->count())
+    <div class="flex flex-wrap -mx-3">
+        @foreach($posts as $post)
+            <a href="{{ route('posts.show', $post) }}" class="w-full md:w-1/2 px-3 mb-6">
+                <div class="p-4 rounded-2xl 
+                            bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                            backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition
+                            flex flex-col h-full">
 
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $post->title }}</h3>
-                                <span class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</span>
-                            </div>
-
-                            @if(filled($post->content))
-                                <p class="text-gray-600 mt-2 line-clamp-3">{{ $post->content }}</p>
-                            @endif
-                        </div>
-
-                        @if($post->media_path)
-                            <div class="mt-3">
-                                <img src="{{ asset('storage/' . $post->media_path) }}" 
-                                     alt="Post Image" 
-                                     class="rounded-lg w-full object-cover max-h-40">
-                            </div>
-                        @endif
-                    </div>
-                </a>
-            @endforeach
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-4">
-            {{ $posts->links() }}
-        </div>
-    @else
-        <p class="text-gray-500">You haven’t posted anything yet.</p>
-    @endif
+          <div class="mb-2 inline-flex items-center gap-1 text-xs">
+    <span class="text-gray-700 font-semibold">in</span>
+    <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
+        {{ $post->group->name }}
+    </span>
 </div>
 
 
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ $post->title }}</h3>
+                        <span class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</span>
+                    </div>
+
+                    @if(filled($post->content))
+                        <p class="text-gray-600 mt-2 line-clamp-3">{{ $post->content }}</p>
+                    @endif
+
+                    @if($post->media_path)
+                        <div class="mt-3">
+                            <img src="{{ asset('storage/' . $post->media_path) }}" 
+                                 alt="Post Image" 
+                                 class="rounded-lg w-full object-cover max-h-40">
+                        </div>
+                    @endif
+                </div>
+            </a>
+        @endforeach
+    </div>
+@endif
+
+
+
+    </div>
+</div>
 @endsection

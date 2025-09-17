@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto p-6 space-y-6">
 
-    <!-- Page Header -->
+    {{-- Page Header --}}
     <div class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-gray-900">Groups</h1>
         <a href="{{ route('groups.create') }}" 
@@ -13,7 +13,7 @@
         </a>
     </div>
 
-    <!-- Search & Filter -->
+    {{-- Search --}}
     <form method="GET" action="{{ route('groups.index') }}" class="flex items-center gap-2 mb-4">
         <input type="text" name="search" value="{{ request('search') }}"
                placeholder="Search groups..."
@@ -24,13 +24,13 @@
         </button>
     </form>
 
-    <!-- Topic Filter Bubbles -->
+    {{-- Topic Filter Bubbles --}}
     <div class="flex flex-wrap gap-2 mb-4">
         @foreach($topics as $topic)
             <a href="{{ route('groups.index', ['topic' => $topic->id]) }}"
                class="px-4 py-2 rounded-full border-2 border-gray-300 cursor-pointer
-                      {{ request('topic') == $topic->id ? 'bg-gray-200 text-gray-900' : 'bg-white text-gray-700' }}
-                      hover:bg-gray-100 hover:text-gray-900 transition">
+                      {{ request('topic') == $topic->id ? 'bg-green-200 text-green-800 font-semibold' : 'bg-white text-gray-700' }}
+                      hover:bg-green-100 hover:text-green-800 transition">
                 {{ $topic->name }}
             </a>
         @endforeach
@@ -43,7 +43,7 @@
         @endif
     </div>
 
-    <!-- Groups List -->
+    {{-- Groups List --}}
     <div class="space-y-4">
         @forelse($groups as $group)
             <div class="p-4 rounded-2xl 
@@ -59,10 +59,12 @@
                     <p class="text-sm text-gray-500">Members: {{ $group->members->count() }}</p>
                 </a>
 
-                <!-- Joined Text -->
+                <!-- Joined Badge -->
                 @auth
                     @if($group->members->contains(auth()->id()))
-                        <p class="mt-3 text-sm font-semibold text-gray-700">Joined</p>
+                        <span class="mt-3 inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-sm">
+                            Joined
+                        </span>
                     @endif
                 @endauth
             </div>

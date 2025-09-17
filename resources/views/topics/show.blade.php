@@ -31,10 +31,12 @@
                     </p>
                 </a>
 
-                <!-- Joined Text -->
+                <!-- Joined Badge -->
                 @auth
                     @if($group->members->contains(auth()->id()))
-                        <p class="mt-3 text-sm font-semibold text-gray-700">Joined</p>
+                        <span class="mt-3 inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-sm">
+                            Joined
+                        </span>
                     @endif
                 @endauth
             </div>

@@ -97,4 +97,21 @@ class GroupController extends Controller
         $group->members()->detach(Auth::id());
         return redirect()->route('groups.show', $group);
     }
+    public function destroy(Group $group)
+{
+    // Only allow the creator or admin to delete
+    if (auth()->id() !== $group->creator_id && !auth()->user()->isAdmin()) {
+        abort(403, 'Unauthorized');
+    }
+
+    // Detach members and topics first (optional, depending on your DB constraints)
+    $group->members()->detach();
+    $group->topics()->detach();
+
+    // Delete the group
+    $group->delete();
+
+    return redirect()->route('groups.index')->with('success', 'Group deleted successfully.');
+}
+
 }

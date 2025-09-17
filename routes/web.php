@@ -28,12 +28,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
 
     // Groups
-    Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
-    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
-    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
-    Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
-    Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+    // Groups
+Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
+Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
+Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+// ✅ DELETE group
+Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
+
 
     // Posts
     Route::get('/groups/{group}/posts/create', [PostController::class, 'create'])->name('posts.create');

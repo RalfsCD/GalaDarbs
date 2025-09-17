@@ -8,18 +8,34 @@
                 backdrop-blur-md border border-gray-200 shadow-sm"
          id="post-{{ $post->id }}">
 
-        <h1 class="text-2xl font-bold text-gray-900">{{ $post->title }}</h1>
-        <p class="text-gray-600 mt-1">{{ $post->content }}</p>
+        {{-- Post Header with avatar --}}
+<div class="flex items-center gap-2 mb-3">
+    @if($post->user->profile_photo_path)
+        <img src="{{ asset('storage/' . $post->user->profile_photo_path) }}" 
+             alt="{{ $post->user->name }}" 
+             class="w-10 h-10 rounded-full object-cover shadow-sm">
+    @else
+        <div class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+            {{ strtoupper(substr($post->user->name, 0, 2)) }}
+        </div>
+    @endif
+    <div>
+        <p class="text-gray-900 font-bold">{{ $post->user->name }}</p>
+        <p class="text-sm">
+            in 
+            <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">
+                {{ $post->group->name }}
+            </span>
+        </p>
+    </div>
+</div>
+
 
         @if($post->media_path)
             <img src="{{ asset('storage/' . $post->media_path) }}" 
                  alt="Post Image" 
                  class="rounded-lg mt-3 max-w-full h-auto">
         @endif
-
-        <p class="text-gray-500 mt-2 text-sm">
-            Posted by {{ $post->user->name }} in {{ $post->group->name }}
-        </p>
 
         @php
             $isOwner = auth()->check() && auth()->id() === $post->user_id;
@@ -46,11 +62,12 @@
                 </span>
             </div>
 
-           @if(auth()->check() && !auth()->user()->isAdmin() && auth()->id() !== $post->user_id)
-    <button type="button" id="reportBtn" class="flex items-center gap-1">
-        <img src="{{ asset('icons/report.svg') }}" alt="Report" class="w-6 h-6">
-    </button>
-@endif
+            {{-- Report --}}
+            @if(auth()->check() && !auth()->user()->isAdmin() && auth()->id() !== $post->user_id)
+                <button type="button" id="reportBtn" class="flex items-center gap-1">
+                    <img src="{{ asset('icons/report.svg') }}" alt="Report" class="w-6 h-6">
+                </button>
+            @endif
 
             {{-- Success message --}}
             @if(session('success'))
@@ -114,10 +131,10 @@
 
 {{-- Modal JS --}}
 <script>
-document.getElementById('reportBtn').addEventListener('click', function() {
+document.getElementById('reportBtn')?.addEventListener('click', function() {
     document.getElementById('reportModal').classList.remove('hidden');
 });
-document.getElementById('closeModal').addEventListener('click', function() {
+document.getElementById('closeModal')?.addEventListener('click', function() {
     document.getElementById('reportModal').classList.add('hidden');
 });
 </script>
