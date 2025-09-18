@@ -1,8 +1,4 @@
-@php
-    /** @var \App\Models\Post $post */
-    $isOwner  = auth()->check() && auth()->id() === $post->user_id;
-    $liked = auth()->check() && $post->likes->contains(auth()->id());
-@endphp
+
 
 <div class="post-item p-4 rounded-2xl 
             bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
@@ -47,7 +43,8 @@
             </span>
         </div>
 
-        {{-- Delete --}}
+
+        
         @if($isOwner)
             <form action="{{ route('posts.destroy', $post->id) }}" method="POST"
                   onsubmit="return confirm('Are you sure you want to delete this post?');">
