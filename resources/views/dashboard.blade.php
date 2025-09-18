@@ -8,7 +8,7 @@
 
     <!-- Feed Section (scrollable) -->
     <main id="feed-column" class="flex-1 px-6 py-6 space-y-6 scrollbar-hide" style="height:100%; overflow-y:auto;">
-        <h2 class="text-2xl font-extrabold text-gray-900">Newest Posts</h2>
+                    <h1 class="text-4xl font-extrabold text-gray-900">Newest Posts</h1>
 
         @forelse($posts as $post)
             <a href="{{ route('posts.show', $post) }}" class="block no-underline">
@@ -83,7 +83,7 @@
 
     <!-- Groups Section (scrollable) -->
     <aside id="groups-column" class="w-80 px-6 py-6 space-y-6 border-l border-gray-300 scrollbar-hide" style="height:100%; overflow-y:auto;">
-        <h2 class="text-2xl font-extrabold text-gray-900">Your Groups</h2>
+            <h1 class="text-4xl font-extrabold text-gray-900">Your Groups</h1>
 
         @forelse($joinedGroups as $group)
             <a href="{{ route('groups.show', $group) }}" class="block no-underline">

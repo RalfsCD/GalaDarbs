@@ -3,10 +3,17 @@
 @section('content')
 <div class="max-w-5xl mx-auto p-6 space-y-6">
 
-    <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
+    {{-- Page Header Card --}}
+    <div class="p-6 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm mb-6 flex justify-between items-center">
+       <h1 class="text-4xl font-extrabold text-gray-900">Admin dashboard</h1>
+    </div>
 
-    {{-- Navigation Buttons --}}
-    <div class="flex flex-wrap gap-2 mb-6">
+    {{-- Navigation Buttons Card --}}
+    <div class="p-4 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm mb-6 flex flex-wrap gap-2">
         <a href="{{ route('admin.reports') }}" 
            class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center">
             All Reports
@@ -22,9 +29,9 @@
 
     <div class="space-y-4">
         @forelse($unsolvedReports as $report)
-            <div class="p-4 rounded-2xl 
+            <div class="p-6 rounded-2xl 
                         bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                        backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
+                        backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition space-y-3">
 
                 <p><strong>Post:</strong>
                     @if($report->post && $report->post->id)

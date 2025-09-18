@@ -7,7 +7,8 @@
     <div class="w-full max-w-3xl bg-white/50 backdrop-blur-md border border-gray-200 rounded-3xl p-8 space-y-8">
 
         <!-- Page Header -->
-        <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
+                     <h1 class="text-4xl font-extrabold text-gray-900">Settings</h1>
+
 
         @if(session('status'))
             <p class="text-green-600 font-medium">{{ session('status') }}</p>

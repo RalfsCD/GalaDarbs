@@ -51,7 +51,8 @@
     <div class="w-full max-w-4xl p-6 rounded-3xl 
                 bg-white/50 backdrop-blur-md border border-gray-200 shadow-sm
                 overflow-hidden">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">My Posts</h2>
+                     <h1 class="text-4xl font-extrabold text-gray-900">My posts</h1><br>
+
 
   @if($posts->count())
     <div class="flex flex-wrap -mx-3">

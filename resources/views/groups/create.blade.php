@@ -1,15 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+<div class="max-w-4xl mx-auto p-6">
 
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Create Group</h1>
+    <!-- Page Header Card -->
+    <div class="p-6 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm mb-6 flex justify-between items-center">
+
+        <h1 class="text-4xl font-extrabold text-gray-900">Create group</h1>
+    </div>
 
     <form action="{{ route('groups.store') }}" method="POST" class="space-y-6">
         @csrf
 
         <!-- Card wrapper -->
-        <div class="p-6 bg-white/30 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition space-y-4">
+        <div class="p-6 rounded-2xl 
+                    bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                    backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition space-y-6">
 
             <!-- Group Name -->
             <div>

@@ -3,13 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'PostPit') }}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('images/logo.jpg') }}" type="image/jpeg">
+
     @vite('resources/css/app.css')
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 <body class="bg-gray-100 text-gray-900">
-
     {{-- Navbar --}}
     @include('layouts.navigation')
 

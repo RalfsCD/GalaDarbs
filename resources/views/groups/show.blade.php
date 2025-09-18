@@ -11,25 +11,24 @@
         <div class="flex justify-between items-start">
             <!-- Group Name & Description -->
             <div class="space-y-1">
-                <h1 class="text-3xl font-bold text-gray-900">{{ $group->name }}</h1>
+                <h1 class="text-4xl font-extrabold text-gray-900">{{ $group->name }}</h1>
                 <p class="text-gray-600">{{ $group->description }}</p>
                 <p class="text-gray-500 text-sm">Members: {{ $group->members->count() }}</p>
             </div>
 
-            <!-- Delete Group button (creator/admin only) -->
-            @auth
-                @if(auth()->id() === $group->creator_id || auth()->user()->isAdmin())
-                    <form action="{{ route('groups.destroy', $group) }}" method="POST"
-                          onsubmit="return confirm('Are you sure you want to delete this group?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="px-4 py-2 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition">
-                            Delete Group
-                        </button>
-                    </form>
-                @endif
-            @endauth
+          <!-- Delete Group button (creator/admin only) -->
+@auth
+    @if(auth()->id() === $group->creator_id || auth()->user()->isAdmin())
+        <form action="{{ route('groups.destroy', $group) }}" method="POST"
+              onsubmit="return confirm('Are you sure you want to delete this group?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="flex items-center justify-center w-10 h-10">
+                <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-5 h-5">
+            </button>
+        </form>
+    @endif
+@endauth
         </div>
 
         {{-- Join/Leave Section --}}
@@ -62,15 +61,20 @@
         @endauth
     </div>
 
-    {{-- Create Post + Sort --}}
-    <div class="flex justify-between items-center mt-4 mb-2">
+    {{-- Create Post + Sort Card --}}
+    <div class="p-5 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+        <!-- Create Post Button -->
         <a href="{{ route('posts.create', $group) }}" 
            class="inline-flex items-center px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
             <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5 mr-2">
             Create Post
         </a>
 
-        <form method="GET" id="sort-posts-form" action="{{ route('groups.show', $group) }}">
+        <!-- Sort Dropdown -->
+        <form method="GET" id="sort-posts-form" action="{{ route('groups.show', $group) }}" class="flex-shrink-0">
             <select name="sort" id="sort-posts" onchange="this.form.submit()"
                     class="appearance-none px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer pr-8">
                 <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
@@ -86,7 +90,7 @@
     </style>
 
     {{-- Posts Feed --}}
-    <div id="posts-container" class="space-y-6">
+    <div id="posts-container" class="space-y-6 mt-4">
         @forelse($posts as $post)
             <a href="{{ route('posts.show', $post) }}" class="block group no-underline">
                 <div class="post-item p-4 rounded-2xl 
@@ -106,9 +110,6 @@
                                 </div>
                             @endif
                             <p class="text-gray-900 font-bold">{{ $post->user->name }}</p>
-                            <span class="text-gray-700 text-xs flex items-center">
-                                in <span class="ml-1 inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">{{ $post->group->name }}</span>
-                            </span>
                         </div>
                         <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
                     </div>

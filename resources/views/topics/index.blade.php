@@ -1,22 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-6">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Topics</h1>
+<div class="max-w-4xl mx-auto p-6 space-y-6">
+
+    {{-- Page Header (Title + Add Button) in Card --}}
+    <div class="p-6 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-200 shadow-sm flex items-center justify-between">
+                     <h1 class="text-4xl font-extrabold text-gray-900">Topics</h1>
+
 
         @if(auth()->check() && auth()->user()->isAdmin())
             <a href="{{ route('topics.create') }}" 
-               class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center space-x-2">
+               class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition flex items-center gap-2">
                
                <!-- Add icon -->
                <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5">
-               
                <span>Add Topic</span>
             </a>
         @endif
     </div>
 
+    {{-- Topics List --}}
     <div class="space-y-6">
         @forelse($topics as $topic)
             <div class="p-4 rounded-2xl 
@@ -37,4 +40,3 @@
     </div>
 </div>
 @endsection
-    

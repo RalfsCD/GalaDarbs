@@ -3,34 +3,48 @@
 @section('content')
 <div class="max-w-5xl mx-auto p-6 space-y-6">
 
-    <h1 class="text-2xl font-bold mb-6">User Management</h1>
+    {{-- Page Header Card --}}
+    <div class="p-6 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm flex justify-between items-center mb-6">
+               <h1 class="text-4xl font-extrabold text-gray-900">User management</h1>
+    </div>
 
-    {{-- Back Button --}}
-    <a href="{{ route('admin.index') }}" 
-       class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center">
-        Back to Admin Dashboard
-    </a>
+    {{-- Back Button Card --}}
+    <div class="p-4 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm mb-6 flex">
+        <a href="{{ route('admin.index') }}" 
+           class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition inline-flex items-center">
+            Back to Admin Dashboard
+        </a>
+    </div>
 
-    {{-- Search & Sort --}}
-    <form method="GET" class="flex flex-col sm:flex-row gap-2 mb-4 items-start sm:items-center">
-        <input type="text" name="search" value="{{ request('search') }}" 
-               placeholder="Search by name or email..."
-               class="flex-1 px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+    {{-- Search & Sort Card --}}
+    <div class="p-4 rounded-2xl 
+                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
+                backdrop-blur-md border border-gray-200 shadow-sm mb-6">
+        <form method="GET" class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Search by name or email..."
+                   class="flex-1 px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
 
-        <select name="sort" class="px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300">
-            <option value="">Sort By</option>
-            <option value="warnings_desc" {{ request('sort')=='warnings_desc' ? 'selected' : '' }}>Most Warnings</option>
-            <option value="warnings_asc" {{ request('sort')=='warnings_asc' ? 'selected' : '' }}>Least Warnings</option>
-            <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected' : '' }}>Name A-Z</option>
-            <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected' : '' }}>Name Z-A</option>
-        </select>
+            <select name="sort" class="px-4 py-2 rounded-full border-2 border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <option value="">Sort By</option>
+                <option value="warnings_desc" {{ request('sort')=='warnings_desc' ? 'selected' : '' }}>Most Warnings</option>
+                <option value="warnings_asc" {{ request('sort')=='warnings_asc' ? 'selected' : '' }}>Least Warnings</option>
+                <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected' : '' }}>Name A-Z</option>
+                <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected' : '' }}>Name Z-A</option>
+            </select>
 
-        <button type="submit" 
-                class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
-            Apply
-        </button>
-    </form>
+            <button type="submit" 
+                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                Apply
+            </button>
+        </form>
+    </div>
 
+    {{-- Users List --}}
     <div class="space-y-4">
         @forelse($users as $user)
             <div class="p-4 rounded-2xl 
