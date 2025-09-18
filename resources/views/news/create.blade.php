@@ -30,8 +30,15 @@
             <!-- Image -->
             <div>
                 <label for="image" class="block text-gray-700 font-medium mb-1">Image (optional)</label>
-                <input type="file" name="image" id="image"
-                       class="w-full p-3 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 text-gray-900 placeholder-gray-400 file:bg-gray-200 file:border-0 file:px-3 file:py-2 file:rounded-lg file:text-gray-900 hover:file:bg-gray-300 focus:outline-none"/>
+                <label 
+                    for="image" 
+                    class="flex items-center justify-center w-full px-3 py-2 rounded-lg border border-gray-300 bg-white/70 backdrop-blur-sm text-gray-900 cursor-pointer hover:bg-gray-200 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v6m0 0l-3-3m3 3l3-3M4 8V6a2 2 0 012-2h12a2 2 0 012 2v2"/>
+                    </svg>
+                    <span id="imageFileName" class="truncate">Choose a file</span>
+                </label>
+                <input type="file" name="image" id="image" class="hidden"/>
             </div>
 
             <!-- Content -->
@@ -62,6 +69,14 @@
 </div>
 
 <script>
+    // Show selected file name for image
+    const imageInput = document.getElementById('image');
+    const imageFileName = document.getElementById('imageFileName');
+    imageInput.addEventListener('change', () => {
+        imageFileName.textContent = imageInput.files.length > 0 ? imageInput.files[0].name : 'Choose a file';
+    });
+
+    // Form validation
     const form = document.getElementById('createNewsForm');
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
@@ -96,6 +111,7 @@
         }
     });
 
+    // Close modal
     document.getElementById('closeModal').addEventListener('click', function() {
         document.getElementById('validationModal').classList.add('hidden');
     });
