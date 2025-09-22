@@ -16,7 +16,6 @@ class ProfileController extends Controller
     $followers = $user->followers()->count();
     $following = $user->following()->count();
 
-    // Get all posts by this user
     $posts = Post::where('user_id', $user->id)
                  ->latest()
                  ->paginate(5);

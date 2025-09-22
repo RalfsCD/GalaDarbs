@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    // Main admin index - only unsolved reports
     public function index()
     {
         $unsolvedReports = Report::with(['post', 'reportedUser', 'reporter'])
@@ -21,7 +20,6 @@ class AdminController extends Controller
         return view('admin.index', compact('unsolvedReports'));
     }
 
-    // All reports page
     public function reports()
     {
         $reports = Report::with(['post', 'reportedUser', 'reporter'])
@@ -31,7 +29,6 @@ class AdminController extends Controller
         return view('admin.reports', compact('reports'));
     }
 
-    // Users page
     public function users(Request $request)
     {
         $query = User::with('warnings');
@@ -65,7 +62,6 @@ class AdminController extends Controller
         return view('admin.users', compact('users'));
     }
 
-    // Delete user
     public function destroyUser(User $user)
     {
         if ($user->isAdmin()) {
@@ -76,20 +72,17 @@ class AdminController extends Controller
         return back()->with('success', 'User deleted successfully.');
     }
 
-    // Delete post (from PostController logic if deleting as admin)
     public function deletePostAsAdmin($post)
     {
         $postModel = \App\Models\Post::findOrFail($post);
         $postModel->delete();
 
-        // Create warning
         Warning::create([
             'user_id' => $postModel->user_id,
             'post_id' => $postModel->id,
             'reason' => 'Post deleted by admin',
         ]);
 
-        // Create notification
         Notification::create([
             'user_id' => $postModel->user_id,
             'type' => 'post_reported',

@@ -11,7 +11,6 @@ class NotificationController extends Controller
 {
     $user = auth()->user();
 
-    // Get all notifications and mark unread as read automatically
     $notifications = $user->notifications()->latest()->get();
     $user->unreadNotifications->markAsRead();
 

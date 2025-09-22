@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 
 class TopicController extends Controller
 {
-    /**
-     * Display a listing of the topics.
-     */
+    
     public function index()
     {
         $topics = Topic::withCount('groups')->latest()->get();
@@ -17,9 +15,7 @@ class TopicController extends Controller
         return view('topics.index', compact('topics'));
     }
 
-    /**
-     * Show the form for creating a new topic (admin only).
-     */
+    
     public function create()
     {
         if (!auth()->user() || !auth()->user()->isAdmin()) {
@@ -29,9 +25,7 @@ class TopicController extends Controller
         return view('topics.create');
     }
 
-    /**
-     * Store a newly created topic.
-     */
+    
     public function store(Request $request)
     {
         if (!auth()->user() || !auth()->user()->isAdmin()) {
@@ -48,12 +42,9 @@ class TopicController extends Controller
         return redirect()->route('topics.index')->with('success', 'Topic created successfully.');
     }
 
-    /**
-     * Display a single topic with its groups.
-     */
+    
     public function show(Topic $topic)
 {
-    // Load groups and their members
     $topic->load('groups.members', 'groups.topics', 'groups.creator');
 
     return view('topics.show', compact('topic'));

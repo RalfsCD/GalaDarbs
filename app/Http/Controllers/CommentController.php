@@ -21,7 +21,6 @@ class CommentController extends Controller
 
         $post->loadCount('comments');
 
-        // Notify post owner if not self-comment
         if ($post->user_id !== $request->user()->id) {
             $post->user->notify(
                 new PostCommentedNotification($request->user()->name, $post->title)

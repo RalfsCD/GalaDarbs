@@ -50,14 +50,12 @@ class PostController extends Controller
         }
 
         if ($isAdmin && auth()->id() !== $post->user_id) {
-            // Create warning
             Warning::create([
                 'user_id' => $post->user_id,
                 'post_id' => $post->id,
                 'reason' => 'Post deleted by admin',
             ]);
 
-            // Notify post owner
             $post->user->notify(new PostDeletedNotification($post->title));
         }
 
