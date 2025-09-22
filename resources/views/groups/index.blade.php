@@ -3,10 +3,9 @@
 @section('content')
 <div class="max-w-4xl mx-auto p-6 space-y-6">
 
-    {{-- Page Header + Search + Filters in One Card --}}
+   
     <div class="p-6 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-200 shadow-sm space-y-6">
 
-        {{-- Header --}}
         <div class="flex justify-between items-center">
              <h1 class="text-4xl font-extrabold text-gray-900">Groups</h1>
             <a href="{{ route('groups.create') }}" 
@@ -16,7 +15,7 @@
             </a>
         </div>
 
-        {{-- Search --}}
+        {{-- meklēšana --}}
         <form method="GET" action="{{ route('groups.index') }}" class="flex items-center gap-2">
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="Search groups..."
@@ -27,7 +26,7 @@
             </button>
         </form>
 
-        {{-- Topic Filter Bubbles --}}
+        {{-- Topic izvēlne --}}
         <div class="flex flex-wrap gap-2">
             @foreach($topics as $topic)
                 <a href="{{ route('groups.index', ['topic' => $topic->id]) }}"
@@ -47,12 +46,11 @@
         </div>
     </div>
 
-    {{-- Groups List --}}
+    {{-- Grupu saraksts --}}
     <div class="space-y-4">
         @forelse($groups as $group)
             <div class="p-5 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-200 shadow-sm hover:shadow-lg transition">
 
-                <!-- Card Link -->
                 <a href="{{ route('groups.show', $group) }}" class="block space-y-2 no-underline">
                     <h2 class="text-xl font-bold text-gray-900">{{ $group->name }}</h2>
                     <p class="text-gray-600">{{ $group->description }}</p>
@@ -61,7 +59,7 @@
                     <p class="text-sm text-gray-500">Members: {{ $group->members->count() }}</p>
                 </a>
 
-                <!-- Joined Badge -->
+                {{-- Pārbauda, vai lietotājs ir pievienojies grupai --}}
                 @auth
                     @if($group->members->contains(auth()->id()))
                         <span class="mt-3 inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-sm">

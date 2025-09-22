@@ -9,14 +9,14 @@
                 backdrop-blur-md border border-gray-200 shadow-sm space-y-4">
 
         <div class="flex justify-between items-start">
-            <!-- Group Name & Description -->
+            
             <div class="space-y-1">
                 <h1 class="text-4xl font-extrabold text-gray-900">{{ $group->name }}</h1>
                 <p class="text-gray-600">{{ $group->description }}</p>
                 <p class="text-gray-500 text-sm">Members: {{ $group->members->count() }}</p>
             </div>
 
-          <!-- Delete Group button (creator/admin only) -->
+          <!-- Dzēšanas poga tikai priekš admin -->
 @auth
     @if(auth()->id() === $group->creator_id || auth()->user()->isAdmin())
         <form action="{{ route('groups.destroy', $group) }}" method="POST"
@@ -31,7 +31,7 @@
 @endauth
         </div>
 
-        {{-- Join/Leave Section --}}
+        {{-- Grupas pievienošanas/aiziešanas poga --}}
         @auth
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2 mt-2">
                 @if($group->members->contains(auth()->id()))
@@ -61,19 +61,19 @@
         @endauth
     </div>
 
-    {{-- Create Post + Sort Card --}}
+    {{-- Ierakstu izveidošanas poga un ierakstu kārtošana --}}
     <div class="p-5 rounded-2xl 
                 bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                 backdrop-blur-md border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-        <!-- Create Post Button -->
+       
         <a href="{{ route('posts.create', $group) }}" 
            class="inline-flex items-center px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
             <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5 mr-2">
             Create Post
         </a>
 
-        <!-- Sort Dropdown -->
+        
         <form method="GET" id="sort-posts-form" action="{{ route('groups.show', $group) }}" class="flex-shrink-0">
             <select name="sort" id="sort-posts" onchange="this.form.submit()"
                     class="appearance-none px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer pr-8">
@@ -89,7 +89,7 @@
         #sort-posts { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 
-    {{-- Posts Feed --}}
+    {{-- Grupas ieraksti --}}
     <div id="posts-container" class="space-y-6 mt-4">
         @forelse($posts as $post)
             <a href="{{ route('posts.show', $post) }}" class="block group no-underline">
@@ -97,7 +97,7 @@
                             bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                             backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
 
-                    {{-- Post Header --}}
+                        {{-- Ieraksta informacija --}}
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             @if($post->user->profile_photo_path)
@@ -114,7 +114,7 @@
                         <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
                     </div>
 
-                    {{-- Title & Content --}}
+                
                     <h3 class="text-xl font-semibold text-gray-900 mt-2">{{ $post->title }}</h3>
                     @if(filled($post->content))
                         <p class="text-gray-600 mt-1">{{ $post->content }}</p>
@@ -129,7 +129,7 @@
                         </div>
                     @endif
 
-                    {{-- Likes & Comments --}}
+                    
                     <div class="mt-3 flex items-center gap-4">
                         @php $liked = auth()->check() && $post->likes->contains(auth()->id()); @endphp
                         <div class="flex items-center gap-1">

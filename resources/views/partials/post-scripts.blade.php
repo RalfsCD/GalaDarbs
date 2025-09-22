@@ -1,5 +1,6 @@
 <script>
 (function () {
+
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
     const postsContainer = document.getElementById('posts-container') || document;
 
@@ -10,7 +11,7 @@
     };
     const isJson = (res) => (res.headers.get('content-type') || '').includes('application/json');
 
-    // Like toggle
+<!-- like pogas loģika -->
     postsContainer.addEventListener('click', function (e) {
         const likeBtn = e.target.closest('.like-btn');
         if (likeBtn) {
@@ -31,7 +32,7 @@
         }
     });
 
-    // Comment submit
+  <!-- Komentāru pievienošanas loģika -->
     postsContainer.addEventListener('submit', function (e) {
         const form = e.target;
         if (form.classList.contains('comment-form')) {

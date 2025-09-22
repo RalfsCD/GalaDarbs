@@ -5,7 +5,7 @@
      class="bg-gray-100 flex gap-6"
      style="position:fixed; top:64px; left:0; right:0; bottom:0; box-sizing:border-box; overflow:hidden;">
 
-    <!-- Feed Section -->
+    <!-- Ieraksta informacija -->
     <main id="feed-column" class="flex-1 px-6 py-6 scrollbar-hide overflow-y-auto">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-6">Newest Posts</h1>
 
@@ -15,7 +15,7 @@
                     <div class="p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-gray-200 
                                 shadow-sm hover:shadow-md hover:scale-[1.01] transition-transform duration-200 overflow-hidden">
                         
-                        {{-- User info --}}
+                        
                         <div class="flex justify-between items-center mb-2">
                             <div class="flex items-center gap-2">
                                 @if($post->user->profile_photo_path)
@@ -74,7 +74,7 @@
         </div>
     </main>
 
-    <!-- Groups Sidebar -->
+    <!-- Grupu Saraksts -->
     <aside id="groups-column" class="w-80 px-6 py-6 space-y-6 border-l border-gray-300 scrollbar-hide overflow-y-auto">
         <h1 class="text-4xl font-extrabold text-gray-900">Your Groups</h1>
 
@@ -106,19 +106,19 @@
 </div>
 
 <style>
-/* Hide scrollbars */
+
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Multi-column layout for posts */
+
 #posts-container {
-    column-count: 2;       /* two columns */
-    column-gap: 1rem;      /* horizontal space between columns */
+    column-count: 2;       
+    column-gap: 1rem;      
 }
 
 .post-card {
-    break-inside: avoid;   /* prevent card splitting */
-    margin-bottom: 1rem;   /* vertical space between posts */
+    break-inside: avoid;   
+    margin-bottom: 1rem;   
 }
 </style>
 

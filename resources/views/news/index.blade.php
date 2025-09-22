@@ -4,12 +4,14 @@
 <main class="bg-gray-100 min-h-screen pt-6 px-6">
     <div class="max-w-4xl mx-auto space-y-6">
 
-        <!-- Page Header Card -->
+    
         <div class="p-6 rounded-2xl 
                     bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                     backdrop-blur-md border border-gray-200 shadow-sm flex justify-between items-center">
             
             <h1 class="text-4xl font-extrabold text-gray-900">News</h1>
+
+            {{-- Pievienot Ziņas poga priekš Admin --}} 
 
             @if(auth()->user() && auth()->user()->role === 'admin')
                 <a href="{{ route('news.create') }}" 
@@ -20,7 +22,7 @@
             @endif
         </div>
 
-        <!-- News List -->
+        {{-- Ziņu saraksts --}}
         <div class="space-y-6">
             @forelse ($news as $item)
                 <div class="p-6 rounded-2xl 

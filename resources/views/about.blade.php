@@ -4,16 +4,14 @@
 <main class="bg-gray-100 min-h-screen pt-6 px-6">
     <div class="max-w-4xl mx-auto space-y-6">
 
-        <!-- Title Card -->
+       
         <div class="p-6 rounded-2xl 
                     bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                     backdrop-blur-md border border-gray-200 shadow-sm">
-            <h1 class="text-4xl font-extrabold text-gray-900">
-                About PostPit
-            </h1>
+            <h1 class="text-4xl font-extrabold text-gray-900">About PostPit</h1>
         </div>
 
-        <!-- Intro Card -->
+       
         <div class="p-6 rounded-2xl 
                     bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                     backdrop-blur-md border border-gray-200 shadow-sm space-y-4">
@@ -28,7 +26,7 @@
             </p>
         </div>
 
-        <!-- Why PostPit Dropdown Card -->
+        
         <div class="p-6 rounded-2xl 
                     bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                     backdrop-blur-md border border-gray-200 shadow-sm">
@@ -44,13 +42,12 @@
                 <ul x-show="open" x-transition class="list-disc pl-6 space-y-2 text-gray-700">
                     <li>Create and join groups around your favorite topics</li>
                     <li>Share posts, links, images, and ideas</li>
-                    <li>Upvote content you like and help surface the best discussions</li>
                     <li>Connect with people who share your passions</li>
                 </ul>
             </section>
         </div>
 
-        <!-- Values Dropdown Card -->
+        
         <div class="p-6 rounded-2xl 
                     bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                     backdrop-blur-md border border-gray-200 shadow-sm">
@@ -71,7 +68,7 @@
             </section>
         </div>
 
-        <!-- Closing Text Card -->
+       
         <div class="p-6 rounded-2xl 
                     bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                     backdrop-blur-md border border-gray-200 shadow-sm">
