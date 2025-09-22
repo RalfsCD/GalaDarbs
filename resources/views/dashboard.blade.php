@@ -5,11 +5,11 @@
      class="bg-gray-100 flex gap-6"
      style="position:fixed; top:64px; left:0; right:0; bottom:0; box-sizing:border-box; overflow:hidden;">
 
-    <!-- Feed Section (Pinterest-style) -->
+    <!-- Feed Section -->
     <main id="feed-column" class="flex-1 px-6 py-6 scrollbar-hide overflow-y-auto">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-6">Newest Posts</h1>
 
-        <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+        <div id="posts-container" class="columns-1 sm:columns-2 gap-6 space-y-6">
             @forelse($posts as $post)
                 <a href="{{ route('posts.show', $post) }}" class="break-inside-avoid mb-6 block no-underline">
                     <div class="p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-gray-200 
@@ -75,14 +75,9 @@
                 <p class="text-gray-500">No posts yet. Join some groups to see activity here!</p>
             @endforelse
         </div>
-
-        {{-- Pagination --}}
-        <div class="mt-4">
-            {{ $posts->links() }}
-        </div>
     </main>
 
-    <!-- Groups Section -->
+    <!-- Groups Sidebar -->
     <aside id="groups-column" class="w-80 px-6 py-6 space-y-6 border-l border-gray-300 scrollbar-hide overflow-y-auto">
         <h1 class="text-4xl font-extrabold text-gray-900">Your Groups</h1>
 
@@ -118,7 +113,7 @@
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Pinterest style columns for feed */
+/* Pinterest-style columns */
 #feed-column .columns-1 { column-gap: 1.5rem; }
 #feed-column .break-inside-avoid { break-inside: avoid; }
 </style>
@@ -127,15 +122,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     const nav = document.querySelector('nav');
     const dashboardRoot = document.getElementById('dashboard-root');
-    const feedCol = document.getElementById('feed-column');
-    const groupsCol = document.getElementById('groups-column');
 
     function applyLayout() {
         const navHeight = (nav && nav.offsetHeight) ? nav.offsetHeight : 0;
         dashboardRoot.style.top = navHeight + 'px';
-        dashboardRoot.style.bottom = '0';
-        dashboardRoot.style.left = '0';
-        dashboardRoot.style.right = '0';
     }
 
     applyLayout();

@@ -12,14 +12,14 @@ class PageController extends Controller
         if(auth()->check()) {
             $user = auth()->user();
 
-            // Get posts from groups the user has joined
+            // Get all posts from groups the user has joined
             $posts = Post::whereIn('group_id', $user->joinedGroups()->pluck('user_groups.id'))
-                        ->with('user','group','likes','comments.user')
+                        ->with(['user', 'group', 'likes', 'comments.user'])
                         ->latest()
-                        ->paginate(10);
+                        ->get(); // ✅ load all posts, not paginate
 
             // Get the groups the user has joined for the sidebar
-            $joinedGroups = $user->joinedGroups()->get();
+            $joinedGroups = $user->joinedGroups()->with('topics','members')->get();
 
             return view('dashboard', compact('posts', 'joinedGroups'));
         }

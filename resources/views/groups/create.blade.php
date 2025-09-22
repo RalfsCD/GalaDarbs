@@ -113,25 +113,27 @@
 
     updateHiddenTopics();
 
-    // Form validation
+    // form elements, kas tiek pārbaudīts ar Javascript
     document.getElementById('createGroupForm').addEventListener('submit', function(e) {
         const errors = [];
         const name = nameInput.value.trim();
 
-        // Reset previous error styles
+    // Ievadlaukiem, kļūdas gadījumā tiek piešķits sarkans rāmis
         nameInput.classList.remove('border-red-600');
         topicsWrapper.classList.remove('border-red-600', 'p-2', 'rounded-lg');
 
+    // Ja nav ievadīts grupas nosaukums
         if (!name) {
             errors.push("Group name is required.");
             nameInput.classList.add('border-red-600');
         }
 
+    // Ja nav izvēlēta neviena tēma (Ievadlauka tiek iekrāsots sarkanā krāsā)
         if (selectedTopics.length === 0) {
             errors.push("Please select at least one topic.");
             topicsWrapper.classList.add('border-red-600', 'p-2', 'rounded-lg');
         }
-
+    // Tad tiek izvadīts uznirstošais logs ar kļūdu paziņojumiem
         if (errors.length > 0) {
             e.preventDefault();
             const errorList = document.getElementById('errorList');

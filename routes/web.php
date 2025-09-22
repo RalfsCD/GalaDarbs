@@ -28,7 +28,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
 
     // Groups
-    // Groups
 Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
 Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
 Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
@@ -44,7 +43,7 @@ Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('gro
     Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-
+    
     // Likes & Comments
     Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
