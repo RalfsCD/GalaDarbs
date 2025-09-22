@@ -9,9 +9,9 @@
     <main id="feed-column" class="flex-1 px-6 py-6 scrollbar-hide overflow-y-auto">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-6">Newest Posts</h1>
 
-        <div id="posts-container" class="columns-1 sm:columns-2 gap-6 space-y-6">
+        <div id="posts-container" class="gap-6">
             @forelse($posts as $post)
-                <a href="{{ route('posts.show', $post) }}" class="break-inside-avoid mb-6 block no-underline">
+                <a href="{{ route('posts.show', $post) }}" class="post-card block no-underline">
                     <div class="p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-gray-200 
                                 shadow-sm hover:shadow-md hover:scale-[1.01] transition-transform duration-200 overflow-hidden">
                         
@@ -55,13 +55,10 @@
 
                         {{-- Likes & Comments --}}
                         <div class="flex items-center gap-4 mt-3">
-                            @php
-                                $liked = auth()->check() && $post->likes->contains(auth()->id());
-                            @endphp
+                            @php $liked = auth()->check() && $post->likes->contains(auth()->id()); @endphp
                             <div class="flex items-center gap-1">
                                 <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" 
-                                     alt="Like" 
-                                     class="w-5 h-5">
+                                     alt="Like" class="w-5 h-5">
                                 <span class="text-gray-900 font-medium">{{ $post->likes_count ?? $post->likes->count() }}</span>
                             </div>
                             <div class="flex items-center gap-1">
@@ -113,9 +110,16 @@
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Pinterest-style columns */
-#feed-column .columns-1 { column-gap: 1.5rem; }
-#feed-column .break-inside-avoid { break-inside: avoid; }
+/* Multi-column layout for posts */
+#posts-container {
+    column-count: 2;       /* two columns */
+    column-gap: 1rem;      /* horizontal space between columns */
+}
+
+.post-card {
+    break-inside: avoid;   /* prevent card splitting */
+    margin-bottom: 1rem;   /* vertical space between posts */
+}
 </style>
 
 <script>
