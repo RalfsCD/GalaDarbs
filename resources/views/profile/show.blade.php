@@ -6,9 +6,9 @@
 
     <div class="flex items-center space-x-6">
         <div class="w-28 h-28 rounded-full overflow-hidden border-2 border-yellow-400">
-            <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=000&color=fff' }}" 
-                 alt="Profile Picture" 
-                 class="w-full h-full object-cover">
+            <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=000&color=fff' }}"
+                alt="Profile Picture"
+                class="w-full h-full object-cover">
         </div>
 
         <div>

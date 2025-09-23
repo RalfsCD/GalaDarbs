@@ -11,7 +11,7 @@
     };
     const isJson = (res) => (res.headers.get('content-type') || '').includes('application/json');
 
-<!-- like pogas loģika -->
+
     postsContainer.addEventListener('click', function (e) {
         const likeBtn = e.target.closest('.like-btn');
         if (likeBtn) {
@@ -32,7 +32,7 @@
         }
     });
 
-  <!-- Komentāru pievienošanas loģika -->
+  
     postsContainer.addEventListener('submit', function (e) {
         const form = e.target;
         if (form.classList.contains('comment-form')) {

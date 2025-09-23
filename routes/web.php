@@ -11,7 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\NotificationController; // ✅ Add this
+use App\Http\Controllers\NotificationController;
 
 // Root
 Route::get('/', [PageController::class, 'dashboard'])->name('home');
@@ -28,14 +28,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
 
     // Groups
-Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
-Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
-Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
-Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
-Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
-Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
-// ✅ DELETE group
-Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
+    Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+    Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
+    Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+    // ✅ DELETE group
+    Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 
 
     // Posts
@@ -43,7 +43,7 @@ Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('gro
     Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-    
+
     // Likes & Comments
     Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
@@ -82,8 +82,7 @@ Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('gro
         // Reports management
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
-
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

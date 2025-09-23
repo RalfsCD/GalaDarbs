@@ -3,23 +3,23 @@
 @section('content')
 <div class="min-h-screen bg-gray-100 flex flex-col items-center p-6 space-y-8">
 
-    <!-- Profile Card -->
+
     <div class="relative w-full max-w-4xl p-8 rounded-3xl 
                 bg-white/50 backdrop-blur-md border border-gray-200 shadow-sm
                 overflow-hidden">
 
-        <!-- Subtle gray gradient -->
+
         <div class="absolute inset-0 bg-gradient-to-tr from-gray-200/20 via-white/10 to-gray-100/10 pointer-events-none rounded-3xl"></div>
 
         <div class="relative flex flex-col md:flex-row items-center md:items-start gap-6">
 
-            <!-- Profile picture -->
+            <!-- Profila attēls -->
             <div class="w-32 h-32 rounded-full overflow-hidden shadow-md">
-                <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=ddd&color=555' }}" 
-                     alt="Profile Picture" class="w-full h-full object-cover">
+                <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=ddd&color=555' }}"
+                    alt="Profile Picture" class="w-full h-full object-cover">
             </div>
 
-            <!-- Name, role, stats -->
+            <!-- Vārds, loma, sekotāju skaits -->
             <div class="text-center md:text-left flex-1">
                 <p class="text-3xl font-bold text-gray-900 drop-shadow-sm">{{ $user->name }}</p>
                 <p class="text-gray-600 font-semibold capitalize mt-1">{{ $user->role ?? 'user' }}</p>
@@ -37,38 +37,38 @@
                 </div>
             </div>
 
-            <!-- Settings Icon -->
+            <!-- Iestatījumi ikona -->
             <div class="absolute top-6 right-6">
-                <a href="{{ route('profile.settings') }}" 
-                   class="p-2 rounded-full">
+                <a href="{{ route('profile.settings') }}"
+                    class="p-2 rounded-full">
                     <img src="{{ asset('icons/settings.svg') }}" alt="Settings" class="w-10 h-10">
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- My Posts Card -->
+    <!-- Mani ieraksti -->
     <div class="w-full max-w-4xl p-6 rounded-3xl 
                 bg-white/50 backdrop-blur-md border border-gray-200 shadow-sm
                 overflow-hidden">
-                     <h1 class="text-4xl font-extrabold text-gray-900">My posts</h1><br>
+        <h1 class="text-4xl font-extrabold text-gray-900">My posts</h1><br>
 
 
-  @if($posts->count())
-    <div class="flex flex-wrap -mx-3">
-        @foreach($posts as $post)
+        @if($posts->count())
+        <div class="flex flex-wrap -mx-3">
+            @foreach($posts as $post)
             <a href="{{ route('posts.show', $post) }}" class="w-full md:w-1/2 px-3 mb-6">
                 <div class="p-4 rounded-2xl 
                             bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
                             backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition
                             flex flex-col h-full">
 
-          <div class="mb-2 inline-flex items-center gap-1 text-xs">
-    <span class="text-gray-700 font-semibold">in</span>
-    <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
-        {{ $post->group->name }}
-    </span>
-</div>
+                    <div class="mb-2 inline-flex items-center gap-1 text-xs">
+                        <span class="text-gray-700 font-semibold">in</span>
+                        <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
+                            {{ $post->group->name }}
+                        </span>
+                    </div>
 
 
                     <div class="flex justify-between items-start">
@@ -77,21 +77,21 @@
                     </div>
 
                     @if(filled($post->content))
-                        <p class="text-gray-600 mt-2 line-clamp-3">{{ $post->content }}</p>
+                    <p class="text-gray-600 mt-2 line-clamp-3">{{ $post->content }}</p>
                     @endif
 
                     @if($post->media_path)
-                        <div class="mt-3">
-                            <img src="{{ asset('storage/' . $post->media_path) }}" 
-                                 alt="Post Image" 
-                                 class="rounded-lg w-full object-cover max-h-40">
-                        </div>
+                    <div class="mt-3">
+                        <img src="{{ asset('storage/' . $post->media_path) }}"
+                            alt="Post Image"
+                            class="rounded-lg w-full object-cover max-h-40">
+                    </div>
                     @endif
                 </div>
             </a>
-        @endforeach
-    </div>
-@endif
+            @endforeach
+        </div>
+        @endif
 
 
 
