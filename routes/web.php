@@ -13,9 +13,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
 
-// Root
-Route::get('/', [PageController::class, 'dashboard'])->name('home');
+// Root → redirect smartly
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : view('welcome');
+})->name('home');
 
+// Routes that require authentication
 Route::middleware(['auth'])->group(function () {
 
     // Dashboard
@@ -34,9 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
-    // ✅ DELETE group
     Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
-
 
     // Posts
     Route::get('/groups/{group}/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -47,8 +50,9 @@ Route::middleware(['auth'])->group(function () {
     // Likes & Comments
     Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
+    Route::get('/posts/{post}/comments', [CommentController::class, 'index'])->name('posts.comments');
 
-    // Report posts
+    // Reports
     Route::post('/posts/{post}/report', [ReportController::class, 'store'])->name('reports.store');
 
     // News
@@ -71,15 +75,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Panel
     Route::prefix('admin')->group(function () {
-
-        // Admin Dashboard: shows unsolved reports
         Route::get('/', [AdminController::class, 'index'])->name('admin.index');
-
-        // Users management
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
         Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
-
-        // Reports management
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
     });

@@ -158,7 +158,7 @@
     });
 
 
-    (session('status'))
+    @if(session('status'))
     document.addEventListener('DOMContentLoaded', () => {
         errorList.innerHTML = '';
         const li = document.createElement('li');
@@ -175,5 +175,6 @@
             modal.classList.add('hidden');
         }, 1000);
     });
+    @endif
 </script>
 @endsection

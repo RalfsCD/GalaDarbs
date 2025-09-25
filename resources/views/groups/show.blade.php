@@ -1,158 +1,176 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-6 space-y-6">
+<div class="ml-64 max-w-5xl px-6 py-8 space-y-8"> {{-- Offset for sidebar --}}
 
     {{-- Group Info --}}
-    <div class="p-5 rounded-2xl 
-                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                backdrop-blur-md border border-gray-200 shadow-sm space-y-4">
+    <div class="p-6 rounded-3xl 
+                bg-white/80 dark:bg-gray-800/70 backdrop-blur-xl 
+                border border-gray-200 dark:border-gray-700 shadow-md space-y-4">
 
         <div class="flex justify-between items-start">
-
             <div class="space-y-1">
-                <h1 class="text-4xl font-extrabold text-gray-900">{{ $group->name }}</h1>
-                <p class="text-gray-600">{{ $group->description }}</p>
+                <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">{{ $group->name }}</h1>
+                <p class="text-gray-600 dark:text-gray-300">{{ $group->description }}</p>
                 <p class="text-gray-500 text-sm">Members: {{ $group->members->count() }}</p>
             </div>
 
-            <!-- Dzēšanas poga tikai priekš admin -->
+            {{-- Delete button --}}
             @auth
             @if(auth()->id() === $group->creator_id || auth()->user()->isAdmin())
             <form action="{{ route('groups.destroy', $group) }}" method="POST"
-                onsubmit="return confirm('Are you sure you want to delete this group?');">
+                  onsubmit="return confirm('Are you sure you want to delete this group?');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="flex items-center justify-center w-10 h-10">
-                    <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-5 h-5">
+                <button type="submit"
+                        class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-600">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 
+                                 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 
+                                 1-2.244 2.077H8.084a2.25 2.25 0 0 
+                                 1-2.244-2.077L4.772 5.79m14.456 
+                                 0a48.108 48.108 0 0 
+                                 0-3.478-.397m-12 .562c.34-.059.68-.114 
+                                 1.022-.165m0 0a48.11 48.11 0 0 
+                                 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 
+                                 51.964 0 0 0-3.32 0c-1.18.037-2.09 
+                                 1.022-2.09 2.201v.916m7.5 0a48.667 
+                                 48.667 0 0 0-7.5 0" />
+                    </svg>
                 </button>
             </form>
             @endif
             @endauth
         </div>
 
-        {{-- Grupas pievienošanas/aiziešanas poga --}}
+        {{-- Join / Leave --}}
         @auth
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2 mt-2">
+        <div class="flex gap-2 mt-2">
             @if($group->members->contains(auth()->id()))
-            <form action="{{ route('groups.leave', $group) }}" method="POST" class="flex-shrink-0">
+            <form action="{{ route('groups.leave', $group) }}" method="POST">
                 @csrf
                 <button type="submit"
-                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-green-200 text-green-800 font-bold hover:bg-green-300 transition">
-                    Joined
+                        class="px-4 py-2 rounded-full border bg-green-200/80 text-green-900 font-bold hover:bg-green-300 transition">
+                    ✅ Joined
                 </button>
             </form>
-            <p class="text-gray-500 text-sm sm:ml-4">
-                You are part of this group and will see its latest posts in your home feed.
-            </p>
             @else
-            <form action="{{ route('groups.join', $group) }}" method="POST" class="flex-shrink-0">
+            <form action="{{ route('groups.join', $group) }}" method="POST">
                 @csrf
                 <button type="submit"
-                    class="px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
+                        class="px-4 py-2 rounded-full border bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     Join
                 </button>
             </form>
-            <p class="text-gray-500 text-sm sm:ml-4">
-                Join this group to get the newest posts in your home feed.
-            </p>
             @endif
         </div>
         @endauth
     </div>
 
-    {{-- Ierakstu izveidošanas poga un ierakstu kārtošana --}}
-    <div class="p-5 rounded-2xl 
-                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                backdrop-blur-md border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
-
+    {{-- Create post & sorting --}}
+    <div class="p-6 rounded-3xl 
+                bg-white/80 dark:bg-gray-800/70 backdrop-blur-xl 
+                border border-gray-200 dark:border-gray-700 shadow-md 
+                flex flex-col sm:flex-row justify-between gap-4">
         <a href="{{ route('posts.create', $group) }}"
-            class="inline-flex items-center px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
-            <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5 mr-2">
+           class="inline-flex items-center px-4 py-2 rounded-full border bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
             Create Post
         </a>
 
-
-        <form method="GET" id="sort-posts-form" action="{{ route('groups.show', $group) }}" class="flex-shrink-0">
-            <select name="sort" id="sort-posts" onchange="this.form.submit()"
-                class="appearance-none px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer pr-8">
-                <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
-                <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+        <form method="GET" action="{{ route('groups.show', $group) }}">
+            <select name="sort" onchange="this.form.submit()"
+                    class="px-4 py-2 rounded-full border bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-bold cursor-pointer">
+                <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
+                <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest</option>
                 <option value="most_liked" {{ request('sort') === 'most_liked' ? 'selected' : '' }}>Most Liked</option>
             </select>
         </form>
     </div>
 
-    <style>
-        #sort-posts::-ms-expand {
-            display: none;
-        }
+    {{-- Posts --}}
+    <div id="posts-container" class="space-y-6">
+        @include('partials.post-card-list', ['posts' => $posts])
+    </div>
 
-        #sort-posts {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-    </style>
+    <!-- Loading spinner -->
+    <div id="loading" class="hidden text-center py-6 text-gray-500">
+        Loading more posts...
+    </div>
 
-    {{-- Grupas ieraksti --}}
-    <div id="posts-container" class="space-y-6 mt-4">
-        @forelse($posts as $post)
-        <a href="{{ route('posts.show', $post) }}" class="block group no-underline">
-            <div class="post-item p-4 rounded-2xl 
-                            bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                            backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
+    <!-- Sentinel element -->
+    <div id="infinite-scroll-trigger"></div>
+</div>
 
-                {{-- Ieraksta informacija --}}
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-2">
-                        @if($post->user->profile_photo_path)
-                        <img src="{{ asset('storage/' . $post->user->profile_photo_path) }}"
-                            alt="{{ $post->user->name }}"
-                            class="w-8 h-8 rounded-full object-cover shadow-sm">
-                        @else
-                        <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                            {{ strtoupper(substr($post->user->name, 0, 2)) }}
-                        </div>
-                        @endif
-                        <p class="text-gray-900 font-bold">{{ $post->user->name }}</p>
-                    </div>
-                    <span class="text-gray-500 text-sm">{{ $post->created_at->diffForHumans() }}</span>
-                </div>
-
-
-                <h3 class="text-xl font-semibold text-gray-900 mt-2">{{ $post->title }}</h3>
-                @if(filled($post->content))
-                <p class="text-gray-600 mt-1">{{ $post->content }}</p>
-                @endif
-
-                {{-- Media --}}
-                @if($post->media_path)
-                <div class="mt-3">
-                    <img src="{{ asset('storage/' . $post->media_path) }}"
-                        alt="Post Image"
-                        class="rounded-lg max-w-full h-auto">
-                </div>
-                @endif
-
-
-                <div class="mt-3 flex items-center gap-4">
-                    @php $liked = auth()->check() && $post->likes->contains(auth()->id()); @endphp
-                    <div class="flex items-center gap-1">
-                        <img src="{{ $liked ? asset('icons/liked.svg') : asset('icons/like.svg') }}" class="w-5 h-5">
-                        <span class="text-gray-700">{{ $post->likes_count ?? $post->likes->count() }}</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <img src="{{ asset('icons/comment.svg') }}" class="w-5 h-5">
-                        <span class="text-gray-700">{{ $post->comments_count ?? $post->comments->count() }}</span>
-                    </div>
-                </div>
-            </div>
-        </a>
-        @empty
-        <p class="text-gray-500">No posts yet in this group.</p>
-        @endforelse
+<!-- Comment Drawer -->
+<div id="commentDrawer"
+     class="fixed inset-0 hidden bg-black/40 dark:bg-black/70 z-50 justify-end">
+    <div class="bg-white dark:bg-gray-900 w-full sm:w-[480px] h-full shadow-2xl flex flex-col">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-bold">Comments</h2>
+            <button id="closeComments" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">&times;</button>
+        </div>
+        <div id="commentsList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+        <form id="commentForm" class="p-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+            @csrf
+            <input type="hidden" name="post_id" id="commentPostId">
+            <input name="content" placeholder="Write a comment..."
+                   class="flex-1 rounded-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring focus:ring-yellow-300 dark:focus:ring-yellow-600">
+            <button class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-full">Send</button>
+        </form>
     </div>
 </div>
+
+<!-- Image Lightbox -->
+<div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+    <span id="closeImageModal" class="absolute top-6 right-8 text-white text-4xl cursor-pointer">&times;</span>
+    <img id="modalImage" src="" class="max-h-[90%] max-w-[90%] rounded-xl shadow-2xl">
+</div>
+@endsection
+
+@section('scripts')
+@include('partials.post-scripts')
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let page = 2; // page 1 is already loaded
+    const trigger = document.getElementById("infinite-scroll-trigger");
+    const postsContainer = document.getElementById("posts-container");
+    const loading = document.getElementById("loading");
+
+    const observer = new IntersectionObserver(async entries => {
+        if (entries[0].isIntersecting) {
+            loading.classList.remove("hidden");
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', page);
+
+                const res = await fetch(url, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                });
+                if (res.ok) {
+                    const html = await res.text();
+                    if (html.trim().length > 0) {
+                        postsContainer.insertAdjacentHTML("beforeend", html);
+                        page++;
+                    } else {
+                        observer.unobserve(trigger);
+                    }
+                }
+            } catch (err) {
+                console.error("Infinite scroll error:", err);
+            } finally {
+                loading.classList.add("hidden");
+            }
+        }
+    });
+
+    observer.observe(trigger);
+});
+</script>
 @endsection

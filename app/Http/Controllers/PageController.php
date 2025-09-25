@@ -7,25 +7,30 @@ use App\Models\Post;
 
 class PageController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        if(auth()->check()) {
-            $user = auth()->user();
+        // If logged in, only show posts from groups user has joined
+        if ($request->user()) {
+            $joinedGroupIds = $request->user()->groups()->pluck('user_groups.id'); // adjust to your table
 
-            // Get all posts from groups the user has joined
-            $posts = Post::whereIn('group_id', $user->joinedGroups()->pluck('user_groups.id'))
-                        ->with(['user', 'group', 'likes', 'comments.user'])
-                        ->latest()
-                        ->get(); // ✅ load all posts, not paginate
+            $posts = Post::with(['user', 'group', 'likes', 'comments'])
+                ->whereIn('group_id', $joinedGroupIds)
+                ->latest()
+                ->paginate(10);
 
-            // Get the groups the user has joined for the sidebar
-            $joinedGroups = $user->joinedGroups()->with('topics','members')->get();
-
-            return view('dashboard', compact('posts', 'joinedGroups'));
+            $joinedGroups = $request->user()->groups()->with('topics')->get();
+        } else {
+            // If not logged in, don’t show posts
+            $posts = collect();
+            $joinedGroups = collect();
         }
 
-        // Not logged in -> welcome page
-        return view('welcome');
+        // Handle infinite scroll
+        if ($request->ajax()) {
+            return view('partials.post-card-list', compact('posts'))->render();
+        }
+
+        return view('dashboard', compact('posts', 'joinedGroups'));
     }
 
     public function about()

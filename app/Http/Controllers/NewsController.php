@@ -16,19 +16,16 @@ class NewsController extends Controller
 
     public function create()
     {
-        // Check if the user is logged in and is an admin
         $user = Auth::user();
         if ($user && $user->role === 'admin') {
             return view('news.create');
         }
 
-        // If not admin, redirect back with an error message
         return redirect()->back()->with('error', 'You are not authorized to access this page.');
     }
 
     public function store(Request $request)
     {
-        // Only allow admins to store news
         $user = Auth::user();
         if (!$user || $user->role !== 'admin') {
             return redirect()->back()->with('error', 'You are not authorized to perform this action.');

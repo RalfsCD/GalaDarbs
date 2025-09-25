@@ -17,6 +17,7 @@ class PostLikeController extends Controller
 
         $post->loadCount('likes');
 
+        // Notify only when liked
         if ($liked && $post->user_id !== $userId) {
             $exists = $post->user->notifications()
                 ->where('type', PostLikedNotification::class)
@@ -31,6 +32,7 @@ class PostLikeController extends Controller
             }
         }
 
+        // Remove notification if unliked
         if (!$liked && $post->user_id !== $userId) {
             $post->user->notifications()
                 ->where('type', PostLikedNotification::class)

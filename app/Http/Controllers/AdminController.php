@@ -13,9 +13,9 @@ class AdminController extends Controller
     public function index()
     {
         $unsolvedReports = Report::with(['post', 'reportedUser', 'reporter'])
-                            ->where('resolved', false)
-                            ->latest()
-                            ->get();
+            ->where('resolved', false)
+            ->latest()
+            ->get();
 
         return view('admin.index', compact('unsolvedReports'));
     }
@@ -23,8 +23,8 @@ class AdminController extends Controller
     public function reports()
     {
         $reports = Report::with(['post', 'reportedUser', 'reporter'])
-                         ->latest()
-                         ->get();
+            ->latest()
+            ->get();
 
         return view('admin.reports', compact('reports'));
     }
@@ -34,9 +34,9 @@ class AdminController extends Controller
         $query = User::with('warnings');
 
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%");
+                    ->orWhere('email', 'like', "%{$request->search}%");
             });
         }
 

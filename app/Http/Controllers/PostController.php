@@ -37,7 +37,7 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        $post->load(['user', 'group', 'comments.user', 'likes'])->loadCount(['likes','comments']);
+        $post->load(['user', 'group', 'comments.user', 'likes'])->loadCount(['likes', 'comments']);
         return view('posts.show', compact('post'));
     }
 
@@ -63,5 +63,4 @@ class PostController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
-   
 }

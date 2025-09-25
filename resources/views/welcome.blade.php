@@ -11,8 +11,8 @@
         Welcome to <span class="text-gray-400 inline-block">PostPit</span>
     </h1>
 
-    <p class="text-gray-700 text-center max-w-xl">
-        Connect, share, and explore communities with PostPit. Join discussions, create posts, and discover new topics!
+    <p class="text-gray-400 text-center max-w-xl">
+        Connect, Create & Explore communities with PostPit.
     </p>
 
 

@@ -11,24 +11,27 @@ use Illuminate\Support\Facades\Redirect;
 
 class ProfileController extends Controller
 {
-    public function show() {
-    $user = Auth::user();
-    $followers = $user->followers()->count();
-    $following = $user->following()->count();
+    public function show()
+    {
+        $user = Auth::user();
+        $followers = $user->followers()->count();
+        $following = $user->following()->count();
 
-    $posts = Post::where('user_id', $user->id)
-                 ->latest()
-                 ->paginate(5);
+        $posts = Post::where('user_id', $user->id)
+            ->latest()
+            ->paginate(5);
 
-    return view('profile.profile', compact('user', 'followers', 'following', 'posts'));
-}
+        return view('profile.profile', compact('user', 'followers', 'following', 'posts'));
+    }
 
 
-    public function settings() {
+    public function settings()
+    {
         return view('profile.settings', ['user' => Auth::user()]);
     }
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'profile_photo' => 'nullable|image|max:2048',
@@ -50,7 +53,8 @@ class ProfileController extends Controller
         return Redirect::route('profile.settings')->with('status', 'Profile updated!');
     }
 
-    public function destroy(Request $request) {
+    public function destroy(Request $request)
+    {
         $request->validate(['password' => ['required', 'current_password']]);
 
         $user = $request->user();

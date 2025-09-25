@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class TopicController extends Controller
 {
-    
+
     public function index()
     {
         $topics = Topic::withCount('groups')->latest()->get();
@@ -15,7 +15,7 @@ class TopicController extends Controller
         return view('topics.index', compact('topics'));
     }
 
-    
+
     public function create()
     {
         if (!auth()->user() || !auth()->user()->isAdmin()) {
@@ -25,7 +25,7 @@ class TopicController extends Controller
         return view('topics.create');
     }
 
-    
+
     public function store(Request $request)
     {
         if (!auth()->user() || !auth()->user()->isAdmin()) {
@@ -42,11 +42,11 @@ class TopicController extends Controller
         return redirect()->route('topics.index')->with('success', 'Topic created successfully.');
     }
 
-    
-    public function show(Topic $topic)
-{
-    $topic->load('groups.members', 'groups.topics', 'groups.creator');
 
-    return view('topics.show', compact('topic'));
-}
+    public function show(Topic $topic)
+    {
+        $topic->load('groups.members', 'groups.topics', 'groups.creator');
+
+        return view('topics.show', compact('topic'));
+    }
 }
