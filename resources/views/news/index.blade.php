@@ -1,53 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-<main class="bg-gray-100 min-h-screen pt-6 px-6">
-    <div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-7xl mx-auto p-6 space-y-6">
 
+    {{-- Page Header --}}
+    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md flex items-center justify-between">
+        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">News</h1>
 
-        <div class="p-6 rounded-2xl 
-                    bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                    backdrop-blur-md border border-gray-200 shadow-sm flex justify-between items-center">
+        {{-- Add News Button for Admin --}}
+        @if(auth()->user() && auth()->user()->role === 'admin')
+        <a href="{{ route('news.create') }}"
+            class="px-5 py-2.5 rounded-full bg-yellow-500 text-white font-bold border border-yellow-400 shadow-md hover:bg-yellow-600 hover:shadow-lg transition flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>Create News</span>
+        </a>
+        @endif
+    </div>
 
-            <h1 class="text-4xl font-extrabold text-gray-900">News</h1>
-
-            {{-- Pievienot Ziņas poga priekš Admin --}}
-
-            @if(auth()->user() && auth()->user()->role === 'admin')
-            <a href="{{ route('news.create') }}"
-                class="inline-flex items-center px-4 py-2 rounded-full border-2 border-gray-300 bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition">
-                <img src="{{ asset('icons/add.svg') }}" alt="Add" class="w-5 h-5 mr-2">
-                Add News
-            </a>
+    {{-- News List (Feed View) --}}
+    <div class="space-y-8">
+     @foreach ($news as $item)
+    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition">
+        <div class="relative">
+            
+            {{-- News Image --}}
+            @if($item->image)
+                <img src="{{ Storage::url('news/' . $item->image) }}" 
+                     alt="{{ $item->title }}" 
+                     class="w-full h-72 object-cover rounded-lg shadow-lg mb-4">
             @endif
+            
+            {{-- News Title --}}
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">{{ $item->title }}</h2>
+            
+            {{-- Content --}}
+            <p class="text-gray-600 dark:text-gray-300 mt-4 line-clamp-3">{{ $item->content }}</p>
+            
+            {{-- Date --}}
+            <p class="text-gray-500 text-sm mt-3">Published {{ $item->created_at->diffForHumans() }}</p>
+
         </div>
-
-        {{-- Ziņu saraksts --}}
-        <div class="space-y-6">
-            @forelse ($news as $item)
-            <div class="p-6 rounded-2xl 
-                            bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                            backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition space-y-4">
-
-                @if($item->image)
-                <img src="{{ asset('storage/' . $item->image) }}"
-                    alt="{{ $item->title }}"
-                    class="w-full rounded-lg object-contain shadow-sm">
-                @endif
-
-                <h2 class="text-2xl font-bold text-gray-900">{{ $item->title }}</h2>
-                <p class="text-gray-700 text-lg leading-relaxed">{{ $item->content }}</p>
-                <p class="text-sm text-gray-500">Published {{ $item->created_at->diffForHumans() }}</p>
-            </div>
-            @empty
-            <div class="p-6 rounded-2xl 
-                            bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                            backdrop-blur-md border border-gray-200 shadow-sm text-gray-500">
-                No news yet. Be the first to add one!
-            </div>
-            @endforelse
-        </div>
+    </div>
+@endforeach
 
     </div>
-</main>
+
+</div>
 @endsection

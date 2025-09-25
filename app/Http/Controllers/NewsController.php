@@ -25,24 +25,28 @@ class NewsController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user || $user->role !== 'admin') {
-            return redirect()->back()->with('error', 'You are not authorized to perform this action.');
-        }
+{
+    // Validate the request data
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'media' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Add validation for image files
+    ]);
 
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'nullable|image|max:2048',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('news', 'public');
-        }
-
-        News::create($data);
-
-        return redirect()->route('news.index')->with('success', 'News published!');
+    // Handle the file upload for the image
+    if ($request->hasFile('media')) {
+        $image = $request->file('media');
+        $path = $image->storeAs('public/news', $image->getClientOriginalName()); // Save image in public/news folder
     }
+
+    // Create the news entry in the database
+    $news = News::create([
+        'title' => $request->title,
+        'content' => $request->content,
+        'image' => isset($path) ? str_replace('public/', '', $path) : null, // Store the image path without the "public/" prefix
+    ]);
+
+    return redirect()->route('news.index')->with('success', 'News created successfully');
 }
+}
+

@@ -1,54 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-6 relative">
+<div class="max-w-7xl mx-auto p-6 space-y-6">
 
-
-    <div class="p-6 rounded-2xl 
-                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                backdrop-blur-md border border-gray-200 shadow-sm mb-6 flex justify-between items-center">
-
-        <h1 class="text-4xl font-extrabold text-gray-900">Create Topic</h1>
+    {{-- Page Header --}}
+    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md flex items-center justify-between">
+        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">Create Topic</h1>
     </div>
 
-
+    {{-- Create Topic Form --}}
     <form id="createTopicForm" action="{{ route('topics.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        <div class="p-6 rounded-2xl 
-                    bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                    backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition space-y-6">
-
+        <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition space-y-6">
 
             <div>
-                <label for="name" class="block text-gray-700 font-medium mb-1">Topic Name</label>
+                <label for="name" class="block text-gray-700 dark:text-gray-100 font-medium mb-1">Topic Name</label>
                 <input type="text" name="name" id="name"
-                    class="w-full p-3 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600"
                     placeholder="Enter topic name">
             </div>
 
-
             <div>
-                <label for="description" class="block text-gray-700 font-medium mb-1">Description (optional)</label>
+                <label for="description" class="block text-gray-700 dark:text-gray-100 font-medium mb-1">Description (optional)</label>
                 <textarea name="description" id="description" rows="4"
-                    class="w-full p-3 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    class="w-full p-3 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600"
                     placeholder="Describe your topic..."></textarea>
             </div>
 
-
-            <button type="submit"
-                class="w-full px-4 py-3 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 transition">
+           <button type="submit" 
+                    class="w-full py-3 px-4 rounded-xl font-semibold 
+                           bg-yellow-400 text-gray-900 
+                           hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-400 
+                           transition shadow-sm">
                 Create Topic
             </button>
         </div>
     </form>
 
-    <!-- Validacijas logs -->
+    <!-- Validation Modal -->
     <div id="validationModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-2xl shadow-lg max-w-lg w-full space-y-4 relative">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-lg max-w-lg w-full space-y-4 relative">
             <button id="closeModal" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl">&times;</button>
-            <h2 class="text-xl font-bold text-gray-900">Please fix the following errors:</h2>
-            <ul id="errorList" class="list-disc pl-5 text-gray-900 space-y-1"></ul>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Please fix the following errors:</h2>
+            <ul id="errorList" class="list-disc pl-5 text-gray-900 dark:text-gray-300 space-y-1"></ul>
         </div>
     </div>
 
@@ -60,7 +55,6 @@
 
     form.addEventListener('submit', function(e) {
         const errors = [];
-
 
         nameInput.classList.remove('border-red-600');
 

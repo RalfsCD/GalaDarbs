@@ -1,78 +1,66 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-6 py-8 space-y-8">
+<div class="max-w-7xl mx-auto p-6 space-y-6">
 
     {{-- Page Header --}}
-    <div class="p-6 rounded-3xl 
-                bg-white/80 dark:bg-gray-800/70 backdrop-blur-md 
-                border border-gray-200 dark:border-gray-700 shadow-md 
-                flex items-center justify-between">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-100">
-            Create Group
-        </h1>
+    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md flex items-center justify-between">
+        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">Create Group</h1>
     </div>
 
-    {{-- Form --}}
-    <form id="createGroupForm" action="{{ route('groups.store') }}" method="POST" 
-          class="p-6 rounded-3xl 
-                 bg-white/80 dark:bg-gray-800/70 backdrop-blur-md 
-                 border border-gray-200 dark:border-gray-700 shadow-md 
-                 space-y-6">
+    {{-- Create Group Form --}}
+    <form id="createGroupForm" action="{{ route('groups.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        {{-- Name --}}
-        <div>
-            <label for="name" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
-                Group Name
-            </label>
-            <input type="text" name="name" id="name" value="{{ old('name') }}"
-                   placeholder="Enter group name"
-                   class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 
-                          bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 
-                          placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:focus:ring-yellow-600">
-        </div>
+        <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition space-y-6">
 
-        {{-- Description --}}
-        <div>
-            <label for="description" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
-                Description (optional)
-            </label>
-            <textarea name="description" id="description" rows="4"
-                      placeholder="Describe your group..."
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 
-                             bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 
-                             placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:focus:ring-yellow-600">{{ old('description') }}</textarea>
-        </div>
-
-        {{-- Topics --}}
-        <div id="topicsWrapper">
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                Topics
-            </label>
-            <div class="flex flex-wrap gap-2 mb-2">
-                @foreach($topics as $topic)
-                    <div 
-                        class="topic-bubble px-4 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 
-                               text-gray-700 dark:text-gray-200 cursor-pointer select-none 
-                               bg-gray-100/60 dark:bg-gray-700/50 hover:bg-yellow-100 dark:hover:bg-yellow-600/70 
-                               transition text-sm font-medium"
-                        data-id="{{ $topic->id }}">
-                        {{ $topic->name }}
-                    </div>
-                @endforeach
+            {{-- Group Name --}}
+            <div>
+                <label for="name" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Group Name</label>
+                <input type="text" name="name" id="name" value="{{ old('name') }}"
+                    placeholder="Enter group name"
+                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 
+                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 
+                           placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:focus:ring-yellow-600">
             </div>
-            <div id="selected-topics-container"></div>
-        </div>
 
-        {{-- Submit --}}
-        <button type="submit" 
-                class="w-full py-3 px-4 rounded-xl font-semibold 
-                       bg-yellow-400 text-gray-900 
-                       hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-400 
-                       transition shadow-sm">
-            Create Group
-        </button>
+            {{-- Description --}}
+            <div>
+                <label for="description" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Description (optional)</label>
+                <textarea name="description" id="description" rows="4"
+                          placeholder="Describe your group..."
+                          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 
+                                 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 
+                                 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 dark:focus:ring-yellow-600">{{ old('description') }}</textarea>
+            </div>
+
+            {{-- Topics --}}
+            <div id="topicsWrapper">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Topics</label>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    @foreach($topics as $topic)
+                        <div 
+                            class="topic-bubble px-4 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 
+                                   text-gray-700 dark:text-gray-200 cursor-pointer select-none 
+                                   bg-gray-100/60 dark:bg-gray-700/50 hover:bg-yellow-100 dark:hover:bg-yellow-600/70 
+                                   transition text-sm font-medium"
+                            data-id="{{ $topic->id }}">
+                            {{ $topic->name }}
+                        </div>
+                    @endforeach
+                </div>
+                <div id="selected-topics-container"></div>
+            </div>
+
+            {{-- Submit --}}
+            <button type="submit" 
+                    class="w-full py-3 px-4 rounded-xl font-semibold 
+                           bg-yellow-400 text-gray-900 
+                           hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-400 
+                           transition shadow-sm">
+                Create Group
+            </button>
+        </div>
     </form>
 
     {{-- Validation Modal --}}
@@ -84,12 +72,11 @@
                     class="absolute top-3 right-3 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 text-2xl">
                 &times;
             </button>
-            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">
-                Please fix the following errors:
-            </h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">Please fix the following errors:</h2>
             <ul id="errorList" class="list-disc pl-5 text-gray-700 dark:text-gray-200 space-y-1"></ul>
         </div>
     </div>
+
 </div>
 
 {{-- Script --}}

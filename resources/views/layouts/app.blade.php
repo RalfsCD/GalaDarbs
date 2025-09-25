@@ -31,7 +31,7 @@
     {{-- Navbar --}}
     @include('layouts.navigation')
 
-    <div class="min-h-screen flex">
+    <div class="flex min-h-screen">
         {{-- Sidebar (optional) --}}
         @hasSection('sidebar')
             <aside class="hidden sm:block fixed top-16 left-0 w-56 h-full bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
@@ -40,8 +40,10 @@
         @endif
 
         {{-- Main content --}}
-        <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8 pt-16">
-            @yield('content')
+        <main class="flex-1 sm:ml-56 pt-16 px-4 sm:px-6 lg:px-8 transition-all duration-300">
+            <div class="max-w-7xl mx-auto">
+                @yield('content')
+            </div>
         </main>
     </div>
 

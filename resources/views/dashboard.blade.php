@@ -5,12 +5,13 @@
      class="flex flex-col md:flex-row gap-6 md:gap-8 
             bg-gradient-to-br from-gray-50 via-white to-gray-100 
             dark:from-gray-900 dark:via-gray-950 dark:to-black
-            fixed inset-0 ml-64 overflow-hidden">
+            fixed inset-0 ml-64 overflow-hidden h-screen"> <!-- Added h-screen to root -->
 
-    <!-- Feed -->
+    <!-- Feed Section -->
     <main id="feed-column"
-          class="flex-1 px-4 sm:px-6 md:px-8 py-6 md:py-8 overflow-y-auto scrollbar-hide flex justify-center">
-        <div class="w-full max-w-3xl"> <!-- Centered narrower feed -->
+          class="flex-1 px-4 sm:px-6 md:px-8 py-6 md:py-8 overflow-y-auto scrollbar-hide flex justify-center h-full"> <!-- Feed scrollable with h-full -->
+
+        <div class="w-full max-w-7xl"> <!-- Centered and fixed width for content -->
 
             <h1 class="text-3xl sm:text-4xl font-extrabold 
                        text-gray-900 dark:text-gray-100 mb-8 tracking-tight">
@@ -32,12 +33,9 @@
         </div>
     </main>
 
-    <!-- Groups -->
+    <!-- Sidebar Section (Groups Sidebar) -->
     <aside id="groups-column"
-           class="w-full md:w-80 lg:w-96 px-4 sm:px-6 md:px-8 py-6 md:py-8 space-y-6 
-                  border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 
-                  overflow-y-auto scrollbar-hide 
-                  bg-gradient-to-b from-transparent via-white/50 dark:via-gray-900/30 to-transparent">
+           class="w-full md:w-80 lg:w-96 px-6 py-8 space-y-6 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 overflow-y-auto max-h-screen"> <!-- Sidebar scrollable with max-h-screen -->
 
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             Your Groups
@@ -72,11 +70,10 @@
             <p class="text-gray-500 dark:text-gray-400 italic">You haven’t joined any groups yet.</p>
         @endforelse
     </aside>
-</div>
+</div> <!-- End of flex container -->
 
-<!-- Comment Drawer (inline, not partial) -->
-<div id="commentDrawer"
-     class="fixed inset-0 hidden bg-black/40 dark:bg-black/70 z-50 justify-end">
+<!-- Comment Drawer -->
+<div id="commentDrawer" class="fixed inset-0 hidden bg-black/40 dark:bg-black/70 z-50 justify-end">
     <div class="bg-white dark:bg-gray-900 w-full sm:w-[480px] h-full shadow-2xl flex flex-col">
         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
             <h2 class="text-lg font-bold">Comments</h2>
@@ -93,11 +90,12 @@
     </div>
 </div>
 
-<!-- Image Lightbox (inline, not partial) -->
+<!-- Image Lightbox -->
 <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
     <span id="closeImageModal" class="absolute top-6 right-8 text-white text-4xl cursor-pointer">&times;</span>
     <img id="modalImage" src="" class="max-h-[90%] max-w-[90%] rounded-xl shadow-2xl">
 </div>
+
 @endsection
 
 @section('scripts')
