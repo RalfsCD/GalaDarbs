@@ -47,7 +47,7 @@
     </div>
 
     {{-- User Posts Section --}}
-    <div class="w-full max-w-4xl p-6 rounded-2xl 
+    <div class="w-full max-w-7xl p-6 rounded-2xl 
                 bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
         <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">My Posts</h1><br>
 
@@ -59,12 +59,12 @@
                             bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition
                             flex flex-col h-full">
 
-                    <div class="mb-2 inline-flex items-center gap-1 text-xs">
-                        <span class="text-gray-700 dark:text-gray-300 font-semibold">in</span>
-                        <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
-                            {{ $post->group->name }}
-                        </span>
-                    </div>
+                    <div class="mb-2 flex items-center gap-2 text-sm">
+    <span class="text-gray-500 dark:text-gray-400">in</span>
+    <span class="font-semibold text-blue-600 dark:text-blue-400">
+        {{ $post->group->name }}
+    </span>
+</div>
 
                     <div class="flex justify-between items-start">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $post->title }}</h3>

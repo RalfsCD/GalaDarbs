@@ -8,13 +8,24 @@ use Illuminate\Http\Request;
 class TopicController extends Controller
 {
 
-    public function index()
-    {
-        $topics = Topic::withCount('groups')->latest()->get();
+   public function index(Request $request)
+{
+    $search = trim((string) $request->query('search', ''));
 
-        return view('topics.index', compact('topics'));
-    }
+    $topics = Topic::query()
+        ->withCount('groups')
+        ->when($search !== '', function ($q) use ($search) {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('name', 'like', "%{$search}%")
+                   ->orWhere('description', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('name')
+        ->paginate(12)
+        ->appends($request->only('search')); // keep ?search= in links
 
+    return view('topics.index', compact('topics'));
+}
 
     public function create()
     {

@@ -1,48 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto p-6 space-y-6">
+<div class="max-w-7xl mx-auto p-6 space-y-6">
 
-    <!-- Tēmas informācija -->
-    <div class="p-5 rounded-2xl 
-                bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                backdrop-blur-md border border-gray-200 shadow-sm">
-        <h1 class="text-3xl font-bold text-gray-900">{{ $topic->name }}</h1>
+    {{-- Topic Header --}}
+    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md">
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">{{ $topic->name }}</h1>
+        
         @if($topic->description)
-        <p class="text-gray-600 mt-1">{{ $topic->description }}</p>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">{{ $topic->description }}</p>
         @endif
-        <p class="text-gray-500 mt-2">{{ $topic->groups->count() }} Groups</p>
+        
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-3">
+            {{ $topic->groups->count() }} {{ Str::plural('Group', $topic->groups->count()) }}
+        </p>
     </div>
 
-    <!-- Grupu saraksts -->
-    <div class="space-y-4">
+    {{-- Groups List --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         @forelse($topic->groups as $group)
-        <div class="p-4 rounded-2xl 
-                        bg-gradient-to-r from-white/30 via-gray-50/50 to-white/30
-                        backdrop-blur-md border border-gray-200 shadow-sm hover:shadow-md transition">
+        <a href="{{ route('groups.show', $group) }}" 
+           class="block p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition">
+            
+            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $group->name }}</h2>
+            
+            <p class="text-gray-600 dark:text-gray-300 mt-2">
+                {{ $group->description ?? 'No description.' }}
+            </p>
+            
+            <p class="text-gray-500 dark:text-gray-400 text-sm mt-3">
+                Members: <span class="font-medium text-gray-900 dark:text-gray-100">{{ $group->members->count() }}</span>
+            </p>
 
-
-            <a href="{{ route('groups.show', $group) }}" class="block space-y-2 no-underline">
-                <h2 class="text-xl font-bold text-gray-900">{{ $group->name }}</h2>
-                <p class="text-gray-600">{{ $group->description ?? 'No description.' }}</p>
-                <p class="text-sm text-gray-500">Members: {{ $group->members->count() }}</p>
-                <p class="text-sm text-gray-700">
-                    Topics: {{ $group->topics->pluck('name')->join(', ') }}
-                </p>
-            </a>
-
+            <p class="text-gray-500 dark:text-gray-400 text-sm">
+                Topics: <span class="font-medium text-gray-900 dark:text-gray-100">{{ $group->topics->pluck('name')->join(', ') }}</span>
+            </p>
 
             @auth
-            @if($group->members->contains(auth()->id()))
-            <span class="mt-3 inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-sm">
-                Joined
-            </span>
-            @endif
+                @if($group->members->contains(auth()->id()))
+                <span class="mt-4 inline-block px-3 py-1 rounded-full bg-green-200 dark:bg-green-700/70 text-green-800 dark:text-green-100 font-semibold text-xs">
+                    Joined
+                </span>
+                @endif
             @endauth
-        </div>
+        </a>
         @empty
-        <p class="text-gray-500">No groups are using this topic yet.</p>
+        <p class="text-gray-500 dark:text-gray-400">No groups are using this topic yet.</p>
         @endforelse
     </div>
+
 </div>
 @endsection
