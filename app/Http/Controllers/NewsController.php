@@ -26,24 +26,23 @@ class NewsController extends Controller
 
     public function store(Request $request)
 {
-    // Validate the request data
     $request->validate([
         'title' => 'required|string|max:255',
         'content' => 'required|string',
-        'media' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Add validation for image files
+        'media' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
     ]);
 
-    // Handle the file upload for the image
+    
     if ($request->hasFile('media')) {
         $image = $request->file('media');
-        $path = $image->storeAs('public/news', $image->getClientOriginalName()); // Save image in public/news folder
+        $path = $image->storeAs('public/news', $image->getClientOriginalName()); 
     }
 
-    // Create the news entry in the database
+    
     $news = News::create([
         'title' => $request->title,
         'content' => $request->content,
-        'image' => isset($path) ? str_replace('public/', '', $path) : null, // Store the image path without the "public/" prefix
+        'image' => isset($path) ? str_replace('public/', '', $path) : null, 
     ]);
 
     return redirect()->route('news.index')->with('success', 'News created successfully');

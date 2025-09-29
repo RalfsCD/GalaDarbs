@@ -2,51 +2,113 @@
 document.addEventListener("DOMContentLoaded", () => {
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
 
-    // -------------------------------
-    // LIKE TOGGLE (CLICK)
-    // -------------------------------
+   
+    const inFlight = new Set(); 
+    const suppressUntil = new Map(); 
+    const SUPPRESS_MS = 450;
+
+    const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const isTouchCapable =
+        ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || isCoarsePointer;
+
+    function shouldSuppress(postId) {
+        return (suppressUntil.get(postId) || 0) > Date.now();
+    }
+    function suppress(postId) {
+        suppressUntil.set(postId, Date.now() + SUPPRESS_MS);
+    }
+
+    
     document.addEventListener("click", async e => {
+        
+        if (e.target.closest(".expand-image")) return;
+
         const btn = e.target.closest(".like-btn");
         if (!btn) return;
-        await toggleLikeRequest(btn.dataset.post, btn);
-    });
 
-    // -------------------------------
-    // DOUBLE CLICK (DESKTOP)
-    // -------------------------------
-    document.addEventListener("dblclick", async e => {
-        const card = e.target.closest(".post-card");
-        if (!card) return;
-        e.preventDefault(); // prevent text selection
-        const postId = card.dataset.postId;
+        const postId = btn.dataset.post;
         if (!postId) return;
-        await toggleLikeRequest(postId, card.querySelector(".like-btn"));
-        showFloatingHeart(card);
+        if (inFlight.has(postId) || shouldSuppress(postId)) return;
+
+        suppress(postId);
+        await toggleLikeRequest(postId, btn);
     });
 
-    // -------------------------------
-    // DOUBLE TAP (MOBILE)
-    // -------------------------------
-    const lastTapByPost = new Map();
-    document.addEventListener("touchend", async e => {
-        const card = e.target.closest(".post-card");
-        if (!card) return;
-        const postId = card.dataset.postId;
-        const now = Date.now();
-        const last = lastTapByPost.get(postId) || 0;
-        lastTapByPost.set(postId, now);
-        if (now - last < 300) {
+   
+    if (!isTouchCapable) {
+        document.addEventListener("dblclick", async e => {
+            
+            if (e.target.closest(".like-btn") || e.target.closest(".expand-image")) return;
+
+            const card = e.target.closest(".post-card");
+            if (!card) return;
+
             e.preventDefault();
+            e.stopPropagation();
+
+            const postId = card.dataset.postId;
+            if (!postId) return;
+            if (inFlight.has(postId) || shouldSuppress(postId)) return;
+
+            suppress(postId);
             await toggleLikeRequest(postId, card.querySelector(".like-btn"));
             showFloatingHeart(card);
-        }
-    }, { passive: false });
+        });
+    }
 
-    // -------------------------------
-    // LIKE REQUEST
-    // -------------------------------
+   
+    if (isTouchCapable) {
+        const lastTapByPost = new Map();
+
+        
+        document.addEventListener("touchstart", e => {
+            const card = e.target.closest(".post-card");
+            if (!card) return;
+            if (e.target.closest(".expand-image")) return; 
+
+            const postId = card.dataset.postId;
+            const now = Date.now();
+            const last = lastTapByPost.get(postId) || 0;
+
+            if (now - last < 300) {
+                
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, { passive: false });
+
+        document.addEventListener("touchend", async e => {
+            const card = e.target.closest(".post-card");
+            if (!card) return;
+            if (e.target.closest(".expand-image")) return;
+
+            const postId = card.dataset.postId;
+            if (!postId) return;
+
+            const now = Date.now();
+            const last = lastTapByPost.get(postId) || 0;
+            lastTapByPost.set(postId, now);
+
+            
+            if (now - last < 300) {
+                
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (inFlight.has(postId) || shouldSuppress(postId)) return;
+
+                suppress(postId);
+                await toggleLikeRequest(postId, card.querySelector(".like-btn"));
+                showFloatingHeart(card);
+            }
+        }, { passive: false });
+    }
+
     async function toggleLikeRequest(postId, btn) {
-        if (!postId) return;
+        if (!postId || !btn) return;
+        if (inFlight.has(postId)) return; 
+
+        inFlight.add(postId);
         try {
             const res = await fetch(`/posts/${postId}/like`, {
                 method: "POST",
@@ -58,16 +120,21 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!res.ok) return;
             const data = await res.json();
             updateLikeUI(btn, data.liked, data.likes);
-        } catch(err) { console.error("Like failed", err); }
+        } catch(err) {
+            console.error("Like failed", err);
+        } finally {
+            inFlight.delete(postId);
+        }
     }
 
-    // Update like button UI
+    
     function updateLikeUI(btn, liked, likes) {
         if (!btn) return;
         btn.querySelector(".like-count").textContent = likes;
         const icon = btn.querySelector(".like-icon");
         if (liked) {
             icon.classList.add("fill-current","text-red-600","dark:text-red-500");
+            icon.classList.remove("text-gray-500","dark:text-gray-400");
             icon.setAttribute("fill","currentColor");
         } else {
             icon.classList.remove("fill-current","text-red-600","dark:text-red-500");
@@ -76,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Floating heart animation
+   
     function showFloatingHeart(card) {
         if (!card) return;
         const heart = document.createElement("div");
@@ -91,21 +158,22 @@ document.addEventListener("DOMContentLoaded", () => {
                      11.54L12 21.35z"/>
         </svg>`;
         heart.className = "absolute inset-0 flex items-center justify-center pointer-events-none animate-pop-heart";
-        card.style.position = "relative";
+        const prevPos = card.style.position;
+        if (!prevPos || prevPos === "static") card.style.position = "relative";
         card.appendChild(heart);
-        setTimeout(() => heart.remove(), 900);
+        setTimeout(() => {
+            heart.remove();
+        }, 900);
     }
 
-    // -------------------------------
-    // COMMENT DRAWER
-    // -------------------------------
+    
     const drawer = document.getElementById("commentDrawer");
     const commentsList = document.getElementById("commentsList");
     const commentForm = document.getElementById("commentForm");
     const closeComments = document.getElementById("closeComments");
     const postIdInput = document.getElementById("commentPostId");
 
-    // Open drawer
+   
     document.addEventListener("click", async e => {
         const btn = e.target.closest(".comment-trigger");
         if (!btn) return;
@@ -138,13 +206,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Close drawer
+    
     closeComments?.addEventListener("click", () => {
         drawer.classList.add("hidden");
         drawer.classList.remove("flex");
     });
 
-    // Submit comment
+   
     commentForm?.addEventListener("submit", async e => {
         e.preventDefault();
         const postId = postIdInput.value;
@@ -164,10 +232,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!res.ok) throw new Error("Failed to send comment");
             const data = await res.json();
 
-            // Append comment
+            
             commentsList.insertAdjacentHTML("beforeend", renderComment(data.comment));
 
-            // Update counter
+            
             document.querySelectorAll(`[data-post='${postId}'] .comment-count`).forEach(el => {
                 el.textContent = data.comments;
             });
@@ -195,17 +263,16 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>`;
     }
 
-    // -------------------------------
-    // IMAGE LIGHTBOX
-    // -------------------------------
+
     const imageModal = document.getElementById("imageModal");
     const modalImage = document.getElementById("modalImage");
     const closeImageModal = document.getElementById("closeImageModal");
 
-    // Open when clicking expand button
     document.addEventListener("click", e => {
         const btn = e.target.closest(".expand-image");
         if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
         const img = btn.closest("div").querySelector(".post-image");
         if (!img) return;
         modalImage.src = img.dataset.src || img.src;
@@ -235,6 +302,20 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 .animate-pop-heart { animation: pop-heart 0.9s ease forwards; }
 
-/* Disable text selection on post cards */
-.post-card { user-select: none; }
+
+.post-card {
+  user-select: none;
+  -webkit-user-select: none; 
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; 
+}
+
+.post-card * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+
 </style>

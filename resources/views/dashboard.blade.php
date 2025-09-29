@@ -5,21 +5,20 @@
      class="flex flex-col md:flex-row gap-6 md:gap-8 
             bg-gradient-to-br from-gray-50 via-white to-gray-100 
             dark:from-gray-900 dark:via-gray-950 dark:to-black
-            fixed inset-0 ml-64 overflow-hidden h-screen"> <!-- Added h-screen to root -->
+            fixed inset-0 md:ml-64 overflow-hidden h-screen"> <!-- ml-64 only on md+ -->
 
     <!-- Feed Section -->
     <main id="feed-column"
-          class="flex-1 px-4 sm:px-6 md:px-8 py-6 md:py-8 overflow-y-auto scrollbar-hide flex justify-center h-full"> <!-- Feed scrollable with h-full -->
+          class="flex-1 w-full min-w-0 px-4 sm:px-6 md:px-8 py-6 md:py-8 overflow-y-auto scrollbar-hide flex justify-center h-full">
 
-        <div class="w-full max-w-7xl"> <!-- Centered and fixed width for content -->
-
-            <h1 class="text-3xl sm:text-4xl font-extrabold 
-                       text-gray-900 dark:text-gray-100 mb-8 tracking-tight">
+        <div class="w-full max-w-7xl">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold 
+                       text-gray-900 dark:text-gray-100 mb-6 sm:mb-8 tracking-tight">
                 Newest Posts
             </h1>
 
             <!-- Posts container -->
-            <div id="posts-container" class="space-y-8">
+            <div id="posts-container" class="space-y-6 sm:space-y-8">
                 @include('partials.post-card-list', ['posts' => $posts])
             </div>
 
@@ -29,13 +28,13 @@
             </div>
 
             <!-- Sentinel element for infinite scroll -->
-            <div id="infinite-scroll-trigger"></div>
+            <div id="infinite-scroll-trigger" class="h-1 w-full"></div>
         </div>
     </main>
 
     <!-- Sidebar Section (Groups Sidebar) -->
     <aside id="groups-column"
-           class="w-full md:w-80 lg:w-96 px-6 py-8 space-y-6 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 overflow-y-auto max-h-screen"> <!-- Sidebar scrollable with max-h-screen -->
+           class="hidden md:block md:w-80 lg:w-96 px-6 py-8 space-y-6 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 md:overflow-y-auto md:max-h-screen">
 
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             Your Groups
@@ -130,10 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 loading.classList.add("hidden");
             }
         }
-    });
+    }, { root: document.querySelector('#feed-column') });
 
     observer.observe(trigger);
 });
 </script>
-
 @endsection

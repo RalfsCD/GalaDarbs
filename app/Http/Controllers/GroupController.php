@@ -65,7 +65,7 @@ class GroupController extends Controller
 {
     $query = $group->posts()->with(['user', 'group', 'likes', 'comments']);
 
-    // Sorting logic
+    
     if ($request->get('sort') === 'oldest') {
         $query->oldest();
     } elseif ($request->get('sort') === 'most_liked') {

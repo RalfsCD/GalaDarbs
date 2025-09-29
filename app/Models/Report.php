@@ -15,7 +15,7 @@ class Report extends Model
         'resolved'
     ];
 
-    // Allow reports to exist even if post is deleted
+
     public function post()
     {
         return $this->belongsTo(Post::class)->withDefault([

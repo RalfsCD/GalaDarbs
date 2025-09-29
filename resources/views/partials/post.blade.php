@@ -1,4 +1,4 @@
-<div class="post-card p-6 rounded-3xl 
+<div class="post-card p-4 sm:p-6 select-none rounded-3xl 
             bg-white dark:bg-gray-800 
             border border-gray-200 dark:border-gray-700 
             shadow-md hover:shadow-lg transition-all duration-200 mb-6"
@@ -6,50 +6,64 @@
 
     {{-- Header --}}
     <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 min-w-0">
             @if($post->user->profile_photo_path)
                 <img src="{{ asset('storage/' . $post->user->profile_photo_path) }}"
                      alt="{{ $post->user->name }}"
-                     class="w-10 h-10 rounded-full object-cover shadow-sm">
+                     class="w-10 h-10 rounded-full object-cover shadow-sm shrink-0">
             @else
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold shrink-0">
                     {{ strtoupper(substr($post->user->name, 0, 2)) }}
                 </div>
             @endif
-            <div>
-                <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $post->user->name }}</p>
+            <div class="min-w-0">
+                <p class="font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base truncate">{{ $post->user->name }}</p>
                 <p class="text-xs text-gray-600 dark:text-gray-400">
-                    in <span class="bg-yellow-100 dark:bg-yellow-700/50 text-yellow-800 dark:text-yellow-100 px-2 py-0.5 rounded-full font-medium">
+                    in <span class="inline-block align-middle bg-yellow-100 dark:bg-yellow-700/50 text-yellow-800 dark:text-yellow-100 px-2 py-0.5 rounded-full font-medium truncate max-w-[170px] sm:max-w-none">
                         {{ $post->group->name }}
                     </span>
                 </p>
             </div>
         </div>
-        <span class="text-gray-400 text-xs">{{ $post->created_at->diffForHumans() }}</span>
+        <span class="text-gray-400 text-xs shrink-0 ml-2">{{ $post->created_at->diffForHumans() }}</span>
     </div>
 
     {{-- Title --}}
     @if($post->title)
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ $post->title }}</h2>
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3 break-words">{{ $post->title }}</h2>
     @endif
 
     {{-- Content --}}
     @if($post->content)
-        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">{{ $post->content }}</p>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 break-words">{{ $post->content }}</p>
     @endif
 
     {{-- Media --}}
     @if($post->media_path)
-        <div class="overflow-hidden rounded-xl mb-4">
+        <div class="relative overflow-hidden rounded-xl mb-4">
             <img src="{{ asset('storage/' . $post->media_path) }}"
                  alt="Post Image"
-                 class="w-full max-h-[28rem] object-cover cursor-pointer transition-transform duration-300 hover:scale-[1.02] post-image"
+                 class="post-image w-full max-h-[28rem] object-cover cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
                  data-src="{{ asset('storage/' . $post->media_path) }}">
+
+           
+            <button type="button"
+                    class="expand-image absolute top-2 right-2 z-10 inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10
+                           rounded-full bg-black/50 hover:bg-black/60 text-white shadow-md backdrop-blur-sm
+                           focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                    aria-label="Expand image">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="1.8" class="w-5 h-5 sm:w-6 sm:h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3.75 9V4.5H8.25M20.25 15v4.5H15.75M8.25 4.5 4.5 8.25M15.75 19.5l3.75-3.75M14.25 9h3.75V5.25M9.75 15H6v3.75"/>
+                </svg>
+            </button>
         </div>
     @endif
 
     {{-- Actions --}}
-    <div class="flex items-center gap-6 mt-3">
+    <div class="flex items-center gap-4 sm:gap-6 mt-3 flex-wrap">
         @php
             $liked = auth()->check() && $post->likes->contains(auth()->id());
             $isOwner = auth()->check() && auth()->id() === $post->user_id;
@@ -69,7 +83,7 @@
                          3.75 3 5.765 3 8.25c0 7.22 9 12 9 
                          12s9-4.78 9-12Z"/>
             </svg>
-            <span class="like-count text-gray-700 dark:text-gray-300 font-medium">
+            <span class="like-count text-gray-700 dark:text-gray-300 font-medium text-sm sm:text-base">
                 {{ $post->likes_count ?? $post->likes->count() }}
             </span>
         </button>
@@ -97,7 +111,7 @@
                          3.746 2.25 5.14 2.25 
                          6.741v6.018Z"/>
             </svg>
-            <span class="comment-count font-medium">
+            <span class="comment-count font-medium text-sm sm:text-base">
                 {{ $post->comments_count ?? $post->comments->count() }}
             </span>
         </button>
@@ -116,7 +130,7 @@
     </div>
 </div>
 
-<!-- Report Modal -->
+
 <div id="reportModal-{{ $post->id }}" class="hidden fixed inset-0 bg-black/40 dark:bg-black/70 z-50 items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl max-w-md w-full space-y-4 relative">
         <button onclick="closeReportModal({{ $post->id }})" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-2xl">&times;</button>

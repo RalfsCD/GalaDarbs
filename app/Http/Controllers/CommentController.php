@@ -9,7 +9,7 @@ class CommentController extends Controller
 {
     public function index(Post $post)
     {
-        $post->load(['comments.user']); // eager load user
+        $post->load(['comments.user']); 
 
         return response()->json([
             'comments' => $post->comments->map(fn($c) => [

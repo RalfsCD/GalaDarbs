@@ -50,7 +50,7 @@
     {{-- Scripts --}}
     @yield('scripts')
 
-    <!-- ✅ Dark Mode Toggle Script -->
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const html = document.documentElement;
