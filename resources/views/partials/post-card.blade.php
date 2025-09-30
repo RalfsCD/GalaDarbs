@@ -167,7 +167,7 @@
                     <option value="Harassment">Harassment</option>
                     <option value="Hate Speech">Hate Speech</option>
                     <option value="Misinformation">Misinformation</option>
-                    <option value="Sexual Content">Sexual Content</option>
+                    <option value="inappropriate Content">inappropriate Content</option>
                     <option value="Violence or Threats">Violence or Threats</option>
                     <option value="Other">Other</option>
                 </select>
