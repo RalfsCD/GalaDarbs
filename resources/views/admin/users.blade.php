@@ -1,87 +1,163 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto p-6 space-y-6">
+<div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-    {{-- Page Header Card --}}
-    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md flex items-center justify-between">
-        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">User Management</h1>
-    </div>
-
-    {{-- Back Button Card --}}
-    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md">
-        <a href="{{ route('admin.index') }}" 
-           class="px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition inline-flex items-center">
-            Back to Admin Dashboard
+  {{-- ===== Breadcrumbs ===== --}}
+  <nav aria-label="Breadcrumb"
+       class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
+    <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+      <li>
+        <a href="{{ url('/') }}"
+           class="inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <span class="font-semibold text-gray-900 dark:text-gray-100">PostPit</span>
         </a>
+      </li>
+      <li aria-hidden="true" class="text-gray-400">
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </li>
+      <li>
+        <a href="{{ route('admin.index') }}"
+           class="inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <span class="font-semibold">Admin</span>
+        </a>
+      </li>
+      <li aria-hidden="true" class="text-gray-400">
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </li>
+      <li class="text-gray-900 dark:text-gray-100 font-semibold">Users</li>
+    </ol>
+  </nav>
+
+  {{-- ===== Header ===== --}}
+  <header
+    class="relative overflow-hidden rounded-3xl p-6 sm:p-8
+           bg-gradient-to-br from-yellow-50 via-white to-yellow-100
+           dark:from-gray-900 dark:via-gray-900/70 dark:to-gray-900
+           border border-yellow-200/60 dark:border-gray-800 shadow-2xl">
+    <div class="relative z-10 flex items-start justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_20px_theme(colors.yellow.300)]"></span>
+          <span class="text-[11px] font-semibold tracking-wide uppercase text-yellow-900/80 dark:text-yellow-100/90">Management</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
+          User Management
+        </h1>
+      </div>
+
+      <a href="{{ route('admin.index') }}"
+         class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full
+                bg-white/70 dark:bg-gray-900/60 backdrop-blur
+                text-gray-900 dark:text-gray-100 text-sm font-semibold
+                border border-gray-300/70 dark:border-gray-700/80
+                shadow-sm hover:shadow-md transition">
+        ← Back
+      </a>
     </div>
+  </header>
 
-    {{-- Search & Sort Card --}}
-    <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md">
-        <form method="GET" class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-            <input type="text" name="search" value="{{ request('search') }}" 
-                   placeholder="Search by name or email..."
-                   class="flex-1 px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600">
+  {{-- ===== Search + Sort ===== --}}
+  <section class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-xl p-4 sm:p-6">
+    <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <input type="text" name="search" value="{{ request('search') }}"
+             placeholder="Search by name or email…"
+             class="flex-1 px-4 py-2.5 rounded-full border border-gray-300 dark:border-gray-700
+                    bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
 
-            <select name="sort" class="px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600">
-                <option value="">Sort By</option>
-                <option value="warnings_desc" {{ request('sort')=='warnings_desc' ? 'selected' : '' }}>Most Warnings</option>
-                <option value="warnings_asc" {{ request('sort')=='warnings_asc' ? 'selected' : '' }}>Least Warnings</option>
-                <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected' : '' }}>Name A-Z</option>
-                <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected' : '' }}>Name Z-A</option>
-            </select>
+      <div class="flex items-center gap-2">
+        <select name="sort"
+                class="px-3 py-2.5 rounded-full border border-gray-300 dark:border-gray-700
+                       bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
+                       focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600">
+          <option value="">Sort By</option>
+          <option value="warnings_desc" {{ request('sort')=='warnings_desc' ? 'selected' : '' }}>Most Warnings</option>
+          <option value="warnings_asc" {{ request('sort')=='warnings_asc' ? 'selected' : '' }}>Least Warnings</option>
+          <option value="name_asc" {{ request('sort')=='name_asc' ? 'selected' : '' }}>Name A–Z</option>
+          <option value="name_desc" {{ request('sort')=='name_desc' ? 'selected' : '' }}>Name Z–A</option>
+        </select>
 
-            <button type="submit" 
-                    class="px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                Apply
-            </button>
-        </form>
-    </div>
+        <button type="submit"
+                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full
+                       bg-yellow-400 text-gray-900 font-semibold
+                       border border-yellow-300/70 shadow-sm hover:shadow-md transition">
+          Apply
+        </button>
+      </div>
+    </form>
+  </section>
 
-    {{-- Users List --}}
-    <div class="space-y-6">
-        @forelse($users as $user)
-            <div class="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition flex flex-col sm:flex-row justify-between items-start sm:items-center">
+  {{-- ===== Users List ===== --}}
+  <section class="space-y-4 sm:space-y-6">
+    @forelse($users as $user)
+      <div class="p-5 sm:p-6 rounded-2xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
+                  border border-gray-200/70 dark:border-gray-800/70
+                  shadow-sm hover:shadow-md transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        {{-- Info --}}
+        <div class="flex items-start gap-3 min-w-0">
+          {{-- Avatar / initials --}}
+          @php
+            $initials = strtoupper(mb_substr($user->name, 0, 2));
+          @endphp
+          <div class="shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white font-bold flex items-center justify-center">
+            {{ $initials }}
+          </div>
 
-                {{-- User Info --}}
-                <div class="space-y-1">
-                    <p class="font-bold text-gray-900 dark:text-gray-100">{{ $user->name }}</p>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">{{ $user->email }}</p>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">
-                        Warnings: 
-                        <span class="@if($user->warnings->count() >= 3) text-red-600 font-bold 
-                                      @elseif($user->warnings->count() >= 1) text-yellow-600 font-semibold 
-                                      @else text-gray-500 @endif">
-                            {{ $user->warnings->count() ?? 0 }}
-                        </span>
-                    </p>
-                </div>
+          <div class="min-w-0">
+            <p class="font-bold text-gray-900 dark:text-gray-100 leading-tight truncate">{{ $user->name }}</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm truncate">{{ $user->email }}</p>
 
-                {{-- Actions --}}
-                <div class="mt-2 sm:mt-0 flex gap-2 items-center">
-                    @if(!$user->isAdmin())
-                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                              onsubmit="return confirm('Delete user?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="hover:opacity-70 transition">
-                                <img src="{{ asset('icons/delete.svg') }}" alt="Delete" class="w-5 h-5">
-                            </button>
-                        </form>
-                    @else
-                        <span class="text-gray-500 dark:text-gray-400 font-semibold">Admin</span>
-                    @endif
-                </div>
-            </div>
-        @empty
-            <p class="text-gray-500 dark:text-gray-400">No users found.</p>
-        @endforelse
-    </div>
+            <p class="text-sm mt-1">
+              <span class="text-gray-500 dark:text-gray-400">Warnings:</span>
+              <span class="{{ ($user->warnings->count() ?? 0) >= 3 ? 'text-red-600 font-semibold' : (($user->warnings->count() ?? 0) >= 1 ? 'text-yellow-600 font-semibold' : 'text-gray-500') }}">
+                {{ $user->warnings->count() ?? 0 }}
+              </span>
+            </p>
+          </div>
+        </div>
 
-    {{-- Pagination --}}
-    <div class="mt-4">
-        {{ $users->appends(request()->query())->links() }}
-    </div>
+        {{-- Actions --}}
+        <div class="mt-1 sm:mt-0 flex items-center gap-2">
+          @if($user->isAdmin())
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                         bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700
+                         text-gray-700 dark:text-gray-300">Admin</span>
+          @else
+            <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
+                  onsubmit="return confirm('Delete user?');">
+              @csrf
+              @method('DELETE')
 
+              {{-- Ghost-danger button that matches the rest of the UI --}}
+              <button type="submit"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full
+                             bg-white/70 dark:bg-gray-900/60 backdrop-blur
+                             text-red-600 dark:text-red-400 font-semibold
+                             border border-red-300/60 dark:border-red-500/40
+                             shadow-sm hover:shadow-md
+                             hover:bg-red-50/70 dark:hover:bg-red-900/20
+                             focus:outline-none focus:ring-2 focus:ring-red-300/70 dark:focus:ring-red-600/50
+                             transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M8 6V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1m-1 0v13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6m3 4v7m4-7v7"/>
+                </svg>
+                Delete
+              </button>
+            </form>
+          @endif
+        </div>
+      </div>
+    @empty
+      <p class="text-gray-500 dark:text-gray-400">No users found.</p>
+    @endforelse
+  </section>
+
+  {{-- ===== Pagination ===== --}}
+  <div>
+    {{ $users->appends(request()->query())->links() }}
+  </div>
 </div>
 @endsection
