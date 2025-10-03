@@ -5,7 +5,8 @@
 
   {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
-       class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
+       class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
+              border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
       <li>
         <a href="{{ url('/') }}"
@@ -37,24 +38,34 @@
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
            dark:from-gray-900 dark:via-gray-900/70 dark:to-gray-900
            border border-yellow-200/60 dark:border-gray-800 shadow-2xl">
-    <div class="relative z-10 flex items-start justify-between gap-4">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute -right-16 -top-10 h-56 w-56 rounded-full blur-3xl bg-yellow-300/30 dark:bg-yellow-500/20"></div>
+      <div class="absolute -left-20 -bottom-16 h-64 w-64 rounded-full blur-3xl bg-orange-300/25 dark:bg-orange-400/15"></div>
+    </div>
+
+    <div class="relative z-10 flex items-start justify-between gap-3">
       <div>
-        <div class="inline-flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_20px_theme(colors.yellow.300)]"></span>
+        <div class="inline-flex items-center gap-2 mb-1">
+          <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_16px_theme(colors.yellow.300)]"></span>
           <span class="text-[11px] font-semibold tracking-wide uppercase text-yellow-900/80 dark:text-yellow-100/90">Moderation</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight
+                   bg-clip-text text-transparent bg-gradient-to-b
+                   from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
           All Reports
         </h1>
       </div>
 
       <a href="{{ route('admin.index') }}"
-         class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full
+         class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
                 bg-white/70 dark:bg-gray-900/60 backdrop-blur
                 text-gray-900 dark:text-gray-100 text-sm font-semibold
                 border border-gray-300/70 dark:border-gray-700/80
-                shadow-sm hover:shadow-md transition">
-        ← Back
+                shadow-sm hover:shadow-md hover:-translate-y-0.5 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12l7.5-7.5M3 12h18"/>
+        </svg>
+        Back
       </a>
     </div>
   </header>
@@ -96,9 +107,9 @@
             @csrf
             @method('PATCH')
             <button type="submit"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full
+                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full
                            bg-white/70 dark:bg-gray-900/60 backdrop-blur
-                           text-gray-900 dark:text-gray-100 font-semibold text-sm
+                           text-gray-900 dark:text-gray-100 text-sm font-semibold
                            border border-gray-300/70 dark:border-gray-700/80
                            hover:bg-yellow-50/60 dark:hover:bg-yellow-500/10
                            focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600

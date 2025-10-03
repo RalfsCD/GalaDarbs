@@ -1,45 +1,60 @@
+{{-- =========================
+  APP NAVIGATION (desktop + mobile)
+  - Yellow dot on active items (incl. Profile & Notifications)
+  - Custom Admin icon
+  - No chevrons/arrows
+========================= --}}
+
+@php
+    // Shared counts/flags
+    $unreadCount = auth()->check()
+        ? auth()->user()->notifications()->whereNull('read_at')->count()
+        : 0;
+
+    // Desktop + Mobile link set
+    $links = [
+        ['name' => 'Home',   'route' => 'dashboard',     'icon' => 'home',                'match' => 'dashboard'],
+        ['name' => 'Topics', 'route' => 'topics.index',  'icon' => 'bookmark',            'match' => 'topics.*'],
+        ['name' => 'Groups', 'route' => 'groups.index',  'icon' => 'users',               'match' => 'groups.*'],
+        ['name' => 'News',   'route' => 'news.index',    'icon' => 'newspaper',           'match' => 'news.*'],
+        ['name' => 'About',  'route' => 'about',         'icon' => 'information-circle',  'match' => 'about'],
+    ];
+
+    if (auth()->check() && auth()->user()->isAdmin()) {
+        // Custom Admin icon; match everything under admin.*
+        $links[] = ['name' => 'Admin', 'route' => 'admin.index', 'icon' => 'admin-custom', 'match' => 'admin.*'];
+    }
+
+    // helpers
+    $isActive = fn(string $pattern) => request()->routeIs($pattern);
+@endphp
+
+{{-- DESKTOP SIDEBAR --}}
 <nav class="hidden md:flex fixed top-0 left-0 h-screen w-64 
             bg-white dark:bg-gray-900 
             border-r border-gray-200 dark:border-gray-800 
             flex-col z-50 transition-colors duration-300">
 
-    <!-- Logo (smaller container, larger image) -->
+    {{-- Logo --}}
     <div class="flex items-center justify-center h-14 border-b border-gray-200 dark:border-gray-800">
         <a href="{{ route('dashboard') }}" class="relative flex items-center justify-center">
             <img id="nav-logo"
-                 src="{{ asset('images/LogoDark.png') }}"  {{-- default; corrected on load to avoid wrong logo --}}
+                 src="{{ asset('images/LogoDark.png') }}"
                  alt="Logo"
                  class="h-14 w-auto opacity-0 transition-opacity duration-200 ease-out">
         </a>
     </div>
 
-    <!-- Navigation Links -->
+    {{-- Links --}}
     <div class="flex-1 overflow-y-auto py-5 px-4 space-y-2">
-        @php
-            $links = [
-                ['name' => 'Home', 'route' => 'dashboard', 'icon' => 'home'],
-                ['name' => 'Topics', 'route' => 'topics.index', 'icon' => 'bookmark'],
-                ['name' => 'Groups', 'route' => 'groups.index', 'icon' => 'users'],
-                ['name' => 'News', 'route' => 'news.index', 'icon' => 'newspaper'],
-                ['name' => 'About', 'route' => 'about', 'icon' => 'information-circle'],
-            ];
-
-            if(auth()->check() && auth()->user()->isAdmin()) {
-                $links[] = ['name' => 'Admin', 'route' => 'admin.index', 'icon' => 'shield-check'];
-            }
-
-            $unreadCount = auth()->check()
-                ? auth()->user()->notifications()->whereNull('read_at')->count()
-                : 0;
-        @endphp
-
-        {{-- Main links --}}
         @foreach($links as $link)
+            @php $active = $isActive($link['match']); @endphp
             <a href="{{ route($link['route']) }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg 
                       text-gray-700 dark:text-gray-300 
                       hover:bg-gray-100 dark:hover:bg-gray-800 transition 
-                      {{ request()->routeIs($link['route']) ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+                      {{ $active ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+                {{-- Icon --}}
                 @switch($link['icon'])
                     @case('home')
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 
@@ -81,8 +96,7 @@
                                   0 0 1 4.5 
                                   0Zm-13.5 
                                   0a2.25 2.25 0 1 1-4.5 
-                                  0 2.25 2.25 
-                                  0 0 1 4.5 0Z" /></svg>
+                                  0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
                         @break
                     @case('newspaper')
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
@@ -103,26 +117,33 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
                               d="M11.25 11.25h1.5v6h-1.5v-6zm.75-4.5a.75.75 0 11-1.5 
                               0 .75.75 0 011.5 0zM12 21a9 9 0 100-18 9 9 0 
-                              000 18z"/></svg>
+                              0 0 0 18z"/></svg>
                         @break
-                    @case('shield-check')
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 6l7.5 4.5v6c0 4.5-7.5 
-                              7.5-7.5 7.5S4.5 21 4.5 
-                              16.5v-6L12 6zm0 
-                              6.75l-2.25 
-                              2.25 4.5 
-                              4.5L18 
-                              13.5"/></svg>
+                    @case('admin-custom')
+                        {{-- Custom admin icon --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                        </svg>
                         @break
                 @endswitch
+
+                {{-- Yellow active dot --}}
+                @if($active)
+                  <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+                @endif
+
                 <span>{{ $link['name'] }}</span>
             </a>
         @endforeach
 
-        {{-- Auth-only links --}}
+        {{-- Auth-only: Profile + Notifications + Logout --}}
         @auth
-            <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+            @php $activeProfile = $isActive('profile.*'); @endphp
+            <a href="{{ route('profile.show') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg
+                      text-gray-700 dark:text-gray-300
+                      hover:bg-gray-100 dark:hover:bg-gray-800 transition
+                      {{ $activeProfile ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
                 @if(auth()->user()->profile_photo_path)
                     <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" class="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600" alt="Profile">
                 @else
@@ -130,13 +151,31 @@
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                 @endif
+
+                @if($activeProfile)
+                  <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+                @endif
+
                 <span>Profile</span>
             </a>
 
-            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-                          d="M14.25 18.75a2.25 2.25 0 11-4.5 0m9-5.25V10.5a6.75 
-                          6.75 0 10-13.5 0v3l-1.5 3h16.5l-1.5-3z"/></svg>
+            @php $activeNotifs = $isActive('notifications.*'); @endphp
+            <a href="{{ route('notifications.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg
+                      text-gray-700 dark:text-gray-300
+                      hover:bg-gray-100 dark:hover:bg-gray-800 transition
+                      {{ $activeNotifs ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+                {{-- Bell --}}
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14.25 18.75a2.25 2.25 0 11-4.5 0m9-5.25V10.5a6.75 
+                        6.75 0 10-13.5 0v3l-1.5 3h16.5l-1.5-3z"/>
+                </svg>
+
+                @if($activeNotifs)
+                  <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+                @endif
+
                 <span>Notifications</span>
                 @if($unreadCount > 0)
                     <span class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $unreadCount }}</span>
@@ -160,9 +199,8 @@
         @endauth
     </div>
 
-    <!-- Bottom section -->
+    {{-- Bottom: Theme toggle --}}
     <div class="p-4 border-t border-gray-200 dark:border-gray-800">
-        <!-- Dark mode toggle -->
         <button id="theme-toggle" type="button"
                 class="flex items-center gap-2 px-3 py-2 w-full rounded-lg 
                        hover:bg-gray-100 dark:hover:bg-gray-800 
@@ -187,12 +225,12 @@
     </div>
 </nav>
 
-{{-- MOBILE TOP BAR (visible only on mobile) --}}
+{{-- MOBILE TOP BAR --}}
 <header class="md:hidden fixed top-0 inset-x-0 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-3"
         style="padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
     <button id="mobile-nav-open" type="button" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false"
             class="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-        <!-- Hamburger -->
+        {{-- Hamburger --}}
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
         </svg>
@@ -202,7 +240,6 @@
         <img id="nav-logo-mobile" src="{{ asset('images/LogoDark.png') }}" alt="Logo" class="h-8 sm:h-10 w-auto opacity-0 transition-opacity duration-200 ease-out">
     </a>
 
-    {{-- Optional right-side space (could place a bell or profile) --}}
     <div class="w-10"></div>
 </header>
 
@@ -214,7 +251,8 @@
               bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
               transform -translate-x-full transition-transform duration-300 z-50"
        style="padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
-    {{-- Drawer header with logo + close --}}
+
+    {{-- Drawer header --}}
     <div class="h-14 px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800"
          style="padding-top: env(safe-area-inset-top);">
         <a href="{{ route('dashboard') }}" class="flex items-center">
@@ -228,33 +266,15 @@
         </button>
     </div>
 
-    {{-- Drawer scrollable content (same links as desktop) --}}
+    {{-- Drawer links (same set) --}}
     <div class="flex-1 overflow-y-auto py-5 px-4 space-y-2">
-        @php
-            // Reuse the same links in mobile
-            $links = [
-                ['name' => 'Home', 'route' => 'dashboard', 'icon' => 'home'],
-                ['name' => 'Topics', 'route' => 'topics.index', 'icon' => 'bookmark'],
-                ['name' => 'Groups', 'route' => 'groups.index', 'icon' => 'users'],
-                ['name' => 'News', 'route' => 'news.index', 'icon' => 'newspaper'],
-                ['name' => 'About', 'route' => 'about', 'icon' => 'information-circle'],
-            ];
-
-            if(auth()->check() && auth()->user()->isAdmin()) {
-                $links[] = ['name' => 'Admin', 'route' => 'admin.index', 'icon' => 'shield-check'];
-            }
-
-            $unreadCount = auth()->check()
-                ? auth()->user()->notifications()->whereNull('read_at')->count()
-                : 0;
-        @endphp
-
         @foreach($links as $link)
+            @php $active = $isActive($link['match']); @endphp
             <a href="{{ route($link['route']) }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg 
                       text-gray-700 dark:text-gray-300 
                       hover:bg-gray-100 dark:hover:bg-gray-800 transition 
-                      {{ request()->routeIs($link['route']) ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+                      {{ $active ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
                 @switch($link['icon'])
                     @case('home')
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 
@@ -296,8 +316,7 @@
                                   0 0 1 4.5 
                                   0Zm-13.5 
                                   0a2.25 2.25 0 1 1-4.5 
-                                  0 2.25 2.25 
-                                  0 0 1 4.5 0Z" /></svg>
+                                  0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
                         @break
                     @case('newspaper')
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
@@ -317,26 +336,30 @@
                     @case('information-circle')
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
                               d="M11.25 11.25h1.5v6h-1.5v-6zm.75-4.5a.75.75 0 11-1.5 
-                              0 .75.75 0 011.5 0zM12 21a9 9 0 100-18 9 9 0 
-                              000 18z"/></svg>
+                              0 .75.75 0 011.5 0zM12 21a9 9 0 100-18 9 9 0 0 0 0 18z"/></svg>
                         @break
-                    @case('shield-check')
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 6l7.5 4.5v6c0 4.5-7.5 
-                              7.5-7.5 7.5S4.5 21 4.5 
-                              16.5v-6L12 6zm0 
-                              6.75l-2.25 
-                              2.25 4.5 
-                              4.5L18 
-                              13.5"/></svg>
+                    @case('admin-custom')
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                        </svg>
                         @break
                 @endswitch
+
+                @if($active)
+                  <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+                @endif
+
                 <span>{{ $link['name'] }}</span>
             </a>
         @endforeach
 
         @auth
-            <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+            @php $activeProfile = $isActive('profile.*'); @endphp
+            <a href="{{ route('profile.show') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg
+                      text-gray-700 dark:text-gray-300
+                      hover:bg-gray-100 dark:hover:bg-gray-800 transition
+                      {{ $activeProfile ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
                 @if(auth()->user()->profile_photo_path)
                     <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" class="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600" alt="Profile">
                 @else
@@ -344,13 +367,28 @@
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                 @endif
+
+                @if($activeProfile)
+                  <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+                @endif
+
                 <span>Profile</span>
             </a>
 
-            <a href="{{ route('notifications.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition relative">
+            @php $activeNotifs = $isActive('notifications.*'); @endphp
+            <a href="{{ route('notifications.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg 
+                      text-gray-700 dark:text-gray-300 
+                      hover:bg-gray-100 dark:hover:bg-gray-800 transition 
+                      {{ $activeNotifs ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
                           d="M14.25 18.75a2.25 2.25 0 11-4.5 0m9-5.25V10.5a6.75 
                           6.75 0 10-13.5 0v3l-1.5 3h16.5l-1.5-3z"/></svg>
+
+                @if($activeNotifs)
+                  <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+                @endif
+
                 <span>Notifications</span>
                 @if($unreadCount > 0)
                     <span class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $unreadCount }}</span>
@@ -374,7 +412,7 @@
         @endauth
     </div>
 
-    {{-- Drawer bottom section --}}
+    {{-- Drawer bottom: Theme toggle --}}
     <div class="p-4 border-t border-gray-200 dark:border-gray-800"
          style="padding-bottom: env(safe-area-inset-bottom);">
         <button id="theme-toggle-mobile" type="button"
@@ -396,7 +434,7 @@
     </div>
 </aside>
 
-{{-- Spin + fade swap for logo, correct logo per theme --}}
+{{-- Spin + fade swap for logo --}}
 <style>
 @keyframes spin-swap {
   0%   { transform: rotate(0deg);   opacity: 1; }
@@ -405,8 +443,6 @@
   100% { transform: rotate(360deg); opacity: 1; }
 }
 .spin-once { animation: spin-swap 0.7s ease-in-out forwards; }
-
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .spin-once { animation: none !important; }
 }
@@ -416,14 +452,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     const html = document.documentElement;
 
-    // Logos (desktop + mobile instances)
+    // Logos
     const logos = [
         document.getElementById('nav-logo'),
         document.getElementById('nav-logo-mobile'),
         document.getElementById('nav-logo-mobile-header')
     ].filter(Boolean);
 
-    // Theme toggles (desktop + mobile)
+    // Theme toggles
     const themeToggles = [
         document.getElementById('theme-toggle'),
         document.getElementById('theme-toggle-mobile')
@@ -443,7 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
         (!localStorage.getItem('color-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
         html.classList.contains('dark');
 
-    // Initialize logos without flicker
     const initLogos = () => {
         const dark = isDarkPref();
         logos.forEach(l => {
@@ -454,7 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     initLogos();
 
-    // Spin + swap logos when theme toggles
     const spinSwapLogos = () => {
         logos.forEach(l => l && l.classList.add('spin-once'));
         setTimeout(() => {
@@ -478,7 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setAria(true);
         document.body.classList.add('overflow-hidden');
 
-        // Focus trap: focus first focusable
         trapFocusInit();
         firstFocusable?.focus();
     };
@@ -494,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay?.addEventListener('click', closeDrawer);
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
-    // Focus trap inside the drawer
+    // Focus trap
     let firstFocusable, lastFocusable;
     const trapFocusInit = () => {
         const focusables = drawer?.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -505,12 +538,12 @@ document.addEventListener('DOMContentLoaded', () => {
     drawer?.addEventListener('keydown', (e) => {
         if (e.key !== 'Tab') return;
         const active = document.activeElement;
-        if (e.shiftKey) { // Shift+Tab
+        if (e.shiftKey) {
             if (active === firstFocusable) {
                 e.preventDefault();
                 lastFocusable?.focus();
             }
-        } else { // Tab
+        } else {
             if (active === lastFocusable) {
                 e.preventDefault();
                 firstFocusable?.focus();
@@ -518,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Close drawer after navigating (improves UX on 320px screens)
+    // Close drawer after navigating
     drawer?.addEventListener('click', (e) => {
         const target = e.target.closest('a');
         if (target) closeDrawer();
