@@ -11,6 +11,11 @@
     $previewLimit = 3;
     $groupsPreview = $joinedGroups->take($previewLimit);
     $groupsRest    = $joinedGroups->skip($previewLimit);
+
+    // New KPI metric: Unread notifications
+    $unreadNotifications = auth()->check()
+        ? auth()->user()->notifications()->whereNull('read_at')->count()
+        : 0;
 @endphp
 
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
@@ -98,21 +103,36 @@
         </div>
       </div>
 
-      {{-- KPI: Newest Posts --}}
+      {{-- KPI: Notifications (replaces "Newest Posts") --}}
       <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
                   bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70
                   shadow-[0_12px_32px_-20px_rgba(0,0,0,0.35)]">
         <div class="flex items-center justify-between">
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Newest Posts</p>
-          <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Notifications</p>
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold
+                       @if($unreadNotifications>0)
+                         bg-yellow-100/80 text-yellow-900 border border-yellow-300/60
+                         dark:bg-yellow-500/20 dark:text-yellow-100 dark:border-yellow-500/30
+                       @else
+                         bg-gray-100 text-gray-600 border border-gray-200
+                         dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700
+                       @endif">
+            {{ $unreadNotifications > 0 ? $unreadNotifications . ' unread' : 'All caught up' }}
+          </span>
         </div>
         <div class="flex items-end justify-between">
-          <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">{{ number_format($totalPosts) }}</h3>
-          <button data-target="feed"
-                  class="mode-link inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
-                         bg-yellow-400/80 border border-yellow-300/70 text-gray-900
-                         hover:bg-yellow-500 transition">Open Feed</button>
+          <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            {{ $unreadNotifications > 0 ? number_format($unreadNotifications) : '0' }}
+          </h3>
+          <a href="{{ route('notifications.index') }}"
+             class="inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
+                    {{ $unreadNotifications>0
+                        ? 'bg-yellow-400/80 border border-yellow-300/70 text-gray-900 hover:bg-yellow-500'
+                        : 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' }}
+                    transition">
+            View
+          </a>
         </div>
       </div>
 

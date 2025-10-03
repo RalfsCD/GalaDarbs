@@ -1,8 +1,9 @@
 {{-- =============================================================
-  resources/views/profile/settings.blade.php — Tailwind-only
+  resources/views/profile/settings.blade.php — Tailwind-only (refined)
   - Breadcrumbs (PostPit > Profile > Settings)
-  - Hero + Back, matches the system design language
-  - Polished forms + modal
+  - Hero + Back (matches global design)
+  - Buttons now match Topics/Create (sizes, borders, motion)
+  - Cancel button next to "Update Profile" removed
 ============================================================= --}}
 
 @extends('layouts.app')
@@ -49,38 +50,39 @@
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
            dark:from-gray-900 dark:via-gray-900/70 dark:to-gray-900
            border border-yellow-200/60 dark:border-gray-800 shadow-2xl">
-    <div class="absolute inset-0 -z-10">
-      <div class="absolute -right-16 -top-10 h-56 w-56 rounded-full blur-3xl bg-yellow-300/30 dark:bg-yellow-500/20"></div>
-      <div class="absolute -left-20 -bottom-16 h-64 w-64 rounded-full blur-3xl bg-orange-300/25 dark:bg-orange-400/15"></div>
+    <div class="absolute inset-0 -z-10 opacity-70">
+      <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl bg-gradient-to-br from-yellow-300/40 to-orange-400/30 dark:from-yellow-500/25 dark:to-orange-400/20"></div>
+      <div class="absolute -bottom-28 -left-20 h-80 w-80 rounded-full blur-3xl bg-gradient-to-tr from-white/40 to-yellow-200/40 dark:from-gray-800/40 dark:to-yellow-500/20"></div>
     </div>
 
     <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-      <div class="max-w-2xl">
+      <div class="max-w-2xl space-y-2">
+        <div class="inline-flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_20px_theme(colors.yellow.300)] motion-safe:animate-pulse"></span>
+          <span class="text-[11px] font-semibold tracking-wide uppercase text-yellow-900/80 dark:text-yellow-100/90">Account</span>
+        </div>
         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight
-                   bg-clip-text text-transparent
-                   bg-gradient-to-b from-gray-900 to-gray-600
-                   dark:from-white dark:to-gray-300">
+                   bg-clip-text text-transparent bg-gradient-to-b
+                   from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
           Settings
         </h1>
-        <p class="mt-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
           Update your profile details and manage your account.
         </p>
       </div>
 
       <div class="flex items-center gap-2 md:self-start">
         <a href="{{ route('profile.show', auth()->user()) }}"
-           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
+           class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
                   bg-white/70 dark:bg-gray-900/60 backdrop-blur
                   text-gray-900 dark:text-gray-100 text-sm font-semibold
                   border border-gray-300/70 dark:border-gray-700/80
-                  shadow-sm hover:shadow-md hover:-translate-y-0.5
-                  hover:bg-yellow-50/60 dark:hover:bg-gray-800/80
-                  transition-all focus:outline-none focus:ring-2
-                  focus:ring-yellow-300 dark:focus:ring-yellow-600">
+                  shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
+                  focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12l7.5-7.5M3 12h18"/>
           </svg>
-          Back to Profile
+          Back
         </a>
       </div>
     </div>
@@ -89,7 +91,8 @@
   {{-- ===== Update Profile Form ===== --}}
   <section
     class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
-           border border-gray-200/70 dark:border-gray-800/70 shadow-xl p-4 sm:p-6 space-y-4 sm:space-y-6">
+           border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)]
+           p-4 sm:p-6 space-y-4 sm:space-y-6">
     <form id="updateProfileForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
       @csrf
       @method('patch')
@@ -100,14 +103,13 @@
         <x-text-input id="name" name="name" value="{{ old('name', $user->name) }}"
           class="mt-1 block w-full rounded-xl border border-gray-300 dark:border-gray-700
                  bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400
-                 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600" />
+                 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
       </div>
 
       {{-- Profile Photo --}}
       <div>
         <x-input-label for="profile_photo" value="Profile Photo" class="text-gray-900 dark:text-gray-100" />
-        <label
-          for="profile_photo"
+        <label for="profile_photo"
           class="inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2.5
                  border border-gray-300 dark:border-gray-700
                  bg-white/70 dark:bg-gray-800/60 backdrop-blur-sm
@@ -124,54 +126,43 @@
         <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-1">Select a profile photo (optional).</p>
       </div>
 
-      {{-- Actions --}}
-      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      {{-- Actions (primary-only, matching Topics/Create) --}}
+      <div class="flex">
         <button type="submit"
-          class="inline-flex items-center gap-2 rounded-full px-5 sm:px-6 py-2.5
-                 text-sm sm:text-base font-semibold
-                 bg-yellow-400 text-gray-900
-                 border border-yellow-300/70 shadow-sm
-                 hover:bg-yellow-500 active:bg-yellow-500/90
-                 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+                       text-sm font-semibold tracking-tight
+                       bg-yellow-400 text-gray-900
+                       hover:bg-yellow-500 active:bg-yellow-500/90
+                       dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:active:bg-yellow-400/90
+                       border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
+                       focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15M12 4.5v15"/>
           </svg>
           <span>Update Profile</span>
         </button>
-
-        <a href="{{ route('profile.show', auth()->user()) }}"
-           class="inline-flex items-center gap-2 rounded-full px-5 sm:px-6 py-2.5
-                  text-sm sm:text-base font-semibold
-                  bg-white/70 dark:bg-gray-800/60
-                  border border-gray-300 dark:border-gray-700
-                  hover:bg-gray-100 dark:hover:bg-gray-700
-                  text-gray-700 dark:text-gray-200
-                  focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12l7.5-7.5M3 12h18"/>
-          </svg>
-          <span>Cancel</span>
-        </a>
       </div>
     </form>
   </section>
 
-  {{-- ===== Delete Account ===== --}}
+  {{-- ===== Delete Account (destructive, styled like Topics buttons) ===== --}}
   <section
     class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
-           border border-gray-200/70 dark:border-gray-800/70 shadow-xl p-4 sm:p-6 space-y-3 sm:space-y-4">
+           border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)]
+           p-4 sm:p-6 space-y-3 sm:space-y-4">
     <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
       <span class="font-semibold text-gray-900 dark:text-gray-100">Warning:</span>
       Deleting your account is permanent. All your posts, comments, and data will be removed.
     </p>
 
     <button id="deleteAccountBtn"
-      class="inline-flex items-center gap-2 rounded-full px-5 sm:px-6 py-2.5
-             text-sm sm:text-base font-semibold
-             bg-red-500 text-white border border-red-400/80 shadow-sm
-             hover:bg-red-600 active:bg-red-600/90
-             focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600 transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+                   text-sm font-semibold
+                   bg-red-500 text-white
+                   hover:bg-red-600 active:bg-red-600/90
+                   border border-red-400/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
+                   focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
       </svg>
       <span>Delete Account</span>
@@ -187,7 +178,8 @@
       <button id="closeModal"
               class="absolute top-2.5 right-2.5 inline-flex items-center justify-center w-8 h-8 rounded-full
                      bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300
-                     hover:bg-gray-200 dark:hover:bg-gray-700 transition">&times;</button>
+                     hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+              aria-label="Close modal">&times;</button>
 
       <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100" id="modalTitle">Notice</h2>
 
@@ -201,22 +193,23 @@
         <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-1">Enter your password to confirm deletion.</p>
       </div>
 
-      <div id="modalSubmit" class="flex justify-end gap-2 mt-1 hidden">
+      <div id="modalSubmit" class="flex flex-col sm:flex-row sm:justify-end gap-2 mt-1 hidden">
         <button id="modalCancelBtn"
-                class="inline-flex items-center gap-2 rounded-full px-4 py-2
-                       bg-white/70 dark:bg-gray-800/60
-                       border border-gray-300 dark:border-gray-700
-                       hover:bg-gray-100 dark:hover:bg-gray-700
-                       text-gray-700 dark:text-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 transition">
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+                       text-sm font-semibold
+                       bg-white/70 dark:bg-gray-900/60 backdrop-blur
+                       text-gray-900 dark:text-gray-100
+                       border border-gray-300/70 dark:border-gray-700/80
+                       shadow-sm hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Cancel
         </button>
         <button id="modalConfirmBtn"
-                class="inline-flex items-center gap-2 rounded-full px-4 py-2
-                       bg-red-500 text-white font-semibold
-                       border border-red-400/80 shadow-sm
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+                       text-sm font-semibold
+                       bg-red-500 text-white
                        hover:bg-red-600 active:bg-red-600/90
-                       focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600 transition">
+                       border border-red-400/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
+                       focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600">
           Confirm
         </button>
       </div>
