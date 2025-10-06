@@ -96,14 +96,17 @@
         </div>
         <div class="flex items-end justify-between">
           <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">{{ number_format($groupsCount) }}</h3>
-          <a href="{{ route('groups.index') }}"
+          {{-- 👇 Send the user to My groups view by setting ?mine=1 --}}
+          <a href="{{ route('groups.index', ['mine' => 1]) }}"
              class="inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
                     bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700
-                    text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Manage</a>
+                    text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+            Manage
+          </a>
         </div>
       </div>
 
-      {{-- KPI: Notifications (replaces "Newest Posts") --}}
+      {{-- KPI: Notifications --}}
       <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
                   bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70

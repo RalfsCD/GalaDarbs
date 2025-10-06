@@ -1,9 +1,10 @@
 {{-- =============================================================
   resources/views/groups/create.blade.php — Tailwind-only + plain JS (updated)
-  - Matches topic bubble style from groups/index
-  - Adds “Show all topics (N)” toggle like index
-  - Primary row shows Top 3 topics (by groups_count when available)
-  - Multi-select bubbles with selected counter
+  - Topic chips identical to groups/index structure
+  - Selected chips smoothly move to the very front of the primary row
+  - “Show all topics (N)” toggle uses #topics-more (unified id)
+  - NEW: “Clear” bubble shows when any topic is selected
+  - Description field restored
 ============================================================= --}}
 
 @extends('layouts.app')
@@ -18,9 +19,7 @@
 
     if ($hasTopics) {
         // Prefer popularity if groups_count exists; otherwise keep given order
-        $topicsSorted = $topics->sortByDesc(fn($t) => $t->groups_count ?? -1)->values();
-
-        // Top 3 (or fewer) for the primary row
+        $topicsSorted  = $topics->sortByDesc(fn($t) => $t->groups_count ?? -1)->values();
         $primaryTopics = $topicsSorted->take(3);
         $moreTopics    = $topicsSorted->slice(3)->values();
     }
@@ -134,7 +133,7 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">Short, memorable, and searchable.</p>
       </div>
 
-      {{-- Description --}}
+      {{-- Description (restored) --}}
       <div class="space-y-2">
         <label for="description" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">
           Description <span class="font-normal text-gray-500">(optional)</span>
@@ -148,7 +147,7 @@
         </div>
       </div>
 
-      {{-- Topics (Top 3 + “Show all topics (N)” like index) --}}
+      {{-- Topics (Top 3 + “Show all topics (N)”) --}}
       @if($hasTopics)
         <div class="space-y-2">
           <div class="flex items-center justify-between">
@@ -162,17 +161,18 @@
             </span>
           </div>
 
-          <div id="topicsWrapper"
+          <div id="topicsWrap"
                class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-950/30 p-3 sm:p-4">
-            {{-- Primary row: Top 3 topics --}}
-            <div class="flex flex-wrap items-center gap-2">
+
+            {{-- Primary row --}}
+            <div id="topics-primary" class="flex flex-wrap items-center gap-2">
               @foreach($primaryTopics as $topic)
                 <button type="button"
                         class="topic-bubble inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
                                bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
                                border border-gray-300/70 dark:border-gray-700/70
                                hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow transition-all hover:-translate-y-0.5 select-none"
-                        data-id="{{ $topic->id }}" aria-pressed="false">
+                        data-id="{{ $topic->id }}" data-origin="primary" aria-pressed="false">
                   <span class="inline-flex items-center gap-1">
                     {{ $topic->name }}
                     @if(isset($topic->groups_count))
@@ -196,28 +196,37 @@
                   Show all topics ({{ $totalTopicsCount }})
                 </button>
               @endif
+
+              {{-- Clear bubble --}}
+              <button id="topics-clear" type="button"
+                      class="hidden inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
+                             bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200
+                             border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                </svg>
+                Clear
+              </button>
             </div>
 
             {{-- Expanded list: remaining topics --}}
             @if($moreTopics->count() > 0)
-              <div id="allTopics" class="hidden">
-                <div class="mt-2 flex flex-wrap items-center gap-2">
-                  @foreach($moreTopics as $topic)
-                    <button type="button"
-                            class="topic-bubble inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
-                                   bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
-                                   border border-gray-300/70 dark:border-gray-700/70
-                                   hover:bg-gray-50 dark:hover:bg-gray-800 transition select-none"
-                            data-id="{{ $topic->id }}" aria-pressed="false">
-                      <span class="inline-flex items-center gap-1">
-                        {{ $topic->name }}
-                        @if(isset($topic->groups_count))
-                          <span class="opacity-70 text-xs font-semibold">• {{ $topic->groups_count }}</span>
-                        @endif
-                      </span>
-                    </button>
-                  @endforeach
-                </div>
+              <div id="topics-more" class="hidden mt-2 flex flex-wrap items-center gap-2">
+                @foreach($moreTopics as $topic)
+                  <button type="button"
+                          class="topic-bubble inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
+                                 bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
+                                 border border-gray-300/70 dark:border-gray-700/70
+                                 hover:bg-gray-50 dark:hover:bg-gray-800 transition select-none"
+                          data-id="{{ $topic->id }}" data-origin="more" aria-pressed="false">
+                    <span class="inline-flex items-center gap-1">
+                      {{ $topic->name }}
+                      @if(isset($topic->groups_count))
+                        <span class="opacity-70 text-xs font-semibold">• {{ $topic->groups_count }}</span>
+                      @endif
+                    </span>
+                  </button>
+                @endforeach
               </div>
             @endif
 
@@ -278,99 +287,163 @@
 {{-- ===== Plain JS only ===== --}}
 @section('scripts')
 <script>
-  // Selected topics comes back from validation (old input)
-  const selectedTopics = @json(old('topics', []));
-  const nameInput      = document.getElementById('name');
-  const topicsWrapper  = document.getElementById('topicsWrapper');
-  const selectedCount  = document.getElementById('selected-count');
+(function () {
+  // ---------- Shared styles ----------
+  const defaultClasses = ['bg-white/70','dark:bg-gray-900/60','text-gray-800','dark:text-gray-200','border-gray-300/70','dark:border-gray-700/70'];
+  const activeClasses  = ['bg-yellow-400','text-gray-900','border-yellow-300/70','shadow-sm','dark:bg-yellow-500','dark:text-gray-900'];
 
-  // Match groups/index default vs active chip classes
-  const defaultClasses = [
-    'bg-white/70','dark:bg-gray-900/60',
-    'text-gray-800','dark:text-gray-200',
-    'border-gray-300/70','dark:border-gray-700/70'
-  ];
-  const activeClasses = [
-    'bg-yellow-400','text-gray-900',
-    'border-yellow-300/70','shadow-sm',
-    'dark:bg-yellow-500','dark:text-gray-900'
-  ];
+  // ---------- Elements ----------
+  const topicsPrimary = document.getElementById('topics-primary');
+  const topicsMore    = document.getElementById('topics-more');
+  const toggleBtn     = document.getElementById('toggleTopics');
+  const clearBtn      = document.getElementById('topics-clear');
+  const countBadge    = document.getElementById('selected-count');
+  const wrap          = document.getElementById('topicsWrap');
+  const hiddenBox     = document.getElementById('selected-topics-container');
+  const nameInput     = document.getElementById('name');
 
-  // Toggle "Show all topics"
-  document.getElementById('toggleTopics')?.addEventListener('click', () => {
-    const wrap = document.getElementById('allTopics');
-    if (!wrap) return;
-    wrap.classList.toggle('hidden');
-  });
+  const selected = new Set(@json(array_map('intval', old('topics', []))));
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-  // Wire up bubbles (both primary and 'more')
-  function bindBubbles() {
-    document.querySelectorAll('.topic-bubble').forEach(b => {
-      const id = Number(b.dataset.id);
-      // init state from old()
-      if (selectedTopics.includes(id)) toggleChip(b, true);
-
-      // avoid double-binding
-      if (b.dataset.bound === '1') return;
-      b.dataset.bound = '1';
-
-      b.addEventListener('click', function () {
-        const idx = selectedTopics.indexOf(id);
-        if (idx > -1) { selectedTopics.splice(idx, 1); toggleChip(this, false); }
-        else { selectedTopics.push(id); toggleChip(this, true); }
-        updateHidden(); updateCount();
-      });
+  // FLIP helper (animate moved elements)
+  function flip(elements, mutateDOM) {
+    const nodes = Array.isArray(elements) ? elements : [elements];
+    const first = new Map();
+    nodes.forEach(el => first.set(el, el.getBoundingClientRect()));
+    mutateDOM();
+    nodes.forEach(el => {
+      const last = el.getBoundingClientRect();
+      const dx = first.get(el).left - last.left;
+      const dy = first.get(el).top  - last.top;
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      el.style.transition = 'transform 220ms ease';
+      requestAnimationFrame(() => { el.style.transform = ''; });
+      el.addEventListener('transitionend', () => (el.style.transition = ''), { once: true });
     });
   }
-  bindBubbles();
 
-  function toggleChip(el, on) {
+  function setPressed(el, on) {
     el.setAttribute('aria-pressed', on ? 'true' : 'false');
     if (on) { el.classList.remove(...defaultClasses); el.classList.add(...activeClasses); }
     else    { el.classList.remove(...activeClasses); el.classList.add(...defaultClasses); }
   }
 
-  function updateHidden() {
-    const c = document.getElementById('selected-topics-container');
-    if (!c) return;
-    c.innerHTML = '';
-    selectedTopics.forEach(id => {
+  function updateHiddenInputs() {
+    if (!hiddenBox) return;
+    hiddenBox.innerHTML = '';
+    [...selected].forEach(id => {
       const i = document.createElement('input');
-      i.type = 'hidden'; i.name = 'topics[]'; i.value = id; c.appendChild(i);
+      i.type='hidden'; i.name='topics[]'; i.value=String(id);
+      hiddenBox.appendChild(i);
     });
   }
 
-  function updateCount() {
-    if (!selectedCount) return;
-    selectedCount.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-yellow-400 inline-block"></span> ${selectedTopics.length} selected`;
+  function updateCountAndClear() {
+    if (countBadge) {
+      countBadge.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-yellow-400 inline-block"></span> ${selected.size} selected`;
+    }
+    if (clearBtn) clearBtn.classList.toggle('hidden', selected.size === 0);
   }
 
-  updateHidden(); updateCount();
+  function moveSelectedToFront() {
+    const chips = $$('.topic-bubble'); // across primary + more
+    const selChips = chips.filter(ch => selected.has(parseInt(ch.dataset.id)));
+    if (!selChips.length) return;
+
+    const ordered = selChips.slice();
+    flip(selChips, () => {
+      for (let i = ordered.length - 1; i >= 0; i--) {
+        const ch = ordered[i];
+        topicsPrimary.insertBefore(ch, topicsPrimary.firstElementChild);
+      }
+    });
+  }
+
+  function moveChipBack(chip) {
+    flip(chip, () => {
+      if (chip.dataset.origin === 'more' && topicsMore) {
+        topicsMore.appendChild(chip);
+      } else {
+        const primaryChips = $$('.topic-bubble', topicsPrimary);
+        const anchor = primaryChips.find(el => !selected.has(parseInt(el.dataset.id)) && el !== chip) || toggleBtn || clearBtn || null;
+        topicsPrimary.insertBefore(chip, anchor);
+      }
+    });
+  }
+
+  function onChipClick(e) {
+    const chip = e.currentTarget;
+    const id = parseInt(chip.dataset.id);
+    const isOn = selected.has(id);
+
+    if (isOn) {
+      selected.delete(id);
+      setPressed(chip, false);
+      moveChipBack(chip);
+    } else {
+      selected.add(id);
+      setPressed(chip, true);
+      moveSelectedToFront();
+    }
+
+    updateHiddenInputs();
+    updateCountAndClear();
+  }
+
+  function clearAll() {
+    const chips = $$('.topic-bubble').filter(ch => selected.has(parseInt(ch.dataset.id)));
+    if (!chips.length) return;
+    flip(chips, () => {
+      chips.forEach(chip => {
+        const id = parseInt(chip.dataset.id);
+        selected.delete(id);
+        setPressed(chip, false);
+        if (chip.dataset.origin === 'more' && topicsMore) {
+          topicsMore.appendChild(chip);
+        } else {
+          const anchor = toggleBtn || clearBtn || null;
+          topicsPrimary.insertBefore(chip, anchor);
+        }
+      });
+    });
+    updateHiddenInputs();
+    updateCountAndClear();
+  }
+
+  // Bind
+  $$('.topic-bubble').forEach(chip => {
+    const id = parseInt(chip.dataset.id);
+    if (selected.has(id)) setPressed(chip, true);
+    chip.addEventListener('click', onChipClick);
+  });
+
+  toggleBtn?.addEventListener('click', () => topicsMore?.classList.toggle('hidden'));
+  clearBtn?.addEventListener('click', clearAll);
+
+  // Initial render from old()
+  moveSelectedToFront();
+  updateHiddenInputs();
+  updateCountAndClear();
 
   // Client-side validation
-  document.getElementById('createGroupForm').addEventListener('submit', function(e) {
+  document.getElementById('createGroupForm')?.addEventListener('submit', (e) => {
     const errors = [];
-    const name = nameInput.value.trim();
-
+    wrap.classList.remove('ring-2','ring-red-500','border-red-600');
     nameInput.classList.remove('ring-2','ring-red-500','border-red-600');
-    topicsWrapper?.classList.remove('ring-2','ring-red-500','border-red-600');
 
-    if (!name) {
+    if (!nameInput.value.trim()) {
       errors.push('Group name is required.');
       nameInput.classList.add('ring-2','ring-red-500','border-red-600');
     }
-    if (selectedTopics.length === 0) {
+    if (selected.size === 0) {
       errors.push('Please select at least one topic.');
-      topicsWrapper?.classList.add('ring-2','ring-red-500','border-red-600');
+      wrap.classList.add('ring-2','ring-red-500','border-red-600');
     }
-
-    if (errors.length > 0) {
+    if (errors.length) {
       e.preventDefault();
       const list = document.getElementById('errorList');
       list.innerHTML = '';
-      errors.forEach(err => {
-        const li = document.createElement('li'); li.textContent = err; list.appendChild(li);
-      });
+      errors.forEach(t => { const li=document.createElement('li'); li.textContent=t; list.appendChild(li); });
       const modal = document.getElementById('validationModal');
       modal.classList.remove('hidden'); modal.classList.add('flex');
     }
@@ -380,6 +453,7 @@
     const modal = document.getElementById('validationModal');
     modal.classList.add('hidden'); modal.classList.remove('flex');
   });
+})();
 </script>
 @endsection
 @endsection

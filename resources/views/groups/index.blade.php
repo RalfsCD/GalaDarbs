@@ -1,14 +1,9 @@
 {{-- =============================================================
   resources/views/groups/index.blade.php — Tailwind-only
-  - Breadcrumbs (PostPit > Groups)
-  - Hero (Create top-right + segmented toggle bottom-right, clickable)
-  - Search/Filters card
-  - Topic filter bubbles: Top 3 + Show all topics (N)
-  - Selected topic rendered as first bubble
-  - Topic bubbles show group counts
-  - Group cards list their topics (first 3 + “+N more”)
-  - Joined green pill + Members pill
-  - NEW (restored): Show all / Show less for groups grid (first 4 shown)
+  - Identical chip structure (ids/classes) to create page
+  - “Show all topics (N)” uses the same #topics-more id
+  - Selected topic is server-side promoted to first chip
+  - NEW: “Clear” bubble appears when a topic filter is active
 ============================================================= --}}
 
 @extends('layouts.app')
@@ -37,6 +32,7 @@
           if ($selectedTopicId) {
               $selectedTopic = $topicsSorted->firstWhere('id', $selectedTopicId);
               if ($selectedTopic) {
+                  // Selected topic rendered first (server-side)
                   $topicsSorted = collect([$selectedTopic])
                       ->merge($topicsSorted->where('id', '!=', $selectedTopicId))
                       ->values();
@@ -189,7 +185,7 @@
         </div>
       </form>
 
-      {{-- Bubbles row --}}
+      {{-- Bubbles row (same structure as create) --}}
       <div class="flex flex-wrap items-center gap-2">
 
         {{-- All bubble --}}
@@ -200,68 +196,70 @@
           All
         </a>
 
-        {{-- Primary 3 topics (selected one appears first if present) --}}
+        {{-- Primary topics (selected one is first when present) --}}
         @if($hasTopics)
-          @foreach($primaryTopics as $topic)
-            <a href="{{ route('groups.index', array_filter(['search' => $searchTerm ?: null, 'mine' => $isMine ? 1 : null, 'topic' => $topic->id])) }}"
-               class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
-                      border transition
-                      {{ $selectedTopicId === $topic->id ? 'bg-yellow-400 text-gray-900 border-yellow-300/70 shadow-sm hover:shadow' : 'bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200 border-gray-300/70 dark:border-gray-700/70 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
-              <span class="inline-flex items-center gap-1">
-                {{ $topic->name }}
-                <span class="opacity-70 text-xs font-semibold">• {{ $topic->groups_count }}</span>
-              </span>
-            </a>
-          @endforeach
-
-          {{-- Toggle all topics --}}
-          @if($moreTopics->count() > 0)
-            <button id="toggleTopics"
-                    type="button"
-                    class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
-                           bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
-                           border border-gray-300/70 dark:border-gray-700/70
-                           hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-              <svg class="w-4 h-4 -ml-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-              </svg>
-              Show all topics ({{ $totalTopicsCount }})
-            </button>
-          @endif
-        @endif
-
-        {{-- Clear button (search or topic active) --}}
-        @if($searching || $selectedTopicId)
-          <a href="{{ route('groups.index', array_filter(['mine' => $isMine ? 1 : null])) }}"
-             class="ml-auto sm:ml-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold
-                    bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200
-                    border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-            Clear
-          </a>
-        @endif
-      </div>
-
-      {{-- Expanded topics --}}
-      @if($hasTopics && $moreTopics->count() > 0)
-        <div id="allTopics" class="hidden">
-          <div class="mt-2 flex flex-wrap items-center gap-2">
-            @foreach($moreTopics as $topic)
+          <div id="topics-primary" class="flex flex-wrap items-center gap-2">
+            @foreach($primaryTopics as $topic)
               <a href="{{ route('groups.index', array_filter(['search' => $searchTerm ?: null, 'mine' => $isMine ? 1 : null, 'topic' => $topic->id])) }}"
                  class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
-                        bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
-                        border border-gray-300/70 dark:border-gray-700/70
-                        hover:bg-gray-50 dark:hover:bg-gray-800 transition
-                        {{ $selectedTopicId === $topic->id ? '!bg-yellow-400 !text-gray-900 !border-yellow-300/70 shadow-sm hover:shadow' : '' }}">
+                        border transition
+                        {{ $selectedTopicId === $topic->id ? 'bg-yellow-400 text-gray-900 border-yellow-300/70 shadow-sm hover:shadow' : 'bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200 border-gray-300/70 dark:border-gray-700/70 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                 <span class="inline-flex items-center gap-1">
                   {{ $topic->name }}
                   <span class="opacity-70 text-xs font-semibold">• {{ $topic->groups_count }}</span>
                 </span>
               </a>
             @endforeach
+
+            {{-- Toggle all topics --}}
+            @if($moreTopics->count() > 0)
+              <button id="toggleTopics" type="button"
+                      class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
+                             bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
+                             border border-gray-300/70 dark:border-gray-700/70
+                             hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <svg class="w-4 h-4 -ml-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                Show all topics ({{ $totalTopicsCount }})
+              </button>
+            @endif
+
+            {{-- NEW: Clear bubble (only when a topic filter is active) --}}
+            @if($selectedTopicId)
+              <a href="{{ route('groups.index', array_filter(['search' => $searchTerm ?: null, 'mine' => $isMine ? 1 : null])) }}"
+                 class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
+                        bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200
+                        border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                </svg>
+                Clear
+              </a>
+            @endif
           </div>
-        </div>
-      @endif
+
+          {{-- Expanded topics (hidden by default) --}}
+          @if($moreTopics->count() > 0)
+            <div id="topics-more" class="hidden mt-2 flex flex-wrap items-center gap-2">
+              @foreach($moreTopics as $topic)
+                <a href="{{ route('groups.index', array_filter(['search' => $searchTerm ?: null, 'mine' => $isMine ? 1 : null, 'topic' => $topic->id])) }}"
+                   class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
+                          bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
+                          border border-gray-300/70 dark:border-gray-700/70
+                          hover:bg-gray-50 dark:hover:bg-gray-800 transition
+                          {{ $selectedTopicId === $topic->id ? '!bg-yellow-400 !text-gray-900 !border-yellow-300/70 shadow-sm hover:shadow' : '' }}">
+                  <span class="inline-flex items-center gap-1">
+                    {{ $topic->name }}
+                    <span class="opacity-70 text-xs font-semibold">• {{ $topic->groups_count }}</span>
+                  </span>
+                </a>
+              @endforeach
+            </div>
+          @endif
+        @endif
+      </div>
     </div>
   </section>
 
@@ -398,7 +396,7 @@
 <script>
   // topics expander
   document.getElementById('toggleTopics')?.addEventListener('click', () => {
-    const wrap = document.getElementById('allTopics');
+    const wrap = document.getElementById('topics-more');
     if (!wrap) return;
     wrap.classList.toggle('hidden');
   });

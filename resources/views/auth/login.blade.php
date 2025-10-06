@@ -81,7 +81,7 @@
                    placeholder-gray-400
                    focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600" />
 
-          {{-- Show / Hide button (your exact icons) --}}
+          {{-- Show / Hide button --}}
           <button type="button" id="toggle-pass"
                   class="absolute inset-y-0 right-2 flex items-center px-1.5 rounded-md
                          text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -114,7 +114,7 @@
                          bg-yellow-400 text-gray-900 border border-yellow-300/70 shadow-sm
                          hover:shadow-md hover:-translate-y-0.5 active:bg-yellow-500/90
                          transition focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
-            {{-- login glyph (profile) --}}
+            {{-- login glyph --}}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
@@ -142,11 +142,11 @@
   </div>
 </main>
 
-{{-- Loading overlay (kept) --}}
+{{-- OPAQUE loading overlay (bigger spinner) --}}
 <div id="loading-overlay"
-     class="fixed inset-0 bg-gray-100/95 dark:bg-gray-900/95 hidden items-center justify-center z-50 transition-opacity">
-  <img src="{{ asset('images/LogoDark.png') }}" alt="Loading Logo" class="h-24 w-auto animate-spin-slow dark:hidden">
-  <img src="{{ asset('images/LogoWhite.png') }}" alt="Loading Logo Dark" class="h-24 w-auto animate-spin-slow hidden dark:block">
+     class="fixed inset-0 hidden items-center justify-center z-50 bg-gray-100 dark:bg-gray-900">
+  <img src="{{ asset('images/LogoDark.png') }}" alt="Loading Logo" class="h-32 w-auto animate-spin-slow dark:hidden">
+  <img src="{{ asset('images/LogoWhite.png') }}" alt="Loading Logo Dark" class="h-32 w-auto animate-spin-slow hidden dark:block">
 </div>
 
 {{-- Little animations --}}
@@ -154,12 +154,11 @@
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-1px)} 80%{transform:translateX(1px)} }
   .animate-shake{ display:inline-block; animation:shake .6s ease-in-out infinite }
   @keyframes spin-slow { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-  .animate-spin-slow{ animation:spin-slow 1.5s linear infinite }
+  .animate-spin-slow{ animation:spin-slow 1.3s linear infinite }
 </style>
 
 {{-- Scripts --}}
 <script>
-  // Loading overlay on submit
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector('form[action="{{ route('login') }}"]');
     const overlay = document.getElementById("loading-overlay");
@@ -169,10 +168,10 @@
     });
 
     // Show/Hide password
-    const pass = document.getElementById("password");
-    const btn  = document.getElementById("toggle-pass");
-    const eyeOn  = document.getElementById("eye-on");
-    const eyeOff = document.getElementById("eye-off");
+    const pass  = document.getElementById("password");
+    const btn   = document.getElementById("toggle-pass");
+    const eyeOn = document.getElementById("eye-on");
+    const eyeOff= document.getElementById("eye-off");
 
     btn?.addEventListener("click", () => {
       const showing = pass.type === "text";

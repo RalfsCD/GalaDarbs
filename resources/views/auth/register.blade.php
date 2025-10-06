@@ -81,7 +81,7 @@
           </button>
         </div>
 
-        <!-- Strength Bar (thin) -->
+        <!-- Strength Bar -->
         <div class="mt-2 h-1.5 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
           <div id="pw-bar" class="h-1.5 w-0 rounded-full transition-all duration-300"></div>
         </div>
@@ -93,7 +93,6 @@
             $tipBase   = 'flex items-center gap-1.5 text-gray-500 dark:text-gray-400';
             $dotBase   = 'inline-flex items-center justify-center h-3 w-3 rounded-full border border-gray-300 dark:border-gray-600';
             $dotInner  = 'h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-gray-600';
-            $validText = 'text-green-600 dark:text-green-400';
           @endphp
 
           <li data-rule="length" class="{{ $tipBase }}">
@@ -158,15 +157,15 @@
   </div>
 </main>
 
-<!-- Loading overlay (subtle) -->
-<div id="loading-overlay" class="fixed inset-0 bg-gray-100/70 dark:bg-gray-900/70 hidden items-center justify-center z-50">
-  <img src="{{ asset('images/LogoDark.png') }}" class="h-16 w-auto animate-spin-slow dark:hidden" alt="">
-  <img src="{{ asset('images/LogoWhite.png') }}" class="h-16 w-auto animate-spin-slow hidden dark:block" alt="">
+<!-- OPAQUE loading overlay (bigger spinner) -->
+<div id="loading-overlay" class="fixed inset-0 hidden items-center justify-center z-50 bg-gray-100 dark:bg-gray-900">
+  <img src="{{ asset('images/LogoDark.png') }}" class="h-32 w-auto animate-spin-slow dark:hidden" alt="">
+  <img src="{{ asset('images/LogoWhite.png') }}" class="h-32 w-auto animate-spin-slow hidden dark:block" alt="">
 </div>
 
 <style>
 @keyframes spin-slow { from { transform: rotate(0) } to { transform: rotate(360deg) } }
-.animate-spin-slow { animation: spin-slow 1.2s linear infinite }
+.animate-spin-slow { animation: spin-slow 1.3s linear infinite }
 </style>
 
 <script>
@@ -224,11 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const score = Object.values(valid).filter(Boolean).length;
     const widths = ['0%','25%','50%','75%','100%'];
-    const color  = ['bg-transparent',
-                    'bg-red-400',
-                    'bg-yellow-400',
-                    'bg-emerald-400',
-                    'bg-green-500'][score];
+    const color  = ['bg-transparent','bg-red-400','bg-yellow-400','bg-emerald-400','bg-green-500'][score];
 
     bar.style.width = widths[score];
     bar.className = 'h-1.5 rounded-full transition-all duration-300 ' + color;
@@ -244,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     matchTip.classList.toggle('dark:text-green-400', same);
   }
 
-  // Loading overlay on submit
+  // Opaque loading overlay on submit
   const form = document.querySelector('form');
   const overlay = document.getElementById('loading-overlay');
   form.addEventListener('submit', () => {
@@ -252,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.add('flex');
   });
 
-  // Initialize once (empty value)
+  // Initialize once
   scorePassword(pw.value || '');
 });
 </script>
