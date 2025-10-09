@@ -33,7 +33,6 @@ class GroupController extends Controller
         return view('groups.index', compact('groups', 'topics'));
     }
 
-
     public function create()
     {
         $topics = Topic::all();
@@ -61,28 +60,59 @@ class GroupController extends Controller
         return redirect()->route('groups.show', $group);
     }
 
-  public function show(Request $request, Group $group)
-{
-    $query = $group->posts()->with(['user', 'group', 'likes', 'comments']);
+    public function show(Request $request, Group $group)
+    {
+        $query = $group->posts()->with(['user', 'group', 'likes', 'comments']);
 
-    
-    if ($request->get('sort') === 'oldest') {
-        $query->oldest();
-    } elseif ($request->get('sort') === 'most_liked') {
-        $query->withCount('likes')->orderBy('likes_count', 'desc');
-    } else {
-        $query->latest();
+        if ($request->get('sort') === 'oldest') {
+            $query->oldest();
+        } elseif ($request->get('sort') === 'most_liked') {
+            $query->withCount('likes')->orderBy('likes_count', 'desc');
+        } else {
+            $query->latest();
+        }
+
+        $posts = $query->paginate(10);
+
+        if ($request->ajax()) {
+            return view('partials.post-card-list', compact('posts'))->render();
+        }
+
+        return view('groups.show', compact('group', 'posts'));
     }
 
-    $posts = $query->paginate(10);
+    public function edit(Group $group)
+    {
+        if (auth()->id() !== $group->creator_id && !auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized');
+        }
 
-    if ($request->ajax()) {
-        return view('partials.post-card-list', compact('posts'))->render();
+        $topics = Topic::all();
+        return view('groups.edit', compact('group', 'topics'));
     }
 
-    return view('groups.show', compact('group', 'posts'));
-}
+    public function update(Request $request, Group $group)
+    {
+        if (auth()->id() !== $group->creator_id && !auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized');
+        }
 
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'topics'      => 'required|array',
+            'topics.*'    => 'exists:topics,id',
+        ]);
+
+        $group->update([
+            'name'        => $request->name,
+            'description' => $request->description,
+        ]);
+
+        $group->topics()->sync($request->topics);
+
+        return redirect()->route('groups.show', $group)->with('success', 'Group updated successfully.');
+    }
 
     public function join(Group $group)
     {
@@ -95,6 +125,7 @@ class GroupController extends Controller
         $group->members()->detach(Auth::id());
         return redirect()->route('groups.show', $group);
     }
+
     public function destroy(Group $group)
     {
         if (auth()->id() !== $group->creator_id && !auth()->user()->isAdmin()) {
@@ -103,7 +134,6 @@ class GroupController extends Controller
 
         $group->members()->detach();
         $group->topics()->detach();
-
         $group->delete();
 
         return redirect()->route('groups.index')->with('success', 'Group deleted successfully.');

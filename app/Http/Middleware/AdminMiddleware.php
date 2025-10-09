@@ -10,8 +10,20 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized.');
+        $user = Auth::user();
+
+        $isAdmin = $user && (
+            (method_exists($user, 'isAdmin') && $user->isAdmin()) ||
+            (($user->role ?? null) === 'admin')
+        );
+
+        if (!$isAdmin) {
+            // JSON callers still get a proper 403
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+            // Web: go home
+            return redirect('/');
         }
 
         return $next($request);

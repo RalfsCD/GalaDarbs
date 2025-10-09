@@ -22,7 +22,7 @@ class TopicController extends Controller
         })
         ->orderBy('name')
         ->paginate(12)
-        ->appends($request->only('search')); // keep ?search= in links
+        ->appends($request->only('search')); 
 
     return view('topics.index', compact('topics'));
 }

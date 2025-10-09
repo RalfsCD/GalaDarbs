@@ -6,9 +6,6 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
-    /**
-     * The application's route middleware groups.
-     */
     protected $middlewareGroups = [
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
@@ -26,13 +23,20 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * The application's route middleware.
+     * Laravel 11+
      */
-   protected $routeMiddleware = [
-    'auth' => \App\Http\Middleware\Authenticate::class,
-    'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-    'admin' => \App\Http\Middleware\AdminMiddleware::class,
-];
+    protected $middlewareAliases = [
+        'auth'  => \App\Http\Middleware\Authenticate::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+    ];
 
-
+    /**
+     * Laravel 9/10
+     */
+    protected $routeMiddleware = [
+        'auth'  => \App\Http\Middleware\Authenticate::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+    ];
 }

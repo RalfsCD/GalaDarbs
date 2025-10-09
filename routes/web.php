@@ -12,6 +12,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Middleware\AdminMiddleware;
 
 // Root → redirect smartly
 Route::get('/', function () {
@@ -37,6 +38,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+    // 🔙 Added back:
+    Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
+    Route::patch('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
+
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
     Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
@@ -73,14 +78,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
-    // Admin Panel
-    Route::prefix('admin')->group(function () {
-        Route::get('/', [AdminController::class, 'index'])->name('admin.index');
-        Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
-        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
-        Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
-        Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
-    });
+    // Admin Panel (auth + admin only)
+    Route::prefix('admin')
+        ->middleware([AdminMiddleware::class])
+        ->group(function () {
+            Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+            Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+            Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
+            Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+            Route::patch('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('admin.reports.resolve');
+        });
 });
 
 require __DIR__ . '/auth.php';
