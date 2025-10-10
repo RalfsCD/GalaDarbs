@@ -1,16 +1,8 @@
-{{-- =============================================================
-  resources/views/topics/create.blade.php
-  - Tailwind-only + plain JS
-  - NEW: Breadcrumbs (PostPit > Topics > Create)
-  - Matches look & feel used across Groups/Topics
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- Breadcrumbs --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -42,7 +34,6 @@
     </ol>
   </nav>
 
-  {{-- Hero --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -84,7 +75,6 @@
     </div>
   </header>
 
-  {{-- Server-side errors --}}
   @if ($errors->any())
     <div class="rounded-3xl border border-red-300/60 dark:border-red-600/50 bg-red-50/80 dark:bg-red-900/30 p-4 sm:p-5 text-red-800 dark:text-red-100 shadow-xl">
       <div class="flex items-start gap-3">
@@ -105,13 +95,11 @@
     </div>
   @endif
 
-  {{-- Form --}}
   <form id="createTopicForm" action="{{ route('topics.store') }}" method="POST" class="space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-6">
 
-      {{-- Name --}}
       <div class="space-y-2">
         <label for="name" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Topic Name <span class="text-red-500">*</span></label>
         <input id="name" name="name" type="text" value="{{ old('name') }}"
@@ -121,7 +109,6 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">Short, memorable, and searchable.</p>
       </div>
 
-      {{-- Description --}}
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label for="description" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">
@@ -138,12 +125,11 @@
         </div>
       </div>
 
-      {{-- Actions --}}
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <a href="{{ route('topics.index') }}"
-           class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
                   bg-white/70 dark:bg-gray-900/60 backdrop-blur
-                  text-gray-900 dark:text-gray-100 text-sm font-semibold
+                  text-gray-900 dark:text-gray-100 text-[13px] sm:text-sm font-semibold
                   border border-gray-300/70 dark:border-gray-700/80
                   shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
                   focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
@@ -151,7 +137,8 @@
         </a>
 
         <button type="submit"
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold tracking-tight
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
+                       text-[13px] sm:text-sm font-semibold tracking-tight whitespace-nowrap
                        bg-yellow-400 text-gray-900 hover:bg-yellow-500 active:bg-yellow-500/90
                        dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:active:bg-yellow-400/90
                        border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
@@ -165,7 +152,6 @@
     </div>
   </form>
 
-  {{-- Client-side Validation Modal --}}
   <div id="validationModal" class="fixed inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full space-y-4 relative border border-gray-200 dark:border-gray-800">
       <button id="closeModal" class="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition" aria-label="Close validation modal">&times;</button>
@@ -184,7 +170,6 @@
   </div>
 </div>
 
-{{-- Plain JS --}}
 <script>
   const form = document.getElementById('createTopicForm');
   const nameInput = document.getElementById('name');

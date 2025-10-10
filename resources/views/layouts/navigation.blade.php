@@ -1,12 +1,3 @@
-{{-- =========================
-  APP NAVIGATION (desktop + mobile)
-  - Yellow dot on active items (incl. Profile & Notifications)
-  - Custom Admin icon
-  - Icon-only theme slider (sun ↔ moon)
-  - Non-transparent track & thumb + yellow dot inside thumb
-  - Matching spin/fade logo swap on theme change
-========================= --}}
-
 @php
     $unreadCount = auth()->check()
         ? auth()->user()->notifications()->whereNull('read_at')->count()
@@ -27,32 +18,38 @@
     $isActive = fn(string $pattern) => request()->routeIs($pattern);
 @endphp
 
-{{-- DESKTOP SIDEBAR --}}
-<nav class="hidden md:flex fixed top-0 left-0 h-screen w-64 
-            bg-white dark:bg-gray-900 
-            border-r border-gray-200 dark:border-gray-800 
-            flex-col z-50 transition-colors duration-300">
+<script>
+(function(){
+  try{
+    var d=document.documentElement, s=localStorage.getItem('color-theme');
+    if(s==='dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)){ d.classList.add('dark'); }
+    else{ d.classList.remove('dark'); }
+  }catch(e){}
+})();
+</script>
 
-  {{-- Logo --}}
+<style>
+@keyframes spin-swap{0%{transform:rotate(0deg);opacity:1}49%{opacity:0}50%{transform:rotate(180deg);opacity:0}100%{transform:rotate(360deg);opacity:1}}
+.spin-once{animation:spin-swap .7s ease-in-out forwards}
+.dark [data-theme-slider] .theme-thumb{transform:translateX(36px)}
+.logo-dark{display:none}
+.dark .logo-dark{display:block}
+.dark .logo-light{display:none}
+</style>
+
+<nav class="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-col z-50 transition-colors duration-300">
   <div class="flex items-center justify-center h-14 border-b border-gray-200 dark:border-gray-800">
     <a href="{{ route('dashboard') }}" class="relative flex items-center justify-center">
-      <img id="nav-logo"
-           src="{{ asset('images/LogoDark.png') }}"
-           alt="Logo"
-           class="h-14 w-auto opacity-0 transition-opacity duration-200 ease-out">
+      <img data-logo class="logo-light h-14 w-auto" src="{{ asset('images/LogoDark.png') }}" alt="Logo">
+      <img data-logo class="logo-dark h-14 w-auto" src="{{ asset('images/LogoWhite.png') }}" alt="Logo">
     </a>
   </div>
 
-  {{-- Links --}}
   <div class="flex-1 overflow-y-auto py-5 px-4 space-y-2">
     @foreach($links as $link)
       @php $active = $isActive($link['match']); @endphp
       <a href="{{ route($link['route']) }}"
-         class="flex items-center gap-3 px-3 py-2 rounded-lg 
-                text-gray-700 dark:text-gray-300 
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition 
-                {{ $active ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
-        {{-- Icon --}}
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $active ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
         @switch($link['icon'])
           @case('home')
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
@@ -67,7 +64,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/></svg>
             @break
           @case('information-circle')
-            {{-- Updated About icon (uses your provided SVG) --}}
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
@@ -78,23 +74,17 @@
             </svg>
             @break
         @endswitch
-
         @if($active)
           <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         @endif
-
         <span>{{ $link['name'] }}</span>
       </a>
     @endforeach
 
-    {{-- Auth-only: Profile / Notifications / Logout (DESKTOP) --}}
     @auth
       @php $activeProfile = $isActive('profile.*'); @endphp
       <a href="{{ route('profile.show') }}"
-         class="flex items-center gap-3 px-3 py-2 rounded-lg
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition
-                {{ $activeProfile ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $activeProfile ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
         @if(auth()->user()->profile_photo_path)
           <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" class="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600" alt="Profile">
         @else
@@ -102,26 +92,19 @@
             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
           </div>
         @endif
-
         @if($activeProfile)
           <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         @endif
-
         <span>Profile</span>
       </a>
 
       @php $activeNotifs = $isActive('notifications.*'); @endphp
       <a href="{{ route('notifications.index') }}"
-         class="flex items-center gap-3 px-3 py-2 rounded-lg
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition
-                {{ $activeNotifs ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $activeNotifs ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 18.75a2.25 2.25 0 11-4.5 0m9-5.25V10.5a6.75 6.75 0 10-13.5 0v3l-1.5 3h16.5l-1.5-3z"/></svg>
-
         @if($activeNotifs)
           <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         @endif
-
         <span>Notifications</span>
         @if($unreadCount > 0)
           <span class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $unreadCount }}</span>
@@ -141,30 +124,19 @@
     @endauth
   </div>
 
-  {{-- Bottom: Theme slider --}}
   <div class="p-4 border-t border-gray-200 dark:border-gray-800">
-    <button type="button" aria-label="Toggle theme" role="switch" aria-checked="false"
-            data-theme-slider
-            class="relative inline-flex items-center w-[68px] h-8 rounded-full overflow-hidden
-                   border border-gray-300 dark:border-gray-700
-                   bg-gray-200 dark:bg-gray-800 transition-colors">
-      {{-- sun --}}
+    <button type="button" aria-label="Toggle theme" role="switch" aria-checked="false" data-theme-slider class="relative inline-flex items-center w-[68px] h-8 rounded-full overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800 transition-colors">
       <span class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/>
         </svg>
       </span>
-      {{-- moon --}}
       <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/>
         </svg>
       </span>
-      {{-- thumb --}}
-      <span class="theme-thumb absolute top-[2px] left-[2px] h-[28px] w-[28px] rounded-full
-                   bg-white dark:bg-gray-900 ring-1 ring-gray-300 dark:ring-gray-700
-                   shadow-sm transition-transform will-change-transform"
-            style="transform: translateX(0px)">
+      <span class="theme-thumb absolute top-[2px] left-[2px] h-[28px] w-[28px] rounded-full bg-white dark:bg-gray-900 ring-1 ring-gray-300 dark:ring-gray-700 shadow-sm transition-transform will-change-transform">
         <span class="pointer-events-none absolute inset-0 grid place-items-center">
           <span class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         </span>
@@ -173,55 +145,41 @@
   </div>
 </nav>
 
-{{-- MOBILE TOP BAR --}}
-<header class="md:hidden fixed top-0 inset-x-0 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-3"
-        style="padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
-  <button id="mobile-nav-open" type="button" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false"
-          class="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+<header class="md:hidden fixed top-0 inset-x-0 h-14 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-3" style="padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
+  <button id="mobile-nav-open" type="button" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false" class="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
     </svg>
   </button>
 
   <a href="{{ route('dashboard') }}" class="flex items-center justify-center">
-    <img id="nav-logo-mobile" src="{{ asset('images/LogoDark.png') }}" alt="Logo" class="h-8 sm:h-10 w-auto opacity-0 transition-opacity duration-200 ease-out">
+    <img data-logo class="logo-light h-8 sm:h-10 w-auto" src="{{ asset('images/LogoDark.png') }}" alt="Logo">
+    <img data-logo class="logo-dark h-8 sm:h-10 w-auto" src="{{ asset('images/LogoWhite.png') }}" alt="Logo">
   </a>
 
   <div class="w-10"></div>
 </header>
 
-{{-- MOBILE OVERLAY + DRAWER --}}
 <div id="mobile-drawer-overlay" class="md:hidden fixed inset-0 bg-black/40 hidden z-40"></div>
 
-<aside id="mobile-drawer" role="dialog" aria-modal="true" aria-hidden="true"
-       class="md:hidden fixed inset-y-0 left-0 w-[88vw] sm:w-72
-              bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
-              transform -translate-x-full transition-transform duration-300 z-50"
-       style="padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
-
-  {{-- Drawer header --}}
-  <div class="h-14 px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800"
-       style="padding-top: env(safe-area-inset-top);">
+<aside id="mobile-drawer" role="dialog" aria-modal="true" aria-hidden="true" class="md:hidden fixed inset-y-0 left-0 w-[88vw] sm:w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full transition-transform duration-300 z-50" style="padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
+  <div class="h-14 px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800" style="padding-top: env(safe-area-inset-top);">
     <a href="{{ route('dashboard') }}" class="flex items-center">
-      <img id="nav-logo-mobile-header" src="{{ asset('images/LogoDark.png') }}" alt="Logo" class="h-8 sm:h-10 w-auto opacity-0 transition-opacity duration-200 ease-out">
+      <img data-logo class="logo-light h-8 sm:h-10 w-auto" src="{{ asset('images/LogoDark.png') }}" alt="Logo">
+      <img data-logo class="logo-dark h-8 sm:h-10 w-auto" src="{{ asset('images/LogoWhite.png') }}" alt="Logo">
     </a>
-    <button id="mobile-nav-close" type="button" aria-label="Close menu"
-            class="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+    <button id="mobile-nav-close" type="button" aria-label="Close menu" class="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
       </svg>
     </button>
   </div>
 
-  {{-- Drawer links (same set as desktop) --}}
   <div class="flex-1 overflow-y-auto py-5 px-4 space-y-2">
     @foreach($links as $link)
       @php $active = $isActive($link['match']); @endphp
       <a href="{{ route($link['route']) }}"
-         class="flex items-center gap-3 px-3 py-2 rounded-lg 
-                text-gray-700 dark:text-gray-300 
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition 
-                {{ $active ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $active ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
         @switch($link['icon'])
           @case('home')
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
@@ -236,34 +194,27 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/></svg>
             @break
           @case('information-circle')
-            {{-- Updated About icon (mobile) --}}
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
             @break
           @case('admin-custom')
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102 .085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
             </svg>
             @break
         @endswitch
-
         @if($active)
           <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         @endif
-
         <span>{{ $link['name'] }}</span>
       </a>
     @endforeach
 
-    {{-- Auth-only: Profile / Notifications / Logout (MOBILE) --}}
     @auth
       @php $activeProfile = $isActive('profile.*'); @endphp
       <a href="{{ route('profile.show') }}"
-         class="flex items-center gap-3 px-3 py-2 rounded-lg
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition
-                {{ $activeProfile ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $activeProfile ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
         @if(auth()->user()->profile_photo_path)
           <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" class="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600" alt="Profile">
         @else
@@ -271,26 +222,19 @@
             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
           </div>
         @endif
-
         @if($activeProfile)
           <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         @endif
-
         <span>Profile</span>
       </a>
 
       @php $activeNotifs = $isActive('notifications.*'); @endphp
       <a href="{{ route('notifications.index') }}"
-         class="flex items-center gap-3 px-3 py-2 rounded-lg
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition
-                {{ $activeNotifs ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $activeNotifs ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 18.75a2.25 2.25 0 11-4.5 0m9-5.25V10.5a6.75 6.75 0 10-13.5 0v3l-1.5 3h16.5l-1.5-3z"/></svg>
-
         @if($activeNotifs)
           <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         @endif
-
         <span>Notifications</span>
         @if($unreadCount > 0)
           <span class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $unreadCount }}</span>
@@ -310,14 +254,8 @@
     @endauth
   </div>
 
-  {{-- Drawer bottom: Theme slider (same as desktop) --}}
-  <div class="p-4 border-t border-gray-200 dark:border-gray-800"
-       style="padding-bottom: env(safe-area-inset-bottom);">
-    <button type="button" aria-label="Toggle theme" role="switch" aria-checked="false"
-            data-theme-slider
-            class="relative inline-flex items-center w-[68px] h-8 rounded-full overflow-hidden
-                   border border-gray-300 dark:border-gray-700
-                   bg-gray-200 dark:bg-gray-800 transition-colors">
+  <div class="p-4 border-t border-gray-200 dark:border-gray-800" style="padding-bottom: env(safe-area-inset-bottom);">
+    <button type="button" aria-label="Toggle theme" role="switch" aria-checked="false" data-theme-slider class="relative inline-flex items-center w-[68px] h-8 rounded-full overflow-hidden border border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-800 transition-colors">
       <span class="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/>
@@ -328,10 +266,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/>
         </svg>
       </span>
-      <span class="theme-thumb absolute top-[2px] left-[2px] h-[28px] w-[28px] rounded-full
-                   bg-white dark:bg-gray-900 ring-1 ring-gray-300 dark:ring-gray-700
-                   shadow-sm transition-transform will-change-transform"
-            style="transform: translateX(0px)">
+      <span class="theme-thumb absolute top-[2px] left-[2px] h-[28px] w-[28px] rounded-full bg-white dark:bg-gray-900 ring-1 ring-gray-300 dark:ring-gray-700 shadow-sm transition-transform will-change-transform">
         <span class="pointer-events-none absolute inset-0 grid place-items-center">
           <span class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
         </span>
@@ -340,80 +275,21 @@
   </div>
 </aside>
 
-{{-- Spin + fade swap for logo --}}
-<style>
-@keyframes spin-swap {
-  0%   { transform: rotate(0deg);   opacity: 1; }
-  49%  { opacity: 0; }
-  50%  { transform: rotate(180deg); opacity: 0; }
-  100% { transform: rotate(360deg); opacity: 1; }
-}
-.spin-once { animation: spin-swap 0.7s ease-in-out forwards; }
-@media (prefers-reduced-motion: reduce) { .spin-once { animation: none !important; } }
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const html = document.documentElement;
-
-  // Logos
-  const logos = [
-    document.getElementById('nav-logo'),
-    document.getElementById('nav-logo-mobile'),
-    document.getElementById('nav-logo-mobile-header')
-  ].filter(Boolean);
-
-  const SRC_LIGHT = "{{ asset('images/LogoDark.png') }}";   // light UI → dark logo
-  const SRC_DARK  = "{{ asset('images/LogoWhite.png') }}";  // dark UI → white logo
-
-  const isDarkPref = () =>
-    (localStorage.getItem('color-theme') === 'dark') ||
-    (!localStorage.getItem('color-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
-    html.classList.contains('dark');
-
-  const initLogos = () => {
-    const dark = isDarkPref();
-    logos.forEach(l => { if (l) { l.src = dark ? SRC_DARK : SRC_LIGHT; requestAnimationFrame(()=>l.classList.remove('opacity-0')); }});
-  };
-  initLogos();
-
-  const spinSwapLogos = () => {
-    logos.forEach(l => l && l.classList.add('spin-once'));
-    setTimeout(() => {
-      const darkAfter = html.classList.contains('dark');
-      logos.forEach(l => l && (l.src = darkAfter ? SRC_DARK : SRC_LIGHT));
-    }, 350);
-    setTimeout(() => logos.forEach(l => l && l.classList.remove('spin-once')), 720);
-  };
-
-  // ===== THEME SLIDER =====
   const sliders = Array.from(document.querySelectorAll('[data-theme-slider]'));
-  const THUMB_TX = 36; // 68 - 28 - 4
-
-  const positionThumb = (el, dark) => {
-    const thumb = el.querySelector('.theme-thumb');
-    if (!thumb) return;
-    thumb.style.transform = `translateX(${dark ? THUMB_TX : 0}px)`;
-    el.setAttribute('aria-checked', dark ? 'true' : 'false');
-  };
-
   const setTheme = (dark) => {
-    if (dark) {
-      html.classList.add('dark');
-      localStorage.setItem('color-theme', 'dark');
-    } else {
-      html.classList.remove('dark');
-      localStorage.setItem('color-theme', 'light');
-    }
-    sliders.forEach(s => positionThumb(s, dark));
-    spinSwapLogos();
+    if (dark) { html.classList.add('dark'); localStorage.setItem('color-theme','dark'); }
+    else { html.classList.remove('dark'); localStorage.setItem('color-theme','light'); }
+    sliders.forEach(s => s.setAttribute('aria-checked', dark ? 'true' : 'false'));
+    document.querySelectorAll('[data-logo]').forEach(l => l.classList.add('spin-once'));
+    setTimeout(() => document.querySelectorAll('[data-logo]').forEach(l => l.classList.remove('spin-once')), 720);
   };
-
-  const currentDark = isDarkPref();
-  sliders.forEach(s => positionThumb(s, currentDark));
+  const currentDark = html.classList.contains('dark');
+  sliders.forEach(s => s.setAttribute('aria-checked', currentDark ? 'true' : 'false'));
   sliders.forEach(s => s.addEventListener('click', () => setTheme(!html.classList.contains('dark'))));
 
-  // ===== Mobile Drawer =====
   const openBtn  = document.getElementById('mobile-nav-open');
   const closeBtn = document.getElementById('mobile-nav-close');
   const drawer   = document.getElementById('mobile-drawer');
@@ -444,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
   overlay?.addEventListener('click', closeDrawer);
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
-  // Focus trap
   let firstFocusable, lastFocusable;
   const trapFocusInit = () => {
     const focusables = drawer?.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -461,8 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (active === lastFocusable) { e.preventDefault(); firstFocusable?.focus(); }
     }
   });
-
-  // Close drawer after navigating
   drawer?.addEventListener('click', (e) => {
     const target = e.target.closest('a');
     if (target) closeDrawer();

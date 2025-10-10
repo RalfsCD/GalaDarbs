@@ -4,7 +4,6 @@
             shadow-md hover:shadow-lg transition-all duration-200 mb-6"
      data-post-id="{{ $post->id }}">
 
-    {{-- Header --}}
     <div class="flex justify-between items-center mb-4">
         <div class="flex items-center gap-3 min-w-0">
             @if($post->user->profile_photo_path)
@@ -26,7 +25,6 @@
                               border border-yellow-300/60 dark:border-yellow-500/40
                               rounded-full px-2.5 py-0.5 font-semibold hover:bg-yellow-100/80
                               dark:hover:bg-yellow-500/25 transition">
-                        <!-- groups icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                              viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                              class="w-3.5 h-3.5 shrink-0">
@@ -43,25 +41,20 @@
         <span class="text-gray-400 text-xs shrink-0 ml-2">{{ $post->created_at->diffForHumans() }}</span>
     </div>
 
-    {{-- Title --}}
     @if($post->title)
         <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3 break-words">{{ $post->title }}</h2>
     @endif
 
-    {{-- Content --}}
     @if($post->content)
         <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 break-words">{{ $post->content }}</p>
     @endif
 
-    {{-- Media --}}
     @if($post->media_path)
         <div class="relative overflow-hidden rounded-xl mb-4">
             <img src="{{ asset('storage/' . $post->media_path) }}"
                  alt="Post Image"
                  class="post-image w-full max-h-[28rem] object-cover cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
                  data-src="{{ asset('storage/' . $post->media_path) }}">
-
-            {{-- Expand image --}}
             <button type="button"
                     class="expand-image absolute top-2 right-2 z-10 inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10
                            rounded-full bg-black/50 hover:bg-black/60 text-white shadow-md backdrop-blur-sm
@@ -76,7 +69,6 @@
         </div>
     @endif
 
-    {{-- Actions --}}
     <div class="flex items-center gap-4 sm:gap-6 mt-3 flex-wrap">
         @php
             $liked = auth()->check() && $post->likes->contains(auth()->id());
@@ -84,7 +76,6 @@
             $isAdmin = auth()->check() && auth()->user()->role === 'admin';
         @endphp
 
-        {{-- Like --}}
         <button type="button" class="like-btn flex items-center gap-2 group" data-post="{{ $post->id }}">
             <svg xmlns="http://www.w3.org/2000/svg"
                  class="like-icon w-6 h-6 transition-colors
@@ -102,7 +93,6 @@
             </span>
         </button>
 
-        {{-- Comment trigger --}}
         <button type="button" class="comment-trigger flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors" data-post="{{ $post->id }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
                  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -130,7 +120,6 @@
             </span>
         </button>
 
-        {{-- Report (always available in this partial as per your original) --}}
         <button type="button" onclick="openReportModal({{ $post->id }})" class="group">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                  viewBox="0 0 24 24" stroke-width="1.5"
@@ -142,7 +131,6 @@
     </div>
 </div>
 
-<!-- Report Modal -->
 <div id="reportModal-{{ $post->id }}" class="hidden fixed inset-0 bg-black/40 dark:bg-black/70 z-50 items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl max-w-md w-full space-y-4 relative">
         <button onclick="closeReportModal({{ $post->id }})" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-2xl">&times;</button>

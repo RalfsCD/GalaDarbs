@@ -10,6 +10,7 @@ class NewsController extends Controller
 {
     public function index()
     {
+        // use simple collection; the view handles both paginated and non-paginated
         $news = News::latest()->get();
         return view('news.index', compact('news'));
     }
@@ -25,27 +26,26 @@ class NewsController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'media' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
-    ]);
+    {
+        $request->validate([
+            'title'   => 'required|string|max:255',
+            'content' => 'required|string',
+            'media'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-    
-    if ($request->hasFile('media')) {
-        $image = $request->file('media');
-        $path = $image->storeAs('public/news', $image->getClientOriginalName()); 
+        $path = null;
+        if ($request->hasFile('media')) {
+            // store on the public disk; returns paths like "news/abc123.jpg"
+            $path = $request->file('media')->store('news', 'public');
+        }
+
+        News::create([
+            'title'   => $request->title,
+            'content' => $request->content,
+            // save exactly what store() returned (e.g. "news/abc123.jpg")
+            'image'   => $path,
+        ]);
+
+        return redirect()->route('news.index')->with('success', 'News created successfully');
     }
-
-    
-    $news = News::create([
-        'title' => $request->title,
-        'content' => $request->content,
-        'image' => isset($path) ? str_replace('public/', '', $path) : null, 
-    ]);
-
-    return redirect()->route('news.index')->with('success', 'News created successfully');
 }
-}
-

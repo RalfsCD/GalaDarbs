@@ -12,7 +12,6 @@
             transition mb-6"
      data-post-id="{{ $post->id }}">
 
-  {{-- Header --}}
   <div class="flex justify-between items-center mb-4">
     <div class="flex items-center gap-3 min-w-0">
       @if($post->user->profile_photo_path)
@@ -42,17 +41,14 @@
     <span class="text-gray-400 text-xs shrink-0 ml-2">{{ $post->created_at->diffForHumans() }}</span>
   </div>
 
-  {{-- Title --}}
   @if($post->title)
     <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 mb-3 break-words">{{ $post->title }}</h2>
   @endif
 
-  {{-- Content --}}
   @if($post->content)
     <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 break-words">{{ $post->content }}</p>
   @endif
 
-  {{-- Media --}}
   @if($post->media_path)
     <div class="relative overflow-hidden rounded-xl mb-4">
       <img src="{{ asset('storage/' . $post->media_path) }}" alt="Post Image"
@@ -71,9 +67,7 @@
     </div>
   @endif
 
-  {{-- Actions --}}
   <div class="flex items-center gap-4 sm:gap-6 mt-3 flex-wrap">
-    {{-- Like --}}
     <button type="button" class="like-btn flex items-center gap-2 group" data-post="{{ $post->id }}">
       <svg xmlns="http://www.w3.org/2000/svg"
            class="like-icon w-6 h-6 transition-colors {{ $liked ? 'fill-current text-red-600 dark:text-red-500' : 'text-gray-500 dark:text-gray-400 group-hover:text-pink-500' }}"
@@ -86,7 +80,6 @@
       </span>
     </button>
 
-    {{-- Comments toggle --}}
     <button type="button" class="comments-toggle flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors" data-post="{{ $post->id }}">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -97,7 +90,6 @@
       </span>
     </button>
 
-    {{-- Report (if not owner/admin) --}}
     @if(auth()->check() && !$isOwner && !$isAdmin)
     <button type="button" onclick="openReportModal({{ $post->id }})" class="group">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -109,7 +101,6 @@
     </button>
     @endif
 
-    {{-- Delete (owner/admin) --}}
     @if($isOwner || $isAdmin)
       <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Delete this post?');">
         @csrf @method('DELETE')
@@ -126,7 +117,6 @@
     @endif
   </div>
 
-  {{-- Inline Comments Panel --}}
   <div id="comments-{{ $post->id }}" class="mt-4 hidden">
     <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/50 p-3 sm:p-4">
       <div id="comments-list-{{ $post->id }}" class="space-y-3">
@@ -145,7 +135,6 @@
   </div>
 </div>
 
-{{-- Report Modal --}}
 @if(auth()->check() && !$isOwner && !$isAdmin)
 <div id="reportModal-{{ $post->id }}" class="hidden fixed inset-0 bg-black/40 dark:bg-black/70 z-50 items-center justify-center">
   <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl max-w-md w-full space-y-4 relative">

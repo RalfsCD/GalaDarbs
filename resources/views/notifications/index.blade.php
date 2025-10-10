@@ -1,20 +1,10 @@
-{{-- =============================================================
-  resources/views/notifications/index.blade.php — Tailwind-only
-  - Default view: UNREAD ONLY (does not mark them read)
-  - Toggle pill switches to "Show all" (via ?all=1)
-  - Breadcrumbs + gradient hero to match the rest of your app
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 @php
-  // We expect $notifications to be a collection (read + unread)
   $unreadCount = $notifications->whereNull('read_at')->count();
-  $showAll     = request()->boolean('all'); // ?all=1 shows everything
+  $showAll     = request()->boolean('all');
   $items       = $showAll ? $notifications : $notifications->whereNull('read_at');
-
-  // Build toggle URL (preserve other params)
   $params = request()->all();
   if ($showAll) { unset($params['all']); } else { $params['all'] = 1; }
   $toggleUrl = url()->current() . (count($params) ? ('?' . http_build_query($params)) : '');
@@ -22,7 +12,6 @@
 
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
               border border-gray-200/70 dark:border-gray-800/70
@@ -44,7 +33,6 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -78,7 +66,6 @@
         </p>
       </div>
 
-      {{-- Actions (toggle + refresh) --}}
       <div class="flex items-center gap-2 md:self-start">
         <a href="{{ $toggleUrl }}"
            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold
@@ -107,7 +94,6 @@
     </div>
   </header>
 
-  {{-- ===== Notifications Grid ===== --}}
   @if($items->count())
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       @foreach($items as $notification)
@@ -124,7 +110,6 @@
                     shadow-[0_16px_40px_-20px_rgba(0,0,0,0.30)] hover:shadow-[0_28px_60px_-28px_rgba(0,0,0,0.45)]
                     transition {{ $ring }}">
           <div class="flex items-start gap-3 sm:gap-4">
-            {{-- Icon by type --}}
             @if($type === 'post_deleted')
               <div class="{{ $iconWrap }} bg-red-100 dark:bg-red-900/30">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -160,7 +145,6 @@
               </div>
             @endif
 
-            {{-- Content --}}
             <div class="flex-1 min-w-0">
               <p class="text-sm sm:text-base text-gray-900 dark:text-gray-100 leading-relaxed break-words">
                 @php $title = $data['post_title'] ?? ''; $who = $data['user_name'] ?? 'Someone'; @endphp
@@ -192,7 +176,6 @@
       @endforeach
     </div>
   @else
-    {{-- No unread -> nudge to show all --}}
     @if(!$showAll)
       <div class="p-8 text-center rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70 shadow-xl">

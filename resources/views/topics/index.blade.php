@@ -1,10 +1,3 @@
-{{-- =============================================================
-  resources/views/topics/index.blade.php
-  - Tailwind-only
-  - NEW: Breadcrumbs (PostPit > Topics)
-  - Animated cards, consistent with Groups pages
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
@@ -17,7 +10,6 @@
     $searchTerm   = request('search', '');
   @endphp
 
-  {{-- Breadcrumbs --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -37,7 +29,6 @@
     </ol>
   </nav>
 
-  {{-- Header --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -91,13 +82,11 @@
     </div>
   </header>
 
-  {{-- Search --}}
   <section class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
-    <form method="GET" action="{{ route('topics.index') }}" class="p-4 sm:p-6">
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+<form method="GET" action="{{ route('topics.index') }}" class="p-4 sm:p-6">
+      <div class="flex items-stretch gap-2 sm:gap-3">
         <label for="topics-search" class="sr-only">Search topics</label>
-
-        <div class="relative w-full min-w-0">
+        <div class="relative w-full min-w-0 flex-1">
           <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
               <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"/>
@@ -105,7 +94,6 @@
           </span>
           <input id="topics-search" type="search" name="search" value="{{ $searchTerm }}" placeholder="Search topics…" autocomplete="off"
                  class="w-full min-w-0 pl-10 pr-3 sm:pr-36 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950/70 text-sm sm:text-base text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
-
           @if($searching)
             <a href="{{ route('topics.index') }}"
                class="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:-translate-y-0.5 hover:shadow transition">
@@ -113,33 +101,22 @@
             </a>
           @endif
         </div>
-
-        {{-- ADDED: Desktop search submit button with provided SVG --}}
         <button type="submit" title="Search" aria-label="Search"
-                class="hidden sm:inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 hover:-translate-y-0.5 hover:shadow transition">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                class="inline-flex items-center justify-center px-3 py-2 rounded-full
+                       bg-yellow-400 text-gray-900 border border-yellow-300/70
+                       shadow-sm hover:shadow-md hover:-translate-y-0.5 transition
+                       focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600
+                       dark:bg-yellow-500 dark:hover:bg-yellow-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
         </button>
-
-        <div class="flex gap-2 sm:hidden">
-          <button type="submit"
-                  class="px-3.5 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-semibold hover:-translate-y-0.5 hover:shadow transition">
-            Search
-          </button>
-
-          @if($searching)
-            <a href="{{ route('topics.index') }}"
-               class="px-3.5 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-transparent hover:-translate-y-0.5 hover:shadow transition">
-              Clear
-            </a>
-          @endif
-        </div>
       </div>
     </form>
   </section>
 
-  {{-- Topics grid --}}
   <section>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
       @forelse($topics as $topic)
@@ -205,7 +182,6 @@
     </div>
   </section>
 
-  {{-- Pagination --}}
   @if(method_exists($topics, 'hasPages') && $topics->hasPages())
     <div class="pt-2">
       {{ $topics->appends(request()->only('search'))->links() }}

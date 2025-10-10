@@ -1,10 +1,3 @@
-{{-- =============================================================
-  resources/views/news/index.blade.php — Tailwind-only
-  - Breadcrumbs (PostPit > News)
-  - Hero with count + Create button for admins
-  - Elegant card feed + optional pagination
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
@@ -15,7 +8,6 @@
     $totalNews  = $hasPaginator ? $news->total() : (is_countable($news) ? count($news) : 0);
   @endphp
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
               border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
@@ -34,7 +26,6 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -89,7 +80,6 @@
     </div>
   </header>
 
-  {{-- ===== News Feed ===== --}}
   <section class="space-y-6 sm:space-y-8">
     @forelse ($news as $item)
       <article class="p-4 sm:p-6 rounded-3xl
@@ -97,31 +87,43 @@
                       border border-gray-200/70 dark:border-gray-800/70
                       shadow-[0_16px_40px_-20px_rgba(0,0,0,0.30)]
                       hover:shadow-[0_28px_60px_-28px_rgba(0,0,0,0.45)]
-                      transition">
+                      transition group">
 
-        {{-- Image --}}
         @if($item->image)
-          <div class="overflow-hidden rounded-2xl mb-4">
-            <img src="{{ Storage::url('news/' . $item->image) }}"
-                 alt="{{ $item->title }}"
-                 class="w-full h-64 object-cover group-hover:scale-[1.01] transition-transform duration-300">
+          <div class="relative overflow-hidden rounded-2xl mb-4">
+            <img
+              src="{{ Storage::url($item->image) }}"
+              alt="{{ $item->title }}"
+              data-expand-image
+              class="w-full h-80 sm:h-96 md:h-[28rem] object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.01]"
+            />
+            <button
+              type="button"
+              class="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+                     bg-white/80 dark:bg-gray-900/60 backdrop-blur
+                     text-gray-900 dark:text-gray-100 text-xs font-semibold
+                     border border-gray-200/80 dark:border-gray-700/70 shadow-sm hover:shadow-md"
+              data-expand-image
+              aria-label="Expand image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 9V4h5M20 15v5h-5M4 15v5h5M20 9V4h-5"/>
+              </svg>
+              Expand
+            </button>
           </div>
         @endif
 
-        {{-- Title --}}
         <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100">
           {{ $item->title }}
         </h2>
 
-        {{-- Content preview --}}
         <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
           {{ Str::limit($item->content, 400) }}
         </p>
 
-        {{-- Meta --}}
         <div class="mt-3 flex items-center justify-between text-xs sm:text-sm text-gray-500 dark:text-gray-400">
           <span>Published {{ $item->created_at->diffForHumans() }}</span>
-          {{-- If you add a show route later, swap this span for a link --}}
         </div>
       </article>
     @empty
@@ -145,11 +147,54 @@
     @endforelse
   </section>
 
-  {{-- ===== Pagination (if applicable) ===== --}}
   @if(method_exists($news, 'hasPages') && $news->hasPages())
     <div>
       {{ $news->links() }}
     </div>
   @endif
 </div>
+
+{{-- Lightbox --}}
+<div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+  <button id="closeImageModal" class="absolute top-6 right-8 text-white text-3xl leading-none w-10 h-10 rounded-full hover:bg-white/10">&times;</button>
+  <img id="modalImage" src="" class="max-h-[92%] max-w-[92%] rounded-xl shadow-2xl" alt="Preview">
+</div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+  const closeBtn = document.getElementById('closeImageModal');
+
+  const openModal = (src) => {
+    if (!src) return;
+    modalImg.src = src;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+  };
+
+  const closeModal = () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    modalImg.src = '';
+    document.body.classList.remove('overflow-hidden');
+  };
+
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('[data-expand-image]');
+    if (target) {
+      const img = target.closest('div')?.querySelector('img[data-expand-image]');
+      const src = img?.getAttribute('src') || target.getAttribute('src');
+      openModal(src);
+    }
+  });
+
+  closeBtn?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+});
+</script>
 @endsection

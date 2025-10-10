@@ -1,31 +1,19 @@
-{{-- =============================================================
-  resources/views/groups/create.blade.php — Tailwind-only + plain JS (updated)
-  - Topic chips identical to groups/index structure
-  - Selected chips smoothly move to the very front of the primary row
-  - “Show all topics (N)” toggle uses #topics-more (unified id)
-  - NEW: “Clear” bubble shows when any topic is selected
-  - Description field restored
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
   @php
-    // ----- Topic prep to mirror groups/index -----
     $hasTopics = isset($topics) && $topics && count($topics) > 0;
     $totalTopicsCount = $hasTopics ? $topics->count() : 0;
 
     if ($hasTopics) {
-        // Prefer popularity if groups_count exists; otherwise keep given order
         $topicsSorted  = $topics->sortByDesc(fn($t) => $t->groups_count ?? -1)->values();
         $primaryTopics = $topicsSorted->take(3);
         $moreTopics    = $topicsSorted->slice(3)->values();
     }
   @endphp
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -53,7 +41,6 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -97,7 +84,6 @@
     </div>
   </header>
 
-  {{-- ===== Server-side validation ===== --}}
   @if ($errors->any())
     <div class="rounded-3xl border border-red-300/60 dark:border-red-600/50 bg-red-50/80 dark:bg-red-900/30 p-4 sm:p-5 text-red-800 dark:text-red-100 shadow-xl">
       <div class="flex items-start gap-3">
@@ -118,13 +104,11 @@
     </div>
   @endif
 
-  {{-- ===== Form ===== --}}
   <form id="createGroupForm" action="{{ route('groups.store') }}" method="POST" class="space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-6">
 
-      {{-- Name --}}
       <div class="space-y-2">
         <label for="name" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Group Name</label>
         <input id="name" name="name" type="text" value="{{ old('name') }}"
@@ -133,7 +117,6 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">Short, memorable, and searchable.</p>
       </div>
 
-      {{-- Description (restored) --}}
       <div class="space-y-2">
         <label for="description" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">
           Description <span class="font-normal text-gray-500">(optional)</span>
@@ -147,7 +130,6 @@
         </div>
       </div>
 
-      {{-- Topics (Top 3 + “Show all topics (N)”) --}}
       @if($hasTopics)
         <div class="space-y-2">
           <div class="flex items-center justify-between">
@@ -164,7 +146,6 @@
           <div id="topicsWrap"
                class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-950/30 p-3 sm:p-4">
 
-            {{-- Primary row --}}
             <div id="topics-primary" class="flex flex-wrap items-center gap-2">
               @foreach($primaryTopics as $topic)
                 <button type="button"
@@ -182,7 +163,6 @@
                 </button>
               @endforeach
 
-              {{-- Toggle all topics --}}
               @if($moreTopics->count() > 0)
                 <button id="toggleTopics" type="button"
                         class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
@@ -197,7 +177,6 @@
                 </button>
               @endif
 
-              {{-- Clear bubble --}}
               <button id="topics-clear" type="button"
                       class="hidden inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold
                              bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200
@@ -209,7 +188,6 @@
               </button>
             </div>
 
-            {{-- Expanded list: remaining topics --}}
             @if($moreTopics->count() > 0)
               <div id="topics-more" class="hidden mt-2 flex flex-wrap items-center gap-2">
                 @foreach($moreTopics as $topic)
@@ -230,7 +208,6 @@
               </div>
             @endif
 
-            {{-- Hidden inputs live here --}}
             <div id="selected-topics-container"></div>
           </div>
 
@@ -238,12 +215,11 @@
         </div>
       @endif
 
-      {{-- Actions --}}
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <a href="{{ route('groups.index') }}"
-           class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
                   bg-white/70 dark:bg-gray-900/60 backdrop-blur
-                  text-gray-900 dark:text-gray-100 text-sm font-semibold
+                  text-gray-900 dark:text-gray-100 text-[13px] sm:text-sm font-semibold
                   border border-gray-300/70 dark:border-gray-700/80
                   shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
                   focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
@@ -251,7 +227,8 @@
         </a>
 
         <button type="submit"
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold tracking-tight
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
+                       text-[13px] sm:text-sm font-semibold tracking-tight
                        bg-yellow-400 text-gray-900 hover:bg-yellow-500 active:bg-yellow-500/90
                        dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:active:bg-yellow-400/90
                        border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
@@ -265,7 +242,6 @@
     </div>
   </form>
 
-  {{-- ===== Client-side Validation Modal ===== --}}
   <div id="validationModal" class="fixed inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full space-y-4 relative border border-gray-200 dark:border-gray-800">
       <button id="closeModal" class="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition" aria-label="Close validation modal">&times;</button>
@@ -284,15 +260,12 @@
   </div>
 </div>
 
-{{-- ===== Plain JS only ===== --}}
 @section('scripts')
 <script>
 (function () {
-  // ---------- Shared styles ----------
   const defaultClasses = ['bg-white/70','dark:bg-gray-900/60','text-gray-800','dark:text-gray-200','border-gray-300/70','dark:border-gray-700/70'];
   const activeClasses  = ['bg-yellow-400','text-gray-900','border-yellow-300/70','shadow-sm','dark:bg-yellow-500','dark:text-gray-900'];
 
-  // ---------- Elements ----------
   const topicsPrimary = document.getElementById('topics-primary');
   const topicsMore    = document.getElementById('topics-more');
   const toggleBtn     = document.getElementById('toggleTopics');
@@ -305,7 +278,6 @@
   const selected = new Set(@json(array_map('intval', old('topics', []))));
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-  // FLIP helper (animate moved elements)
   function flip(elements, mutateDOM) {
     const nodes = Array.isArray(elements) ? elements : [elements];
     const first = new Map();
@@ -346,7 +318,7 @@
   }
 
   function moveSelectedToFront() {
-    const chips = $$('.topic-bubble'); // across primary + more
+    const chips = $$('.topic-bubble');
     const selChips = chips.filter(ch => selected.has(parseInt(ch.dataset.id)));
     if (!selChips.length) return;
 
@@ -410,7 +382,6 @@
     updateCountAndClear();
   }
 
-  // Bind
   $$('.topic-bubble').forEach(chip => {
     const id = parseInt(chip.dataset.id);
     if (selected.has(id)) setPressed(chip, true);
@@ -420,12 +391,10 @@
   toggleBtn?.addEventListener('click', () => topicsMore?.classList.toggle('hidden'));
   clearBtn?.addEventListener('click', clearAll);
 
-  // Initial render from old()
   moveSelectedToFront();
   updateHiddenInputs();
   updateCountAndClear();
 
-  // Client-side validation
   document.getElementById('createGroupForm')?.addEventListener('submit', (e) => {
     const errors = [];
     wrap.classList.remove('ring-2','ring-red-500','border-red-600');

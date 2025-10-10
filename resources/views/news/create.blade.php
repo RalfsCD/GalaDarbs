@@ -1,16 +1,8 @@
-{{-- =============================================================
-  resources/views/news/create.blade.php — Tailwind-only
-  - Breadcrumbs (PostPit > News > Add News)
-  - Matching hero + glass card form
-  - Consistent validation modal + file-name preview
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
               border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
@@ -39,7 +31,6 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -82,14 +73,12 @@
     </div>
   </header>
 
-  {{-- ===== Form ===== --}}
   <form id="createNewsForm" action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                 border border-gray-200/70 dark:border-gray-800/70 shadow-xl p-4 sm:p-6 space-y-6">
 
-      {{-- Title --}}
       <div>
         <label for="title" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Title</label>
         <input type="text" name="title" id="title" value="{{ old('title') }}"
@@ -100,7 +89,6 @@
                       focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">
       </div>
 
-      {{-- Image / Media --}}
       <div>
         <label for="media" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">
           Image (optional)
@@ -128,7 +116,6 @@
         <input type="file" name="media" id="media" class="hidden"/>
       </div>
 
-      {{-- Content --}}
       <div>
         <label for="content" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Content</label>
         <textarea name="content" id="content" rows="6"
@@ -139,7 +126,6 @@
                          focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">{{ old('content') }}</textarea>
       </div>
 
-      {{-- Actions --}}
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
         <a href="{{ route('news.index') }}"
            class="inline-flex justify-center items-center gap-2 px-3 py-2 rounded-full
@@ -166,7 +152,6 @@
     </div>
   </form>
 
-  {{-- ===== Validation Modal ===== --}}
   <div id="validationModal"
        class="fixed inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full space-y-4 relative border border-gray-200 dark:border-gray-800">
@@ -190,16 +175,13 @@
 
 </div>
 
-{{-- ===== Scripts ===== --}}
 <script>
-  // File name preview
   const imageInput = document.getElementById('media');
   const imageFileName = document.getElementById('mediaFileName');
   imageInput?.addEventListener('change', () => {
     imageFileName.textContent = imageInput.files?.length ? imageInput.files[0].name : 'Choose a file';
   });
 
-  // Client-side validation -> modal
   const form = document.getElementById('createNewsForm');
   const titleInput = document.getElementById('title');
   const contentInput = document.getElementById('content');

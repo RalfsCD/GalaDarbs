@@ -1,40 +1,30 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const token = document.querySelector('meta[name="csrf-token"]')?.content;
-
-  // ===== LIKE logic (with debounce & dblclick)
   const inFlight = new Set();
   const suppressUntil = new Map();
   const SUPPRESS_MS = 450;
-
   const isCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || isCoarse;
-
   function suppress(postId){ suppressUntil.set(postId, Date.now() + SUPPRESS_MS); }
   function shouldSuppress(postId){ return (suppressUntil.get(postId) || 0) > Date.now(); }
-
   document.addEventListener("click", async e => {
     if (e.target.closest(".expand-image")) return;
     const btn = e.target.closest(".like-btn");
     if (!btn) return;
-
     const postId = btn.dataset.post;
     if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
-
     suppress(postId);
     await toggleLike(postId, btn);
   });
-
   if (!isTouch) {
     document.addEventListener("dblclick", async e => {
       if (e.target.closest(".like-btn") || e.target.closest(".expand-image")) return;
       const card = e.target.closest(".post-card");
       if (!card) return;
       e.preventDefault(); e.stopPropagation();
-
       const postId = card.dataset.postId;
       if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
-
       suppress(postId);
       await toggleLike(postId, card.querySelector(".like-btn"));
       popHeart(card);
@@ -48,12 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const now = Date.now(), last = lastTapByPost.get(postId) || 0;
       if (now - last < 300) { e.preventDefault(); e.stopPropagation(); }
     }, { passive: false });
-
     document.addEventListener("touchend", async e => {
       const card = e.target.closest(".post-card");
       if (!card || e.target.closest(".expand-image")) return;
       const postId = card.dataset.postId; if (!postId) return;
-
       const now = Date.now(), last = lastTapByPost.get(postId) || 0;
       lastTapByPost.set(postId, now);
       if (now - last < 300) {
@@ -65,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, { passive: false });
   }
-
   async function toggleLike(postId, btn) {
     if (!postId || !btn || inFlight.has(postId)) return;
     inFlight.add(postId);
@@ -76,14 +63,12 @@ document.addEventListener("DOMContentLoaded", () => {
       updateLikeUI(btn, data.liked, data.likes);
     } catch(_) {} finally { inFlight.delete(postId); }
   }
-
   function updateLikeUI(btn, liked, likes) {
     btn.querySelector(".like-count").textContent = likes;
     const icon = btn.querySelector(".like-icon");
     if (liked) { icon.classList.add("fill-current","text-red-600","dark:text-red-500"); icon.classList.remove("text-gray-500","dark:text-gray-400"); icon.setAttribute("fill","currentColor"); }
     else { icon.classList.remove("fill-current","text-red-600","dark:text-red-500"); icon.classList.add("text-gray-500","dark:text-gray-400"); icon.setAttribute("fill","none"); }
   }
-
   function popHeart(card) {
     const heart = document.createElement("div");
     heart.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -98,16 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const prev = card.style.position; if (!prev || prev === "static") card.style.position = "relative";
     card.appendChild(heart); setTimeout(() => heart.remove(), 900);
   }
-
-  // ===== Comments (inline panel per post)
   document.addEventListener("click", async e => {
     const toggle = e.target.closest(".comments-toggle");
     if (!toggle) return;
-
     const postId = toggle.dataset.post;
     const panel  = document.getElementById(`comments-${postId}`);
     const list   = document.getElementById(`comments-list-${postId}`);
-
     if (panel.classList.contains("hidden")) {
       panel.classList.remove("hidden");
       list.innerHTML = `<p class="text-gray-500 text-sm">Loading comments…</p>`;
@@ -123,13 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.classList.add("hidden");
     }
   });
-
   function renderComments(container, comments) {
     if (!comments?.length) { container.innerHTML = `<p class="text-gray-500 italic text-sm">No comments yet.</p>`; return; }
     container.innerHTML = "";
     comments.forEach(c => container.insertAdjacentHTML("beforeend", commentItem(c)));
   }
-
   function commentItem(c) {
     const avatar = c.user?.profile_photo_path
       ? `<img src="/storage/${c.user.profile_photo_path}" class="w-8 h-8 rounded-full object-cover">`
@@ -148,18 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>`;
   }
-
-  // Submit new comment
   document.addEventListener("submit", async e => {
     const form = e.target.closest("form[data-comment-form]");
     if (!form) return;
     e.preventDefault();
-
     const postId = form.getAttribute("data-comment-form");
     const input  = form.querySelector("input[name='content']");
     const content = (input.value || '').trim();
     if (!content) return;
-
     try {
       const res = await fetch(`/posts/${postId}/comment`, {
         method: "POST",
@@ -174,19 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       const list = document.getElementById(`comments-list-${postId}`);
       if (list) list.insertAdjacentHTML("beforeend", commentItem(data.comment));
-
-      // bump visible counters
       document.querySelectorAll(`[data-post='${postId}'] .comment-count`).forEach(el => { el.textContent = data.comments; });
-
       input.value = "";
-    } catch(_) { /* silently fail */ }
+    } catch(_) { }
   });
-
-  // ===== Image Lightbox
   const imageModal = document.getElementById("imageModal");
   const modalImage = document.getElementById("modalImage");
   const closeImageModal = document.getElementById("closeImageModal");
-
   document.addEventListener("click", e => {
     const btn = e.target.closest(".expand-image"); if (!btn) return;
     e.preventDefault(); e.stopPropagation();
@@ -194,13 +163,9 @@ document.addEventListener("DOMContentLoaded", () => {
     modalImage.src = img.dataset.src || img.src;
     imageModal.classList.remove("hidden"); imageModal.classList.add("flex");
   });
-
   closeImageModal?.addEventListener("click", () => { imageModal.classList.add("hidden"); imageModal.classList.remove("flex"); });
   imageModal?.addEventListener("click", e => { if (e.target === imageModal) { imageModal.classList.add("hidden"); imageModal.classList.remove("flex"); } });
-
 });
-
-// lil heart animation
 const style = document.createElement('style'); style.textContent = `
 @keyframes pop-heart { 0%{transform:scale(.3);opacity:0} 40%{transform:scale(1.35);opacity:1} 100%{transform:scale(1);opacity:0} }
 .animate-pop-heart{animation:pop-heart .9s ease forwards}

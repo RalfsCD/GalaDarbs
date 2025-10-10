@@ -1,15 +1,7 @@
-{{-- =============================================================
-  resources/views/posts/show.blade.php
-  - Matches groups.show styling (hero, breadcrumbs, cards)
-  - Uses your existing partials for UI + JS bindings
-  - Reuses post-card partial so dbl-like & comments work out-of-the-box
-============================================================= --}}
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
-
-  {{-- ===== Breadcrumbs (same style as groups.show) ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
               border border-gray-200/70 dark:border-gray-800/70
@@ -48,8 +40,6 @@
       <li class="text-gray-900 dark:text-gray-100 font-semibold">Post</li>
     </ol>
   </nav>
-
-  {{-- ===== Hero (visual parity with groups.show) ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -59,7 +49,6 @@
       <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl bg-gradient-to-br from-yellow-300/40 to-orange-400/30 dark:from-yellow-500/25 dark:to-orange-400/20"></div>
       <div class="absolute -bottom-28 -left-20 h-80 w-80 rounded-full blur-3xl bg-gradient-to-tr from-white/40 to-yellow-200/40 dark:from-gray-800/40 dark:to-yellow-500/20"></div>
     </div>
-
     <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-3 sm:gap-4">
       <div class="max-w-full md:max-w-2xl min-w-0">
         <div class="inline-flex items-center gap-2 mb-1">
@@ -77,7 +66,6 @@
           <span class="text-gray-500 dark:text-gray-400">{{ $post->created_at->diffForHumans() }}</span>
         </p>
       </div>
-
       <div class="flex items-center gap-2 md:self-start">
         <a href="{{ route('groups.show', $post->group) }}"
            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
@@ -93,14 +81,10 @@
       </div>
     </div>
   </header>
-
-  {{-- ===== Post (use your partial so JS works exactly like groups.show) ===== --}}
   <section>
     @include('partials.post-card', ['post' => $post])
   </section>
 </div>
-
-{{-- Global Image Lightbox (same ids/classes as groups.show so post-scripts works) --}}
 <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
   <span id="closeImageModal" class="absolute top-6 right-8 text-white text-4xl cursor-pointer">&times;</span>
   <img id="modalImage" src="" class="max-h-[90%] max-w-[90%] rounded-xl shadow-2xl" alt="Preview">

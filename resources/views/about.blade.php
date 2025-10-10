@@ -1,17 +1,8 @@
-{{-- =============================================================
-  resources/views/about.blade.php
-  - Tailwind-only (no inline <style>, no frameworks)
-  - NEW: Breadcrumbs (PostPit > About)
-  - Slimmed content, consistent hero + CTA row
-  - Dark mode ready, mobile-friendly
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
               border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
@@ -32,7 +23,6 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero / Page Header ===== --}}
   <section
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -69,7 +59,6 @@
     </div>
   </section>
 
-  {{-- ===== What is PostPit (compact) ===== --}}
   <section class="p-4 sm:p-6 rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70 shadow-xl space-y-2">
     <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">What is PostPit?</h2>
@@ -79,7 +68,6 @@
     </p>
   </section>
 
-  {{-- ===== A few reasons (3 tight cards) ===== --}}
   <section class="p-4 sm:p-6 rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
     <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Why you’ll like it</h2>
@@ -110,7 +98,6 @@
     </div>
   </section>
 
-  {{-- ===== Quick “How it works” (super short) ===== --}}
   <section class="p-4 sm:p-6 rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
     <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">How it works</h2>
@@ -130,15 +117,12 @@
     </ol>
   </section>
 
-  {{-- ===== CTA row (Explore) ===== --}}
   <section class="p-4 sm:p-6 rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
     <div class="flex flex-col gap-3 sm:gap-4">
       <p class="text-sm sm:text-base text-gray-900 dark:text-gray-100">
         Ready to explore? <span class="font-semibold">Find a community that fits you.</span>
       </p>
-
-      {{-- Always horizontal; both flex to 1/2 width, identical heights --}}
       <div class="flex w-full items-stretch gap-2 sm:gap-3">
         <a href="{{ route('groups.index') }}"
            class="flex-1 min-w-0 inline-flex items-center justify-center gap-2
@@ -149,7 +133,6 @@
                   shadow-md hover:shadow-lg
                   hover:bg-yellow-50/80 dark:hover:bg-gray-800/80
                   focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 transition">
-          {{-- Groups icon (provided style) --}}
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6 opacity-90"
                fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -180,7 +163,6 @@
                   dark:from-yellow-500 dark:to-amber-500 dark:hover:from-yellow-400 dark:hover:to-amber-400
                   border border-yellow-300/70 shadow-md hover:shadow-lg
                   focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 transition">
-          {{-- Topics icon (provided style) --}}
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6 opacity-90"
                fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"

@@ -1,17 +1,8 @@
-{{-- =============================================================
-  resources/views/profile/settings.blade.php — Tailwind-only (refined)
-  - Breadcrumbs (PostPit > Profile > Settings)
-  - Hero + Back (matches global design)
-  - Buttons now match Topics/Create (sizes, borders, motion)
-  - Cancel button next to "Update Profile" removed
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur
               border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
@@ -44,7 +35,6 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -88,7 +78,6 @@
     </div>
   </header>
 
-  {{-- ===== Update Profile Form ===== --}}
   <section
     class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
            border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)]
@@ -97,7 +86,6 @@
       @csrf
       @method('patch')
 
-      {{-- Name --}}
       <div>
         <x-input-label for="name" value="Name" class="text-gray-900 dark:text-gray-100" />
         <x-text-input id="name" name="name" value="{{ old('name', $user->name) }}"
@@ -106,7 +94,6 @@
                  focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
       </div>
 
-      {{-- Profile Photo --}}
       <div>
         <x-input-label for="profile_photo" value="Profile Photo" class="text-gray-900 dark:text-gray-100" />
         <label for="profile_photo"
@@ -126,7 +113,6 @@
         <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-1">Select a profile photo (optional).</p>
       </div>
 
-      {{-- Actions (primary-only, matching Topics/Create) --}}
       <div class="flex">
         <button type="submit"
                 class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
@@ -145,7 +131,6 @@
     </form>
   </section>
 
-  {{-- ===== Delete Account (destructive, styled like Topics buttons) ===== --}}
   <section
     class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
            border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)]
@@ -169,7 +154,6 @@
     </button>
   </section>
 
-  {{-- ===== Modal (validation + delete confirm) ===== --}}
   <div id="validationModal"
        class="fixed inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center px-2">
     <div class="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl shadow-2xl
@@ -216,7 +200,6 @@
     </div>
   </div>
 
-  {{-- Hidden form for account deletion --}}
   <form id="deleteAccountForm" method="POST" action="{{ route('profile.destroy') }}">
     @csrf
     @method('delete')
@@ -224,16 +207,13 @@
   </form>
 </div>
 
-{{-- ===== Scripts ===== --}}
 <script>
-  // File name preview
   const fileInput = document.getElementById('profile_photo');
   const fileName  = document.getElementById('fileName');
   fileInput?.addEventListener('change', () => {
     fileName.textContent = fileInput.files?.length ? fileInput.files[0].name : 'Choose a file';
   });
 
-  // Profile Update Validation
   const updateForm = document.getElementById('updateProfileForm');
   const nameInput  = document.getElementById('name');
 
@@ -263,7 +243,6 @@
     }
   });
 
-  // Delete flow
   const deleteBtn            = document.getElementById('deleteAccountBtn');
   const deleteForm           = document.getElementById('deleteAccountForm');
   const hiddenDeletePassword = document.getElementById('hiddenDeletePassword');
@@ -303,7 +282,6 @@
     deletePasswordInput.value = '';
   });
 
-  // Toast for session status
   @if(session('status'))
   document.addEventListener('DOMContentLoaded', () => {
     errorList.innerHTML = '';

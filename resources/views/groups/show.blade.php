@@ -1,17 +1,10 @@
-{{-- =============================================================
-  resources/views/groups/show.blade.php
-  - Mobile: horizontal-scroll topic rail next to name,
-            mobile action row (Back/Join/Edit/Delete),
-            desktop actions unchanged
-============================================================= --}}
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
+<div class="page-mobile max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
   @php $memberCount = $group->members->count(); @endphp
 
-  {{-- Breadcrumbs --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -37,7 +30,6 @@
     </ol>
   </nav>
 
-  {{-- Hero --}}
   <header
     class="relative overflow-hidden rounded-3xl p-4 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -50,7 +42,6 @@
 
     <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-3 sm:gap-4">
       <div class="max-w-full md:max-w-2xl min-w-0">
-        {{-- Title row with inline topic chips --}}
         <div class="flex items-center gap-2">
           <span class="inline-block h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_20px_theme(colors.yellow.300)] motion-safe:animate-pulse"></span>
           <h1 class="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent truncate bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
@@ -58,9 +49,8 @@
           </h1>
         </div>
 
-        {{-- Topics inline next to name (mobile: horizontal scroll) --}}
         @if($group->topics && $group->topics->count())
-          <div class="mt-2 flex items-center gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible -mx-1 px-1 pb-1">
+          <div class="mt-2 flex items-center gap-2 overflow-x-auto no-scrollbar sm:flex-wrap sm:overflow-visible -mx-1 px-1 pb-1">
             @foreach($group->topics as $topic)
               <span class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold
                            bg-white/70 dark:bg-gray-900/60 text-gray-800 dark:text-gray-200
@@ -85,8 +75,7 @@
           {{ number_format($memberCount) }} {{ Str::plural('member', $memberCount) }}
         </div>
 
-        {{-- Mobile action row (Back → Join/Joined → Edit → Delete) --}}
-        <div class="mt-3 flex items-center gap-2 overflow-x-auto md:hidden -mx-1 px-1 pb-1">
+        <div class="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar md:hidden -mx-1 px-1 pb-1">
           <a href="{{ route('groups.index') }}"
              class="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
                     bg-white/70 dark:bg-gray-900/60 backdrop-blur
@@ -155,7 +144,6 @@
         </div>
       </div>
 
-      {{-- Desktop actions (Back → Joined/Join → Edit → Delete) --}}
       <div class="hidden md:flex items-center gap-2 md:self-start">
         <a href="{{ route('groups.index') }}"
            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
@@ -220,7 +208,6 @@
     </div>
   </header>
 
-  {{-- Composer + Sort --}}
   <section class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-xl p-3 sm:p-6">
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
       <a href="{{ route('posts.create', $group) }}"
@@ -242,7 +229,6 @@
     </div>
   </section>
 
-  {{-- Posts --}}
   <section>
     <div id="posts-container" class="space-y-6 sm:space-y-8">
       @include('partials.post-card-list', ['posts' => $posts])
@@ -253,11 +239,36 @@
   </section>
 </div>
 
-{{-- Global Image Lightbox --}}
 <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
   <span id="closeImageModal" class="absolute top-6 right-8 text-white text-4xl cursor-pointer">&times;</span>
   <img id="modalImage" src="" class="max-h-[90%] max-w-[90%] rounded-xl shadow-2xl" alt="Preview">
 </div>
+
+<style>
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .page-mobile{
+    width: 100%;
+    overflow-x: hidden; position: relative;
+    container-type: inline-size;
+  }
+  @media (max-width: 640px){
+    .page-mobile{
+      padding-left: max(0.75rem, env(safe-area-inset-left));
+      padding-right: max(0.75rem, env(safe-area-inset-right));
+    }
+  }
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+  @media (max-width:550px){
+    header.relative{ padding:12px !important; }
+  }
+  @media (max-width:360px){
+    header.relative{ border-radius:18px !important; }
+  }
+</style>
 @endsection
 
 @section('scripts')
@@ -265,7 +276,6 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // Infinite scroll
   let page = 2;
   const trigger = document.getElementById("infinite-scroll-trigger");
   const postsContainer = document.getElementById("posts-container");

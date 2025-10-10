@@ -1,10 +1,3 @@
-{{-- =============================================================
-  resources/views/topics/show.blade.php
-  - Tailwind-only
-  - NEW: Breadcrumbs (PostPit > Topics > {{ $topic->name }})
-  - Consistent hero, “Joined” green pill on groups
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
@@ -14,7 +7,6 @@
     $groupCount = $topic->groups?->count() ?? 0;
   @endphp
 
-  {{-- Breadcrumbs --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -48,7 +40,6 @@
     </ol>
   </nav>
 
-  {{-- Hero --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -86,7 +77,6 @@
           </div>
         </div>
 
-        {{-- Back button --}}
         <div class="flex items-center gap-2 md:self-start">
           <a href="{{ route('topics.index') }}"
              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
@@ -105,7 +95,6 @@
     </div>
   </header>
 
-  {{-- Groups using this topic --}}
   <section>
     @if($groupCount > 0)
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -117,7 +106,6 @@
                 {{ $group->name }}
               </h2>
 
-              {{-- Joined pill (if member) --}}
               @auth
                 @if($group->members->contains(auth()->id()))
                   <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-500/15 dark:bg-green-600/20 text-green-800 dark:text-green-100 border border-green-400/40 dark:border-green-500/30">

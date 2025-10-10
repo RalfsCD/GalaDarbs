@@ -6,7 +6,7 @@ use App\Models\Topic;
 
 uses(RefreshDatabase::class);
 
-test('meklē TopicTest sarakstā un uzņem ekrānuzņēmumu', function () {
+test('lietotājs meklē topic', function () {
 
     Topic::create(['name' => 'TopicTest',  'description' => 'Pārlūkprogrammas Test topic']);
     Topic::create(['name' => '1111', 'description' => 'Pārlūkprogrammas Test topic']);

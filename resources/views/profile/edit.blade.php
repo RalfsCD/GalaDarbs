@@ -3,7 +3,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
-    {{-- Hero Header (matches Topics/Groups style) --}}
     <header
         class="relative overflow-hidden rounded-3xl p-6 sm:p-8
                bg-gradient-to-br from-yellow-100 via-white to-yellow-50
@@ -21,8 +20,6 @@
                     Manage your account details, password, and account deletion settings.
                 </p>
             </div>
-
-            {{-- Optional badge for visual balance --}}
             <div class="hidden sm:block md:self-start">
                 <div class="rounded-2xl px-3 py-1.5 text-[11px] font-bold tracking-wide
                             bg-yellow-400/20 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-100
@@ -31,16 +28,12 @@
                 </div>
             </div>
         </div>
-
-        {{-- soft decorative blobs --}}
         <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full blur-3xl bg-yellow-300/30 dark:bg-yellow-500/20"></div>
         <div class="pointer-events-none absolute -left-16 -bottom-12 h-48 w-48 rounded-full blur-3xl bg-orange-300/20 dark:bg-orange-400/10"></div>
     </header>
 
-    {{-- Forms container --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
-        {{-- Update Profile Information --}}
         <section class="rounded-2xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                         border border-gray-200/70 dark:border-gray-800/70 shadow-lg p-4 sm:p-6">
             <div class="flex items-center justify-between mb-3">
@@ -56,7 +49,6 @@
             </div>
         </section>
 
-        {{-- Update Password --}}
         <section class="rounded-2xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                         border border-gray-200/70 dark:border-gray-800/70 shadow-lg p-4 sm:p-6">
             <div class="flex items-center justify-between mb-3">
@@ -72,7 +64,6 @@
             </div>
         </section>
 
-        {{-- Delete Account (full width on lg for emphasis) --}}
         <section class="lg:col-span-2 rounded-2xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                         border border-gray-200/70 dark:border-gray-800/70 shadow-lg p-4 sm:p-6">
             <div class="flex items-center justify-between mb-3">

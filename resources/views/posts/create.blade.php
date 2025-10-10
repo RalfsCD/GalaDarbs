@@ -1,17 +1,8 @@
-{{-- =============================================================
-  resources/views/posts/create.blade.php (Create Post)
-  - Tailwind-only + plain JS
-  - Matches look & feel of Groups pages
-  - Breadcrumbs: PostPit > Groups > {{ $group->name }} > Create Post
-  - Dark mode ready, mobile-friendly, subtle animations
-============================================================= --}}
-
 @extends('layouts.app')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- ===== Breadcrumbs ===== --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -55,13 +46,11 @@
     </ol>
   </nav>
 
-  {{-- ===== Hero Header ===== --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
            dark:from-gray-900 dark:via-gray-900/70 dark:to-gray-900
            border border-yellow-200/60 dark:border-gray-800 shadow-2xl">
-    {{-- ambient beams --}}
     <div class="absolute inset-0 -z-10 opacity-70">
       <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl bg-gradient-to-br from-yellow-300/40 to-orange-400/30 dark:from-yellow-500/25 dark:to-orange-400/20"></div>
       <div class="absolute -bottom-28 -left-20 h-80 w-80 rounded-full blur-3xl bg-gradient-to-tr from-white/40 to-yellow-200/40 dark:from-gray-800/40 dark:to-yellow-500/20"></div>
@@ -104,7 +93,6 @@
     </div>
   </header>
 
-  {{-- ===== Server-side errors ===== --}}
   @if ($errors->any())
     <div class="rounded-3xl border border-red-300/60 dark:border-red-600/50 bg-red-50/80 dark:bg-red-900/30 p-4 sm:p-5 text-red-800 dark:text-red-100 shadow-xl">
       <div class="flex items-start gap-3">
@@ -125,13 +113,11 @@
     </div>
   @endif
 
-  {{-- ===== Create Post Form ===== --}}
   <form id="createPostForm" action="{{ route('posts.store', $group) }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-4 sm:space-y-6">
 
-      {{-- Title --}}
       <div>
         <label for="title" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Title</label>
         <input type="text" name="title" id="title" value="{{ old('title') }}"
@@ -142,7 +128,6 @@
                       focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">
       </div>
 
-      {{-- Content --}}
       <div>
         <label for="content" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Content</label>
         <textarea name="content" id="content" rows="5"
@@ -153,7 +138,6 @@
                          focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">{{ old('content') }}</textarea>
       </div>
 
-      {{-- Media Upload --}}
       <div>
         <label class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Media (optional)</label>
 
@@ -180,25 +164,24 @@
         <input type="file" name="media" id="media" class="hidden" />
       </div>
 
-      {{-- Actions --}}
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <a href="{{ route('groups.show', $group) }}"
-           class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
                   bg-white/70 dark:bg-gray-900/60 backdrop-blur
-                  text-gray-900 dark:text-gray-100 text-sm font-semibold
+                  text-gray-900 dark:text-gray-100 text-[13px] sm:text-sm font-semibold
                   border border-gray-300/70 dark:border-gray-700/80
                   shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
           Cancel
         </a>
 
         <button type="submit"
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full
-                       text-sm font-semibold tracking-tight
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
+                       text-[13px] sm:text-sm font-semibold tracking-tight
                        bg-yellow-400 text-gray-900
                        hover:bg-yellow-500 active:bg-yellow-500/90
                        dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:active:bg-yellow-400/90
                        border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all whitespace-nowrap">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
           </svg>
           <span class="whitespace-nowrap">Create Post</span>
@@ -207,7 +190,6 @@
     </div>
   </form>
 
-  {{-- ===== Client-side Validation Modal ===== --}}
   <div id="validationModal"
        class="fixed inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full space-y-4 relative border border-gray-200 dark:border-gray-800">
@@ -235,16 +217,13 @@
 
 </div>
 
-{{-- ===== Page Scripts (plain JS) ===== --}}
 <script>
-  // Media file name preview
   const mediaInput = document.getElementById('media');
   const mediaFileName = document.getElementById('mediaFileName');
   mediaInput?.addEventListener('change', () => {
     mediaFileName.textContent = mediaInput.files?.length ? mediaInput.files[0].name : 'Choose a file';
   });
 
-  // Client-side validation
   const form = document.getElementById('createPostForm');
   const titleInput = document.getElementById('title');
   const contentInput = document.getElementById('content');
@@ -280,7 +259,6 @@
     }
   });
 
-  // Close validation modal
   document.getElementById('closeModal')?.addEventListener('click', () => {
     const modal = document.getElementById('validationModal');
     modal.classList.add('hidden');
