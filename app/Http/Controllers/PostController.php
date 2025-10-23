@@ -10,28 +10,34 @@ use App\Notifications\PostDeletedNotification;
 
 class PostController extends Controller
 {
+        // tiek izsaukts ieraksta veidošanas skats grupā
     public function create(Group $group)
     {
         return view('posts.create', compact('group'));
     }
 
+        // ieraksta veidošanas pierpasījums
     public function store(Request $request, Group $group)
     {
+
+        // datu validācija
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'media' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,mp4,mp3,pdf|max:20480',
         ]);
 
+        // ja ir pievienots multivides fails, tas tiek saglabāts
         $path = $request->file('media') ? $request->file('media')->store('posts', 'public') : null;
 
+        // ieraksta saglabāšana datu bāzē
         $post = $group->posts()->create([
             'user_id' => $request->user()->id,
             'title' => $validated['title'],
             'content' => $validated['content'] ?? null,
             'media_path' => $path,
         ]);
-
+        // pēc ieraksta izveides, lietotāju pāradresē uz grupas skatu ar paziņojumu
         return redirect()->route('groups.show', $group)->with('success', 'Post created successfully!');
     }
 

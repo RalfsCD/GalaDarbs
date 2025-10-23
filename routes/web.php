@@ -31,6 +31,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
     Route::get('/topics/create', [TopicController::class, 'create'])->name('topics.create');
     Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
+
+    // Manage (Admin only via controller checks)
+    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
+    Route::patch('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
+    Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
+
+    // Show (keep after edit route)
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
 
     // Groups

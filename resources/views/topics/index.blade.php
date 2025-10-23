@@ -8,8 +8,10 @@
     $totalTopics  = $hasPaginator ? $topics->total() : (is_countable($topics) ? count($topics) : 0);
     $searching    = request()->filled('search');
     $searchTerm   = request('search', '');
+    $isAdmin      = auth()->check() && auth()->user()->isAdmin();
   @endphp
 
+  {{-- Breadcrumb --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -29,6 +31,7 @@
     </ol>
   </nav>
 
+  {{-- Hero Header --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -41,7 +44,6 @@
 
     <div class="relative z-10 flex flex-col gap-5">
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-
         <div class="max-w-2xl">
           <div class="inline-flex items-center gap-2 mb-1">
             <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_20px_theme(colors.yellow.300)] motion-safe:animate-pulse"></span>
@@ -50,14 +52,12 @@
           <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
             Topics
           </h1>
-
           <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Discover conversations by interest. Follow topics to find groups and posts you’ll enjoy.
             @if($searching)
               <span class="block mt-1">Showing results for <span class="font-semibold text-gray-900 dark:text-gray-100">“{{ $searchTerm }}”</span>.</span>
             @endif
           </p>
-
           @if($totalTopics)
             <div class="mt-3 inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-yellow-900 dark:text-yellow-100 bg-yellow-400/15 dark:bg-yellow-500/20 border border-yellow-300/40 dark:border-yellow-500/40 rounded-full px-3 py-1">
               <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
@@ -66,7 +66,7 @@
           @endif
         </div>
 
-        @if(auth()->check() && auth()->user()->isAdmin())
+        @if($isAdmin)
         <div class="flex items-center gap-3 md:self-start">
           <a href="{{ route('topics.create') }}"
              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-yellow-400 text-gray-900 text-sm font-semibold border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
@@ -77,13 +77,13 @@
           </a>
         </div>
         @endif
-
       </div>
     </div>
   </header>
 
+  {{-- Search --}}
   <section class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
-<form method="GET" action="{{ route('topics.index') }}" class="p-4 sm:p-6">
+    <form method="GET" action="{{ route('topics.index') }}\" class="p-4 sm:p-6">
       <div class="flex items-stretch gap-2 sm:gap-3">
         <label for="topics-search" class="sr-only">Search topics</label>
         <div class="relative w-full min-w-0 flex-1">
@@ -117,26 +117,41 @@
     </form>
   </section>
 
+  {{-- Topics Grid --}}
   <section>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
       @forelse($topics as $topic)
-        <a href="{{ route('topics.show', $topic) }}"
-           class="group block p-4 sm:p-6 rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.30)] hover:shadow-[0_30px_70px_-30px_rgba(0,0,0,0.55)] hover:-translate-y-0.5 transition-all">
-          <div class="flex items-start justify-between gap-3">
+        <div class="relative p-4 sm:p-6 rounded-3xl
+                    bg-white/80 dark:bg-gray-900/70 backdrop-blur
+                    border border-gray-200/70 dark:border-gray-800/70
+                    shadow-[0_16px_40px_-20px_rgba(0,0,0,0.30)]
+                    hover:shadow-[0_30px_70px_-30px_rgba(0,0,0,0.55)]
+                    hover:-translate-y-0.5 transition-all
+                    pb-14 sm:pb-16"> {{-- Reserve space for bottom bar --}}
+          
+          {{-- Full-card link layer --}}
+          <a href="{{ route('topics.show', $topic) }}" class="absolute inset-0 z-0" aria-label="Open topic"></a>
+
+          {{-- Content --}}
+          <div class="relative z-10 flex items-start justify-between gap-3">
             <h2 class="text-lg sm:text-xl text-gray-900 dark:text-gray-100 font-bold break-words">
               {{ $topic->name }}
             </h2>
-            <span class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100/80 dark:bg-yellow-500/20 text-yellow-800 dark:text-yellow-100 border border-yellow-300/60 dark:border-yellow-500/30">
+            <span class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full
+                         text-xs font-semibold
+                         bg-yellow-100/80 dark:bg-yellow-500/20
+                         text-yellow-800 dark:text-yellow-100
+                         border border-yellow-300/60 dark:border-yellow-500/30">
               <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
               {{ $topic->groups_count }} {{ Str::plural('Group', $topic->groups_count) }}
             </span>
           </div>
 
-          <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">
+          <p class="relative z-10 text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">
             {{ $topic->description ?? 'No description.' }}
           </p>
 
-          <div class="mt-4 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div class="relative z-10 mt-4 text-xs text-gray-500 dark:text-gray-400">
             <span class="inline-flex items-center gap-1 opacity-90 group-hover:opacity-100 transition">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12l-7.5 7.5M21 12H3"/>
@@ -144,7 +159,28 @@
               View Topic
             </span>
           </div>
-        </a>
+
+          @if($isAdmin)
+            {{-- Fixed bottom-right overlay bar (matches card padding) --}}
+            <div class="pointer-events-none absolute left-0 right-0 bottom-0 p-4 sm:p-6 z-30">
+              <div class="flex justify-end">
+                <a href="{{ route('topics.edit', $topic) }}"
+                   class="pointer-events-auto inline-flex items-center gap-1.5
+                          px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
+                          bg-white/80 dark:bg-gray-800/70 backdrop-blur
+                          text-gray-900 dark:text-gray-100 text-[12px] sm:text-sm font-semibold
+                          border border-gray-300/70 dark:border-gray-700/70
+                          shadow-sm hover:shadow-md transition">
+                  {{-- Provided edit icon --}}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg>
+                  Manage
+                </a>
+              </div>
+            </div>
+          @endif
+        </div>
       @empty
         <div class="col-span-full">
           @if($searching)
@@ -165,8 +201,7 @@
           @else
             <div class="p-10 text-center rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
               <p class="text-gray-600 dark:text-gray-400">No topics yet.</p>
-
-              @if(auth()->check() && auth()->user()->isAdmin())
+              @if($isAdmin)
                 <a href="{{ route('topics.create') }}"
                    class="inline-flex items-center gap-1.5 mt-4 px-3.5 py-2 rounded-full bg-yellow-400 text-gray-900 border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition dark:bg-yellow-500 dark:hover:bg-yellow-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -182,6 +217,7 @@
     </div>
   </section>
 
+  {{-- Pagination --}}
   @if(method_exists($topics, 'hasPages') && $topics->hasPages())
     <div class="pt-2">
       {{ $topics->appends(request()->only('search'))->links() }}

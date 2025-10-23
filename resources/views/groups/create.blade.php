@@ -112,7 +112,7 @@
       <div class="space-y-2">
         <label for="name" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Group Name</label>
         <input id="name" name="name" type="text" value="{{ old('name') }}"
-               placeholder="e.g., European Coffee Lovers"
+               placeholder="What do you want to call your group?"
                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">
         <p class="text-xs text-gray-500 dark:text-gray-400">Short, memorable, and searchable.</p>
       </div>
