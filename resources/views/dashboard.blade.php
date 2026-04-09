@@ -11,13 +11,14 @@
   $previewLimit = 3;
   $groupsPreview = $joinedGroups->take($previewLimit);
   $groupsRest    = $joinedGroups->skip($previewLimit);
+  $initialMode   = request('view') === 'feed' ? 'feed' : 'overview';
 
   $unreadNotifications = auth()->check()
     ? auth()->user()->notifications()->whereNull('read_at')->count()
     : 0;
 @endphp
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
+<div id="dashboard-page" class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6" data-initial-mode="{{ $initialMode }}">
 
   <nav aria-label="Breadcrumb"
      class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
@@ -31,7 +32,7 @@
     <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
        stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
     </li>
-    <li id="crumb-mode" class="text-gray-900 dark:text-gray-100 font-semibold">Overview</li>
+    <li id="crumb-mode" class="text-gray-900 dark:text-gray-100 font-semibold">{{ $initialMode === 'feed' ? 'Feed' : 'Overview' }}</li>
   </ol>
   </nav>
 
@@ -65,18 +66,20 @@
           class="mode-btn data-[active=true]:bg-yellow-400 data-[active=true]:text-gray-900
              data-[active=true]:ring-1 data-[active=true]:ring-yellow-300 data-[active=true]:dark:ring-yellow-500
              h-10 px-4 rounded-full text-sm font-semibold text-gray-700 dark:text-gray-500 transition"
-          data-target="overview" data-active="true" aria-pressed="true">Overview</button>
+          data-target="overview" data-dashboard-url="{{ route('dashboard', ['view' => 'overview']) }}"
+          data-active="{{ $initialMode === 'overview' ? 'true' : 'false' }}" aria-pressed="{{ $initialMode === 'overview' ? 'true' : 'false' }}">Overview</button>
       <button id="btn-feed"
           class="mode-btn data-[active=true]:bg-yellow-400 data-[active=true]:text-gray-900
              data-[active=true]:ring-1 data-[active=true]:ring-yellow-300 data-[active=true]:dark:ring-yellow-500
              h-10 px-4 rounded-full text-sm font-semibold text-gray-700 dark:text-gray-500 transition"
-          data-target="feed" aria-pressed="false">Feed</button>
+          data-target="feed" data-dashboard-url="{{ route('dashboard', ['view' => 'feed']) }}"
+          data-active="{{ $initialMode === 'feed' ? 'true' : 'false' }}" aria-pressed="{{ $initialMode === 'feed' ? 'true' : 'false' }}">Feed</button>
     </div>
     </div>
   </div>
   </header>
 
-  <section id="view-overview" class="space-y-6 sm:space-y-8">
+      <section id="view-overview" class="space-y-6 sm:space-y-8 {{ $initialMode === 'feed' ? 'hidden' : '' }}">
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 
     <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
@@ -248,7 +251,7 @@
   </section>
   </section>
 
-  <section id="view-feed" class="hidden">
+  <section id="view-feed" class="{{ $initialMode === 'feed' ? '' : 'hidden' }}">
   <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-xl p-4 sm:p-6">
     <div class="flex items-center justify-between">
     <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100">Newest Posts</h2>
@@ -265,6 +268,11 @@
   </section>
 </div>
 
+<div id="dashboard-loading" class="fixed inset-0 hidden items-center justify-center z-50 bg-white/20 dark:bg-black/25 backdrop-blur-[2px]" role="status" aria-live="polite" aria-label="Loading dashboard">
+  <img src="{{ asset('images/LogoDark.png') }}" alt="Loading Logo" class="h-32 w-auto animate-spin-slow dark:hidden">
+  <img src="{{ asset('images/LogoWhite.png') }}" alt="Loading Logo Dark" class="h-32 w-auto animate-spin-slow hidden dark:block">
+</div>
+
 <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
   <span id="closeImageModal" class="absolute top-6 right-8 text-white text-4xl cursor-pointer">&times;</span>
   <img id="modalImage" src="" class="max-h-[90%] max-w-[90%] rounded-xl shadow-2xl" alt="Preview">
@@ -276,93 +284,190 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const btns = document.querySelectorAll(".mode-btn");
-  const modeLinks = document.querySelectorAll(".mode-link");
-  const viewOverview = document.getElementById("view-overview");
-  const viewFeed = document.getElementById("view-feed");
-  const crumbMode = document.getElementById("crumb-mode");
+  const dashboardPath = new URL(@json(route('dashboard')), window.location.origin).pathname.replace(/\/+$/, '');
+  let observer = null;
+  let page = 2;
 
-  const toggleAllBtn = document.getElementById('toggle-all-groups');
-  const toggleLessBtn = document.getElementById('toggle-less-groups');
-  const groupsRest   = document.getElementById('groups-rest');
+  const showLoader = () => {
+    const loading = document.getElementById('dashboard-loading');
+    if (!loading) return;
+    loading.classList.remove('hidden');
+    loading.classList.add('flex');
+  };
 
-  if (toggleAllBtn && groupsRest) {
-  toggleAllBtn.addEventListener('click', () => {
-    groupsRest.classList.remove('hidden');
-    toggleAllBtn.setAttribute('aria-expanded', 'true');
-    toggleAllBtn.innerHTML = `Show less
-    <svg class="w-3.5 h-3.5 ml-1 -rotate-90 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-    </svg>`;
-    toggleAllBtn.addEventListener('click', collapseRest, { once: true });
-  });
-  }
-  if (toggleLessBtn && groupsRest) toggleLessBtn.addEventListener('click', collapseRest);
+  const hideLoader = () => {
+    const loading = document.getElementById('dashboard-loading');
+    if (!loading) return;
+    loading.classList.add('hidden');
+    loading.classList.remove('flex');
+  };
 
-  function collapseRest() {
-  groupsRest.classList.add('hidden');
-  if (toggleAllBtn) {
-    toggleAllBtn.setAttribute('aria-expanded', 'false');
-    toggleAllBtn.innerHTML = `Show all
-    <svg class="w-3.5 h-3.5 ml-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-    </svg>`;
-    toggleAllBtn.addEventListener('click', () => {
-    groupsRest.classList.remove('hidden');
-    toggleAllBtn.setAttribute('aria-expanded', 'true');
-    toggleAllBtn.innerHTML = `Show less
-      <svg class="w-3.5 h-3.5 ml-1 -rotate-90 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-      </svg>`;
-    toggleAllBtn.addEventListener('click', collapseRest, { once: true });
-    }, { once: true });
-  }
-  }
-
-  let page = 2, observer;
   function manageInfiniteScroll(enable) {
-  const trigger = document.getElementById("infinite-scroll-trigger");
-  const postsContainer = document.getElementById("posts-container");
-  const loading = document.getElementById("loading");
-  if (!trigger || !postsContainer || !loading) return;
+    const trigger = document.getElementById("infinite-scroll-trigger");
+    const postsContainer = document.getElementById("posts-container");
+    const loading = document.getElementById("loading");
+    if (!trigger || !postsContainer || !loading) return;
 
-  if (observer) { observer.disconnect(); observer = null; }
-  if (!enable) return;
+    if (observer) { observer.disconnect(); observer = null; }
+    if (!enable) return;
 
-  observer = new IntersectionObserver(async entries => {
-    if (entries[0].isIntersecting) {
-    loading.classList.remove("hidden");
-    try {
-      const url = new URL("{{ route('dashboard') }}", window.location.origin);
-      url.searchParams.set("page", page);
-      const res = await fetch(url.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } });
-      if (res.ok) {
-      const html = await res.text();
-      if (html.trim().length > 0) { postsContainer.insertAdjacentHTML("beforeend", html); page++; }
-      else { observer.unobserve(trigger); }
+    observer = new IntersectionObserver(async entries => {
+      if (entries[0].isIntersecting) {
+        loading.classList.remove("hidden");
+        try {
+          const url = new URL("{{ route('dashboard') }}", window.location.origin);
+          const currentMode = document.getElementById('dashboard-page')?.dataset.initialMode || 'overview';
+          url.searchParams.set("page", page);
+          url.searchParams.set("view", currentMode);
+          const res = await fetch(url.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } });
+          if (res.ok) {
+            const html = await res.text();
+            if (html.trim().length > 0) { postsContainer.insertAdjacentHTML("beforeend", html); page++; }
+            else { observer.unobserve(trigger); }
+          }
+        } catch(_) { } finally { loading.classList.add("hidden"); }
       }
-    } catch(_) { } finally { loading.classList.add("hidden"); }
-    }
-  });
-  observer.observe(trigger);
+    });
+    observer.observe(trigger);
+  }
+
+  function initGroupsPreviewToggle() {
+    const toggleAllBtn = document.getElementById('toggle-all-groups');
+    const toggleLessBtn = document.getElementById('toggle-less-groups');
+    const groupsRest = document.getElementById('groups-rest');
+    if (!toggleAllBtn || !groupsRest) return;
+
+    const openRest = () => {
+      groupsRest.classList.remove('hidden');
+      toggleAllBtn.setAttribute('aria-expanded', 'true');
+      toggleAllBtn.innerHTML = `Show less
+      <svg class="w-3.5 h-3.5 ml-1 -rotate-90 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>`;
+      toggleAllBtn.onclick = collapseRest;
+    };
+
+    const collapseRest = () => {
+      groupsRest.classList.add('hidden');
+      toggleAllBtn.setAttribute('aria-expanded', 'false');
+      toggleAllBtn.innerHTML = `Show all
+      <svg class="w-3.5 h-3.5 ml-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>`;
+      toggleAllBtn.onclick = openRest;
+    };
+
+    toggleAllBtn.onclick = openRest;
+    if (toggleLessBtn) toggleLessBtn.onclick = collapseRest;
   }
 
   function setMode(target) {
-  const isOverview = target === "overview";
-  document.querySelectorAll(".mode-btn").forEach(b => {
-    const active = (b.dataset.target === target);
-    b.dataset.active = active.toString();
-    b.setAttribute('aria-pressed', active ? 'true' : 'false');
-  });
-  viewOverview.classList.toggle("hidden", !isOverview);
-  viewFeed.classList.toggle("hidden", isOverview);
-  crumbMode.textContent = isOverview ? 'Overview' : 'Feed';
-  manageInfiniteScroll(!isOverview);
+    const viewOverview = document.getElementById("view-overview");
+    const viewFeed = document.getElementById("view-feed");
+    const crumbMode = document.getElementById("crumb-mode");
+    const pageRoot = document.getElementById('dashboard-page');
+
+    if (!viewOverview || !viewFeed || !crumbMode || !pageRoot) return;
+
+    const isOverview = target === "overview";
+    pageRoot.dataset.initialMode = target;
+
+    document.querySelectorAll(".mode-btn").forEach(b => {
+      const active = (b.dataset.target === target);
+      b.dataset.active = active.toString();
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    viewOverview.classList.toggle("hidden", !isOverview);
+    viewFeed.classList.toggle("hidden", isOverview);
+    crumbMode.textContent = isOverview ? 'Overview' : 'Feed';
+
+    page = 2;
+    manageInfiniteScroll(!isOverview);
   }
 
-  document.querySelectorAll(".mode-btn").forEach(b => b.addEventListener("click", () => setMode(b.dataset.target)));
-  document.querySelectorAll(".mode-link").forEach(l => l.addEventListener("click", () => setMode(l.dataset.target)));
-  setMode("overview");
+  const swapDashboardPage = (html) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const nextPage = doc.getElementById('dashboard-page');
+    const currentPage = document.getElementById('dashboard-page');
+    if (!nextPage || !currentPage) return false;
+
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+
+    currentPage.replaceWith(nextPage);
+    return true;
+  };
+
+  const loadDashboardMode = async (url, pushState = true) => {
+    showLoader();
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'text/html' },
+      });
+
+      if (!response.ok) {
+        window.location.href = url;
+        return;
+      }
+
+      const html = await response.text();
+      const swapped = swapDashboardPage(html);
+
+      if (!swapped) {
+        window.location.href = url;
+        return;
+      }
+
+      if (pushState && window.location.href !== url) {
+        history.pushState({ dashboardAsync: true }, '', url);
+      }
+
+      initDashboardInteractions();
+    } catch (_) {
+      window.location.href = url;
+    } finally {
+      hideLoader();
+    }
+  };
+
+  function initDashboardInteractions() {
+    initGroupsPreviewToggle();
+
+    document.querySelectorAll('.mode-btn').forEach((button) => {
+      button.onclick = () => {
+        const target = button.dataset.target;
+        const url = button.dataset.dashboardUrl;
+        if (!target || !url) return;
+
+        const current = document.getElementById('dashboard-page')?.dataset.initialMode || 'overview';
+        if (current === target) return;
+
+        loadDashboardMode(url, true);
+      };
+    });
+
+    const initialMode = document.getElementById('dashboard-page')?.dataset.initialMode || 'overview';
+    setMode(initialMode);
+  }
+
+  window.addEventListener('popstate', () => {
+    const url = new URL(window.location.href);
+    const normalizedPath = url.pathname.replace(/\/+$/, '');
+    if (normalizedPath === dashboardPath) {
+      loadDashboardMode(url.toString(), false);
+    }
+  });
+
+  initDashboardInteractions();
 });
 </script>
+<style>
+  @keyframes spin-slow { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  .animate-spin-slow{ animation:spin-slow 1.3s linear infinite }
+</style>
 @endsection

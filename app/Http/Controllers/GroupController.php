@@ -11,15 +11,27 @@ class GroupController extends Controller
 {
     public function index(Request $request)
     {
-        $topicId = $request->query('topic');
-        $search  = $request->query('search');
+        $topicIds = collect($request->query('topics', []))
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($topicIds->isEmpty() && $request->filled('topic')) {
+            $legacyTopicId = (int) $request->query('topic');
+            if ($legacyTopicId > 0) {
+                $topicIds = collect([$legacyTopicId]);
+            }
+        }
+
+        $search = $request->query('search');
 
         $groups = Group::query()
             ->with(['topics', 'creator', 'members'])
             ->when(
-                $topicId,
+                $topicIds->isNotEmpty(),
                 fn($q) =>
-                $q->whereHas('topics', fn($qq) => $qq->where('topics.id', $topicId))
+                $q->whereHas('topics', fn($qq) => $qq->whereIn('topics.id', $topicIds->all()))
             )
             ->when(
                 $search,

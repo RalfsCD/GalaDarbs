@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -38,24 +39,53 @@ class ProfileController extends Controller
         // datu validācija
         $request->validate([
             'name' => 'required|string|max:255',
-            'profile_photo' => 'nullable|image|max:2048',
+            'profile_photo' => 'nullable|image|max:6048',
+        ], [
+            'profile_photo.image' => 'Profile photo must be an image file (jpg, png, webp, ...).',
+            'profile_photo.max' => 'Profile photo is too large. Max allowed size is 2MB.',
         ]);
 
         // iegūst pašreizējo lietotāju
         $user = $request->user();
         $user->name = $request->name;
 
-        // ja ir augšupielādēts profila foto, tiek izdzēsts vecais un saglabāts jaunais
-        if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo_path) {
-                Storage::disk('public')->delete($user->profile_photo_path);
-            }
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
-            $user->profile_photo_path = $path;
-        }
+        $oldPhotoPath = $user->profile_photo_path;
 
-        // saglabā lietotāja izmaiņas
-        $user->save();
+        try {
+            // ja ir augšupielādēts profila foto, tiek saglabāts jaunais
+            if ($request->hasFile('profile_photo')) {
+                $path = $request->file('profile_photo')->store('profile-photos', 'public');
+
+                if (! $path) {
+                    return Redirect::back()
+                        ->withInput()
+                        ->withErrors([
+                            'profile_photo' => 'Could not save profile photo. Please check storage permissions and try again.',
+                        ]);
+                }
+
+                $user->profile_photo_path = $path;
+            }
+
+            // saglabā lietotāja izmaiņas
+            $user->save();
+
+            // dzēš veco foto tikai pēc veiksmīgas jaunā saglabāšanas
+            if ($request->hasFile('profile_photo') && $oldPhotoPath && $oldPhotoPath !== $user->profile_photo_path) {
+                Storage::disk('public')->delete($oldPhotoPath);
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Profile update failed', [
+                'user_id' => $user->id,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return Redirect::back()
+                ->withInput()
+                ->withErrors([
+                    'profile_photo' => 'Profile photo upload failed: ' . $exception->getMessage(),
+                ]);
+        }
 
         // pāradresē lietotāju uz profila iestatījumu skatu 
         return Redirect::route('profile.settings')->with('status', 'Profile updated!');

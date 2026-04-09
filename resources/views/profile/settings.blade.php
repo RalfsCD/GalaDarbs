@@ -86,12 +86,26 @@
       @csrf
       @method('patch')
 
+      @if($errors->any())
+        <div class="rounded-xl border border-red-300/80 dark:border-red-700/80 bg-red-50/80 dark:bg-red-900/20 p-3 sm:p-4">
+          <p class="text-sm font-semibold text-red-800 dark:text-red-300">Could not update profile:</p>
+          <ul class="mt-1 list-disc pl-5 space-y-0.5 text-sm text-red-700 dark:text-red-200">
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
       <div>
         <x-input-label for="name" value="Name" class="text-gray-900 dark:text-gray-100" />
         <x-text-input id="name" name="name" value="{{ old('name', $user->name) }}"
           class="mt-1 block w-full rounded-xl border border-gray-300 dark:border-gray-700
                  bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400
                  focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
+        @error('name')
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
       </div>
 
       <div>
@@ -111,6 +125,9 @@
         </label>
         <input type="file" name="profile_photo" id="profile_photo" class="hidden" />
         <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-1">Select a profile photo (optional).</p>
+        @error('profile_photo')
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
       </div>
 
       <div class="flex">
