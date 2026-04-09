@@ -151,6 +151,78 @@
   <section
     class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
            border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)]
+           p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div>
+      <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Change Password</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Use a strong password with at least 8 characters.</p>
+    </div>
+
+    @if($errors->updatePassword->any())
+      <div class="rounded-xl border border-red-300/80 dark:border-red-700/80 bg-red-50/80 dark:bg-red-900/20 p-3 sm:p-4">
+        <p class="text-sm font-semibold text-red-800 dark:text-red-300">Could not update password:</p>
+        <ul class="mt-1 list-disc pl-5 space-y-0.5 text-sm text-red-700 dark:text-red-200">
+          @foreach($errors->updatePassword->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    <form method="POST" action="{{ route('profile.password.update') }}" class="space-y-4 sm:space-y-5" autocomplete="off">
+      @csrf
+      @method('patch')
+
+      <div>
+        <x-input-label for="current_password" value="Current Password" class="text-gray-900 dark:text-gray-100" />
+        <x-text-input id="current_password" name="current_password" type="password"
+          class="mt-1 block w-full rounded-xl border border-gray-300 dark:border-gray-700
+                 bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400
+                 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
+        @error('current_password', 'updatePassword')
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
+      </div>
+
+      <div>
+        <x-input-label for="password" value="New Password" class="text-gray-900 dark:text-gray-100" />
+        <x-text-input id="password" name="password" type="password"
+          class="mt-1 block w-full rounded-xl border border-gray-300 dark:border-gray-700
+                 bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400
+                 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
+        @error('password', 'updatePassword')
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
+      </div>
+
+      <div>
+        <x-input-label for="password_confirmation" value="Confirm New Password" class="text-gray-900 dark:text-gray-100" />
+        <x-text-input id="password_confirmation" name="password_confirmation" type="password"
+          class="mt-1 block w-full rounded-xl border border-gray-300 dark:border-gray-700
+                 bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400
+                 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm" />
+      </div>
+
+      <div class="flex">
+        <button type="submit"
+                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full
+                       text-sm font-semibold tracking-tight
+                       bg-yellow-400 text-gray-900
+                       hover:bg-yellow-500 active:bg-yellow-500/90
+                       dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:active:bg-yellow-400/90
+                       border border-yellow-300/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all
+                       focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75A4.5 4.5 0 0 0 12 2.25v0a4.5 4.5 0 0 0-4.5 4.5V10.5M5.25 10.5h13.5a1.5 1.5 0 0 1 1.5 1.5v6.75A2.25 2.25 0 0 1 18 21H6a2.25 2.25 0 0 1-2.25-2.25V12a1.5 1.5 0 0 1 1.5-1.5z" />
+          </svg>
+          <span>Update Password</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section
+    class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
+           border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)]
            p-4 sm:p-6 space-y-3 sm:space-y-4">
     <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
       <span class="font-semibold text-gray-900 dark:text-gray-100">Warning:</span>

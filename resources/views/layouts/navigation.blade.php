@@ -8,7 +8,6 @@
         ['name' => 'Topics', 'route' => 'topics.index',  'icon' => 'bookmark',            'match' => 'topics.*'],
         ['name' => 'Groups', 'route' => 'groups.index',  'icon' => 'users',               'match' => 'groups.*'],
         ['name' => 'News',   'route' => 'news.index',    'icon' => 'newspaper',           'match' => 'news.*'],
-        ['name' => 'About',  'route' => 'about',         'icon' => 'information-circle',  'match' => 'about'],
     ];
 
     if (auth()->check() && auth()->user()->isAdmin()) {
@@ -109,6 +108,18 @@
         @if($unreadCount > 0)
           <span class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $unreadCount }}</span>
         @endif
+      </a>
+
+      @php $activeAbout = $isActive('about'); @endphp
+      <a href="{{ route('about') }}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $activeAbout ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+        </svg>
+        @if($activeAbout)
+          <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+        @endif
+        <span>About</span>
       </a>
 
       <form method="POST" action="{{ route('logout') }}">
@@ -239,6 +250,18 @@
         @if($unreadCount > 0)
           <span class="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{{ $unreadCount }}</span>
         @endif
+      </a>
+
+      @php $activeAbout = $isActive('about'); @endphp
+      <a href="{{ route('about') }}"
+         class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition {{ $activeAbout ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+        </svg>
+        @if($activeAbout)
+          <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+        @endif
+        <span>About</span>
       </a>
 
       <form method="POST" action="{{ route('logout') }}">

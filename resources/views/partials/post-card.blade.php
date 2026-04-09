@@ -80,7 +80,7 @@
       </span>
     </button>
 
-    <button type="button" class="comments-toggle flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors" data-post="{{ $post->id }}">
+    <button type="button" class="comments-toggle flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 transition-colors" data-post="{{ $post->id }}" aria-expanded="false" aria-controls="comments-{{ $post->id }}">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
               d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
@@ -88,6 +88,7 @@
       <span class="comment-count font-medium text-sm sm:text-base">
         {{ $post->comments_count ?? $post->comments->count() }}
       </span>
+      <span class="text-sm font-medium">Comments</span>
     </button>
 
     @if(auth()->check() && !$isOwner && !$isAdmin)
@@ -118,20 +119,32 @@
   </div>
 
   <div id="comments-{{ $post->id }}" class="mt-4 hidden">
-    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/50 p-3 sm:p-4">
-      <div id="comments-list-{{ $post->id }}" class="space-y-3">
-        <p class="text-gray-500 text-sm">Loading comments…</p>
+    <section class="rounded-2xl border border-gray-200/80 dark:border-gray-800/80 bg-white/70 dark:bg-gray-900/60 backdrop-blur overflow-hidden">
+      <header class="px-3 sm:px-4 py-3 border-b border-gray-200/70 dark:border-gray-800/70 bg-gray-50/70 dark:bg-gray-900/50 flex items-center justify-between gap-2">
+        <h3 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100">Comments</h3>
+        <span id="comments-total-{{ $post->id }}" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-100/80 dark:bg-yellow-500/20 text-yellow-900 dark:text-yellow-100 border border-yellow-300/60 dark:border-yellow-500/30">
+          {{ $post->comments_count ?? $post->comments->count() }}
+        </span>
+      </header>
+
+      <div id="comments-list-{{ $post->id }}" class="space-y-3 p-3 sm:p-4 max-h-[24rem] overflow-y-auto">
+        <p class="text-gray-500 text-sm">Open comments to load…</p>
       </div>
 
       @auth
-      <form class="mt-3 flex gap-2 items-start" data-comment-form="{{ $post->id }}">
+      <form class="border-t border-gray-200/70 dark:border-gray-800/70 p-3 sm:p-4 flex gap-2 items-start bg-white/70 dark:bg-gray-900/50" data-comment-form="{{ $post->id }}">
         @csrf
         <input type="hidden" name="post_id" value="{{ $post->id }}">
-        <input name="content" placeholder="Write a comment…" class="flex-1 rounded-xl px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring focus:ring-yellow-300 dark:focus:ring-yellow-600">
-        <button class="px-3 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold border border-yellow-300/70 shadow-sm transition">Send</button>
+        <input name="content" placeholder="Write a comment…" autocomplete="off" class="flex-1 rounded-xl px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring focus:ring-yellow-300 dark:focus:ring-yellow-600">
+        <button type="submit" data-comment-submit class="px-3 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold border border-yellow-300/70 shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">Send</button>
       </form>
+      <p class="px-3 sm:px-4 pb-3 sm:pb-4 text-xs text-red-500 hidden" data-comment-error="{{ $post->id }}"></p>
+      @else
+      <div class="border-t border-gray-200/70 dark:border-gray-800/70 p-3 sm:p-4 text-sm text-gray-600 dark:text-gray-300">
+        <a href="{{ route('login') }}" class="font-semibold underline underline-offset-4">Log in</a> to join the conversation.
+      </div>
       @endauth
-    </div>
+    </section>
   </div>
 </div>
 
@@ -173,4 +186,5 @@ function closeReportModal(id){const el=document.getElementById(`reportModal-${id
 <style>
 .post-card { user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
 .post-card * { user-select:none; -webkit-user-select:none; }
+.post-card input, .post-card textarea { user-select:text; -webkit-user-select:text; }
 </style>

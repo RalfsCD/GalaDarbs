@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -89,6 +90,24 @@ class ProfileController extends Controller
 
         // pāradresē lietotāju uz profila iestatījumu skatu 
         return Redirect::route('profile.settings')->with('status', 'Profile updated!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validateWithBag('updatePassword', [
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.current_password' => 'Your current password is incorrect.',
+            'password.confirmed' => 'New password confirmation does not match.',
+            'password.min' => 'New password must be at least 8 characters long.',
+        ]);
+
+        $request->user()->forceFill([
+            'password' => Hash::make($validated['password']),
+        ])->save();
+
+        return Redirect::route('profile.settings')->with('status', 'Password updated!');
     }
 
     // profila dzēšanas funkcija
