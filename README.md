@@ -1,4 +1,5 @@
-<p align="center"><img src="public/images/LogoWhite.png" alt="PostPit logo" width="120"></p># PostPit
+<p align="center"><img src="public/images/LogoWhite.png" alt="PostPit logo" width="120"></p>
+# PostPit
 
 
 
