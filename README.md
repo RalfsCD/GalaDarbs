@@ -1,6 +1,6 @@
-<p align="center">
-	<img src="public/images/LogoDark.png" alt="PostPit logo" width="120">
-</p>
+<p align="center"><img src="public/images/LogoWhite.png" alt="PostPit logo" width="120"></p>
+#PostPit
+
 
 <h1 align="center">PostPit</h1>
 
