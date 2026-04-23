@@ -132,7 +132,7 @@
       </div>
 
       @auth
-      <form class="border-t border-gray-200/70 dark:border-gray-800/70 p-3 sm:p-4 flex gap-2 items-start bg-white/70 dark:bg-gray-900/50" data-comment-form="{{ $post->id }}">
+      <form class="border-t border-gray-200/70 dark:border-gray-800/70 p-3 sm:p-4 flex gap-2 items-start bg-white/70 dark:bg-gray-900/50" data-comment-form="{{ $post->id }}" novalidate>
         @csrf
         <input type="hidden" name="post_id" value="{{ $post->id }}">
         <input name="content" placeholder="Write a comment…" autocomplete="off" class="flex-1 rounded-xl px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:ring focus:ring-yellow-300 dark:focus:ring-yellow-600">
@@ -153,11 +153,11 @@
   <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl max-w-md w-full space-y-4 relative">
     <button onclick="closeReportModal({{ $post->id }})" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-2xl">&times;</button>
     <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Report Post</h2>
-    <form method="POST" action="{{ route('reports.store', $post) }}" class="space-y-4">
+    <form method="POST" action="{{ route('reports.store', $post) }}" novalidate class="space-y-4">
       @csrf
       <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Reason</label>
-        <select name="reason" required class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600">
+        <select name="reason" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600">
           <option value="">-- Select a reason --</option>
           <option value="Spam">Spam</option>
           <option value="Harassment">Harassment</option>
@@ -170,7 +170,7 @@
       </div>
       <div>
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Details (optional)</label>
-        <textarea name="details" rows="3" maxlength="1000" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600"></textarea>
+        <textarea name="details" rows="3" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600"></textarea>
       </div>
       <button type="submit" class="w-full py-2.5 rounded-lg bg-red-500 text-white font-bold hover:bg-red-600 transition">Submit Report</button>
     </form>

@@ -104,7 +104,7 @@
     </div>
   @endif
 
-  <form id="createGroupForm" action="{{ route('groups.store') }}" method="POST" class="space-y-6">
+  <form id="createGroupForm" action="{{ route('groups.store') }}" method="POST" novalidate class="space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-6">
@@ -259,6 +259,13 @@
     </div>
   </div>
 </div>
+
+@include('partials.validation-modal', [
+  'modalId' => 'groupCreateServerValidationModal',
+  'modalTitle' => 'Please fix the following:',
+  'modalErrors' => $errors->all(),
+  'openOnLoad' => $errors->any(),
+])
 
 @section('scripts')
 <script>

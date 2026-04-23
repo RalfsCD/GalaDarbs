@@ -179,7 +179,7 @@
     @if(!$showAll)
       <div class="p-8 text-center rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
                   border border-gray-200/70 dark:border-gray-800/70 shadow-xl">
-        <p class="text-gray-700 dark:text-gray-300">You’re all caught up 🎉</p>
+        <p class="text-gray-700 dark:text-gray-300">You’re caught up.</p>
         <a href="{{ url()->current() }}?all=1"
            class="inline-flex items-center gap-1.5 mt-4 px-3.5 py-2 rounded-full
                   bg-white/70 dark:bg-gray-900/60 backdrop-blur

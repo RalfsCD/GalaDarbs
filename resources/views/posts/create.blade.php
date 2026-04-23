@@ -93,49 +93,31 @@
     </div>
   </header>
 
-  @if ($errors->any())
-    <div class="rounded-3xl border border-red-300/60 dark:border-red-600/50 bg-red-50/80 dark:bg-red-900/30 p-4 sm:p-5 text-red-800 dark:text-red-100 shadow-xl">
-      <div class="flex items-start gap-3">
-        <div class="shrink-0 mt-0.5">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M4.93 4.93l14.14 14.14M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="font-semibold mb-1">Please fix the following:</p>
-          <ul class="list-disc pl-5 space-y-1 text-sm">
-            @foreach ($errors->all() as $error)
-              <li>{{ $error }}</li>
-            @endforeach
-          </ul>
-        </div>
-      </div>
-    </div>
-  @endif
-
-  <form id="createPostForm" action="{{ route('posts.store', $group) }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
+  <form id="createPostForm" action="{{ route('posts.store', $group) }}" method="POST" enctype="multipart/form-data" novalidate class="space-y-4 sm:space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-4 sm:space-y-6">
 
       <div>
         <label for="title" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Title</label>
-        <input type="text" name="title" id="title" value="{{ old('title') }}"
-               placeholder="Catchy headline goes here"
+         <input type="text" name="title" id="title" value="{{ old('title') }}"
+           placeholder="Catchy headline goes here"
                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700
                       bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
                       placeholder-gray-400 focus:outline-none focus:ring-2
                       focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">
+         <x-input-error :messages="$errors->get('title')" class="mt-1 text-red-500" />
       </div>
 
       <div>
         <label for="content" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Content</label>
         <textarea name="content" id="content" rows="5"
-                  placeholder="Write what’s on your mind…"
+              placeholder="Write what’s on your mind…"
                   class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700
                          bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
                          placeholder-gray-400 focus:outline-none focus:ring-2
                          focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">{{ old('content') }}</textarea>
+         <x-input-error :messages="$errors->get('content')" class="mt-1 text-red-500" />
       </div>
 
       <div>
@@ -162,6 +144,7 @@
           </span>
         </label>
         <input type="file" name="media" id="media" class="hidden" />
+        <x-input-error :messages="$errors->get('media')" class="mt-1 text-red-500" />
       </div>
 
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
@@ -217,6 +200,13 @@
 
 </div>
 
+@include('partials.validation-modal', [
+  'modalId' => 'postServerValidationModal',
+  'modalTitle' => 'Please fix the following:',
+  'modalErrors' => $errors->all(),
+  'openOnLoad' => $errors->any(),
+])
+
 <script>
   const mediaInput = document.getElementById('media');
   const mediaFileName = document.getElementById('mediaFileName');
@@ -227,6 +217,8 @@
   const form = document.getElementById('createPostForm');
   const titleInput = document.getElementById('title');
   const contentInput = document.getElementById('content');
+  const titleMax = 120;
+  const contentMax = 5000;
 
   form?.addEventListener('submit', function(e) {
     const errors = [];
@@ -237,10 +229,16 @@
     if (!titleInput.value.trim()) {
       errors.push("Title is required.");
       titleInput.classList.add('ring-2','ring-red-500','border-red-600');
+    } else if (titleInput.value.trim().length > titleMax) {
+      errors.push(`Title must be ${titleMax} characters or less.`);
+      titleInput.classList.add('ring-2','ring-red-500','border-red-600');
     }
 
     if (!contentInput.value.trim()) {
       errors.push("Content is required.");
+      contentInput.classList.add('ring-2','ring-red-500','border-red-600');
+    } else if (contentInput.value.trim().length > contentMax) {
+      errors.push(`Content must be ${contentMax} characters or less.`);
       contentInput.classList.add('ring-2','ring-red-500','border-red-600');
     }
 

@@ -2,6 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  h1, h2, h3, h4, p, li {
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+
+  a.inline-flex,
+  button.inline-flex {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  a.inline-flex.rounded-md,
+  a.inline-flex.rounded-lg,
+  a.inline-flex.rounded-xl,
+  a.inline-flex.rounded-2xl,
+  button.inline-flex.rounded-md,
+  button.inline-flex.rounded-lg,
+  button.inline-flex.rounded-xl,
+  button.inline-flex.rounded-2xl {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  a.inline-flex > span,
+  button.inline-flex > span {
+    min-width: 0;
+  }
+
+  /* Keep rounded-pill buttons and badges from overflowing narrow layouts. */
+  .inline-flex.rounded-full:not([data-theme-slider]):not(.theme-thumb) {
+    max-width: 100%;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  a.inline-flex.rounded-full:not([data-theme-slider]),
+  button.inline-flex.rounded-full:not([data-theme-slider]) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span.inline-flex.rounded-full,
+  div.inline-flex.rounded-full {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Allow pill controls inside stacked button groups to wrap cleanly on very small widths. */
+  .inline-flex.rounded-full > span,
+  .inline-flex.rounded-full > strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .adaptive-badge {
+    max-width: 100%;
+  }
+
+  .adaptive-badge .badge-value,
+  .adaptive-badge .badge-label {
+    display: inline-block;
+    min-width: 0;
+  }
+
+  .adaptive-badge .badge-value {
+    flex-shrink: 0;
+  }
+
+  .adaptive-badge .badge-label {
+    white-space: nowrap;
+  }
+
+  .adaptive-badge.is-compact {
+    max-width: max-content;
+  }
+
+  .adaptive-badge.is-compact .badge-label {
+    display: none;
+  }
+
+  .adaptive-badge.is-compact .badge-dot {
+    display: none;
+  }
+}
+
+@media (max-width: 1280px) {
+  .adaptive-badge .badge-label {
+    display: none;
+  }
+
+  .adaptive-badge .badge-dot {
+    display: none;
+  }
+
+  .adaptive-badge {
+    max-width: max-content;
+  }
+}
+
+@media (max-width: 640px) {
+  .inline-flex.rounded-full,
+  .inline-flex.rounded-xl,
+  .inline-flex.rounded-2xl {
+    font-size: 0.75rem;
+  }
+}
+
 /* --- Custom Utilities --- */
 
 /* Hide scrollbar but keep scroll functionality */

@@ -9,7 +9,7 @@
         </p>
     </header>
 
-    <!-- Delete Account Button (Yellow) -->
+    {{-- Dzēšanas poga (dzeltena) --}}
     <x-danger-button
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
@@ -18,12 +18,12 @@
         {{ __('Delete Account') }}
     </x-danger-button>
 
-    <!-- Modal -->
+    {{-- Modālis --}}
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <!-- Full translucent background -->
+        {{-- Pilns caurspīdīgs fons --}}
         <div class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 
-        <!-- Modal content with translucent background -->
+        {{-- Modāļa saturs ar caurspīdīgu fonu --}}
         <form method="post" action="{{ route('profile.destroy') }}" class="p-6 relative z-50 bg-black bg-opacity-70 text-white rounded-lg shadow-lg max-w-lg mx-auto mt-24">
             @csrf
             @method('delete')
@@ -55,7 +55,7 @@
                     {{ __('Cancel') }}
                 </x-secondary-button>
 
-                <!-- Delete Account Button Yellow -->
+                {{-- Dzēšanas poga dzeltenā krāsā --}}
                 <x-danger-button class="ms-3 bg-yellow-400 text-black hover:bg-yellow-300">
                     {{ __('Delete Account') }}
                 </x-danger-button>

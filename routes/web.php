@@ -14,38 +14,36 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\AdminMiddleware;
 
-// Root → redirect smartly
+// Sakne → publiskā sākumlapa
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : view('welcome');
+    return view('welcome');
 })->name('home');
 
-// Routes that require authentication
+// Maršruti, kuriem nepieciešama autentifikācija
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
+    // Vadības panelis
     Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
 
-    // Topics
+    // Tēmas
     Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
     Route::get('/topics/create', [TopicController::class, 'create'])->name('topics.create');
     Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
 
-    // Manage (Admin only via controller checks)
+    // Pārvaldība (administratoram paredzēts pārbaudes slānis kontrolierī)
     Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
     Route::patch('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
 
-    // Show (keep after edit route)
+    // Skats (jāpaliek pēc labošanas maršruta)
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
 
-    // Groups
+    // Grupas
     Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
-    // 🔙 Added back:
+    // Atjaunots atpakaļ
     Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
     Route::patch('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
 
@@ -53,40 +51,40 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
     Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 
-    // Posts
+    // Ieraksti
     Route::get('/groups/{group}/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/groups/{group}/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    // Likes & Comments
+    // Patīk un komentāri
     Route::post('/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
     Route::get('/posts/{post}/comments', [CommentController::class, 'index'])->name('posts.comments');
 
-    // Reports
+    // Ziņojumi
     Route::post('/posts/{post}/report', [ReportController::class, 'store'])->name('reports.store');
 
-    // News
+    // Jaunumi
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
     Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
 
-    // About
+    // Par sistēmu
     Route::get('/about', [PageController::class, 'about'])->name('about');
 
-    // Profile
+    // Profils
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Notifications
+    // Paziņojumi
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
-    // Admin Panel (auth + admin only)
+    // Administrācijas panelis (autentificēts + administrators)
     Route::prefix('admin')
         ->middleware([AdminMiddleware::class])
         ->group(function () {

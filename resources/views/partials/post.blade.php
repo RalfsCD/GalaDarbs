@@ -135,18 +135,18 @@
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl max-w-md w-full space-y-4 relative">
         <button onclick="closeReportModal({{ $post->id }})" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-2xl">&times;</button>
         <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Report Post</h2>
-        <form method="POST" action="{{ route('reports.store', $post) }}" class="space-y-4">
+        <form method="POST" action="{{ route('reports.store', $post) }}" novalidate class="space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Reason</label>
-                <input type="text" name="reason" required maxlength="255"
+                <input type="text" name="reason"
                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
                               bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
                               placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600">
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Details (optional)</label>
-                <textarea name="details" rows="3" maxlength="1000"
+                <textarea name="details" rows="3"
                           class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
                                  placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400 dark:focus:ring-red-600"></textarea>

@@ -52,13 +52,14 @@
         </p>
 
         @if($totalNews)
-          <div class="mt-3 inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold
+          <div data-badge-adaptive class="adaptive-badge mt-3 inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold
                       text-yellow-900 dark:text-yellow-100
                       bg-yellow-400/15 dark:bg-yellow-500/20
                       border border-yellow-300/40 dark:border-yellow-500/40
                       rounded-full px-3 py-1">
             <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
-            {{ number_format($totalNews) }} {{ Str::plural('post', $totalNews) }}
+            <span class="badge-value">{{ number_format($totalNews) }}</span>
+            <span class="badge-label"> {{ Str::plural('post', $totalNews) }}</span>
           </div>
         @endif
       </div>
@@ -154,7 +155,7 @@
   @endif
 </div>
 
-{{-- Lightbox --}}
+{{-- Gaismas lodziņš --}}
 <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
   <button id="closeImageModal" class="absolute top-6 right-8 text-white text-3xl leading-none w-10 h-10 rounded-full hover:bg-white/10">&times;</button>
   <img id="modalImage" src="" class="max-h-[92%] max-w-[92%] rounded-xl shadow-2xl" alt="Preview">

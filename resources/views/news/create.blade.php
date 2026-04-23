@@ -73,7 +73,7 @@
     </div>
   </header>
 
-  <form id="createNewsForm" action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
+  <form id="createNewsForm" action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data" novalidate class="space-y-4 sm:space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur
@@ -81,8 +81,8 @@
 
       <div>
         <label for="title" class="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">Title</label>
-        <input type="text" name="title" id="title" value="{{ old('title') }}"
-               placeholder="Enter news title"
+         <input type="text" name="title" id="title" value="{{ old('title') }}"
+           placeholder="Enter news title"
                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700
                       bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
                       placeholder-gray-400 focus:outline-none focus:ring-2
@@ -174,6 +174,13 @@
   </div>
 
 </div>
+
+@include('partials.validation-modal', [
+  'modalId' => 'newsServerValidationModal',
+  'modalTitle' => 'Please fix the following:',
+  'modalErrors' => $errors->all(),
+  'openOnLoad' => $errors->any(),
+])
 
 <script>
   const imageInput = document.getElementById('media');

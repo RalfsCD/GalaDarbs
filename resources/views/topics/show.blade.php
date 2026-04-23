@@ -71,9 +71,10 @@
             </p>
           @endif
 
-          <div class="mt-3 inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-yellow-900 dark:text-yellow-100 bg-yellow-400/15 dark:bg-yellow-500/20 border border-yellow-300/40 dark:border-yellow-500/40 rounded-full px-3 py-1">
+          <div data-badge-adaptive class="adaptive-badge mt-3 inline-flex max-w-full items-center gap-2 text-[10px] sm:text-xs font-semibold text-yellow-900 dark:text-yellow-100 bg-yellow-400/15 dark:bg-yellow-500/20 border border-yellow-300/40 dark:border-yellow-500/40 rounded-full px-2.5 py-1 whitespace-nowrap">
             <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
-            {{ number_format($groupCount) }} {{ Str::plural('Group', $groupCount) }}
+            <span class="badge-value">{{ number_format($groupCount) }}</span>
+            <span class="badge-label"> {{ Str::plural('Group', $groupCount) }}</span>
           </div>
         </div>
 
@@ -108,7 +109,7 @@
 
               @auth
                 @if($group->members->contains(auth()->id()))
-                  <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-500/15 dark:bg-green-600/20 text-green-800 dark:text-green-100 border border-green-400/40 dark:border-green-500/30">
+                  <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-green-500/15 dark:bg-green-600/20 text-green-800 dark:text-green-100 border border-green-400/40 dark:border-green-500/30 whitespace-nowrap">
                     <span class="h-1.5 w-1.5 rounded-full bg-green-400"></span>
                     Joined
                   </span>

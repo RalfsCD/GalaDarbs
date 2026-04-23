@@ -66,13 +66,14 @@
           {{ $group->description ?: 'No description provided.' }}
         </p>
 
-        <div class="mt-2 inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold
+        <div data-badge-adaptive class="adaptive-badge mt-2 inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold max-w-full
                     text-yellow-900 dark:text-yellow-100
                     bg-yellow-400/15 dark:bg-yellow-500/20
                     border border-yellow-300/40 dark:border-yellow-500/40
                     rounded-full px-2.5 sm:px-3 py-0.5">
           <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
-          {{ number_format($memberCount) }} {{ Str::plural('member', $memberCount) }}
+          <span class="badge-value">{{ number_format($memberCount) }}</span>
+          <span class="badge-label"> {{ Str::plural('member', $memberCount) }}</span>
         </div>
 
         <div class="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar md:hidden -mx-1 px-1 pb-1">

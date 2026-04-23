@@ -16,7 +16,7 @@
       <p class="text-sm text-gray-500 dark:text-gray-400">Log in to your account to continue</p>
     </div>
     <x-auth-session-status class="mb-2" :status="session('status')" />
-    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+    <form method="POST" action="{{ route('login') }}" novalidate class="space-y-4">
       @csrf
       <div class="space-y-1.5">
         <x-input-label for="email" :value="__('Email')" class="text-gray-900 dark:text-gray-200" />
@@ -29,9 +29,9 @@
           <x-text-input
             id="email"
             name="email"
-            type="email"
+            type="text"
+            inputmode="email"
             :value="old('email')"
-            required
             autofocus
             autocomplete="username"
             class="block w-full pl-10 pr-3 py-2.5 rounded-xl
@@ -55,7 +55,6 @@
             id="password"
             name="password"
             type="password"
-            required
             autocomplete="current-password"
             class="block w-full pl-10 pr-11 py-2.5 rounded-xl
                    text-gray-900 dark:text-gray-100
@@ -113,6 +112,7 @@
     </div>
   </div>
 </main>
+
 <div id="loading-overlay"
      class="fixed inset-0 hidden items-center justify-center z-50 bg-gray-100 dark:bg-gray-900">
   <img src="{{ asset('images/LogoDark.png') }}" alt="Loading Logo" class="h-32 w-auto animate-spin-slow dark:hidden">

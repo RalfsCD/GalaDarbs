@@ -123,9 +123,10 @@
       @endif
     </p>
     @if($displayTotal)
-      <div aria-live="polite" class="inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-yellow-900 dark:text-yellow-100 bg-yellow-400/15 dark:bg-yellow-500/20 border border-yellow-300/40 dark:border-yellow-500/40 rounded-full px-3 py-1">
+      <div aria-live="polite" data-badge-adaptive class="adaptive-badge inline-flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-yellow-900 dark:text-yellow-100 bg-yellow-400/15 dark:bg-yellow-500/20 border border-yellow-300/40 dark:border-yellow-500/40 rounded-full px-3 py-1 max-w-full">
       <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
-      {{ number_format($displayTotal) }} {{ Str::plural('group', $displayTotal) }}
+      <span class="badge-value">{{ number_format($displayTotal) }}</span>
+      <span class="badge-label"> {{ Str::plural('group', $displayTotal) }}</span>
       </div>
     @endif
     <div>
@@ -304,11 +305,12 @@
         {{ $group->name }}
       </h2>
       <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold
+         <span data-badge-adaptive class="adaptive-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold max-w-[7rem]
                bg-yellow-100/80 dark:bg-yellow-500/20 text-yellow-800 dark:text-yellow-100
                border border-yellow-300/60 dark:border-yellow-500/30">
         <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
-        {{ $group->members->count() }} {{ Str::plural('Member', $group->members->count()) }}
+         <span class="badge-value">{{ $group->members->count() }}</span>
+         <span class="badge-label"> {{ Str::plural('Member', $group->members->count()) }}</span>
         </span>
         @auth
         @if($group->members->contains(auth()->id()))

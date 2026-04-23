@@ -23,7 +23,7 @@ class TopicSeeder extends Seeder
         ];
 
         foreach ($topics as $topic) {
-            Topic::create($topic);
+            Topic::updateOrCreate(['name' => $topic['name']], $topic);
         }
     }
 }

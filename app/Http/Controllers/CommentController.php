@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 
 class CommentController extends Controller
 {
@@ -26,9 +28,21 @@ class CommentController extends Controller
 
     public function store(Request $request, Post $post)
     {
+        $rateKey = sprintf('comment:%d:%s', $post->id, $request->user()?->id ?? $request->ip());
+
+        if (RateLimiter::tooManyAttempts($rateKey, 6)) {
+            $seconds = RateLimiter::availableIn($rateKey);
+
+            throw ValidationException::withMessages([
+                'content' => "You're commenting too fast. Please wait {$seconds} seconds.",
+            ]);
+        }
+
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
         ]);
+
+        RateLimiter::hit($rateKey, 60);
 
         $comment = $post->comments()->create([
             'user_id' => $request->user()->id,

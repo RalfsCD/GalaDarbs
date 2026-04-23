@@ -95,16 +95,15 @@
     </div>
   @endif
 
-  <form id="createTopicForm" action="{{ route('topics.store') }}" method="POST" class="space-y-6">
+  <form id="createTopicForm" action="{{ route('topics.store') }}" method="POST" novalidate class="space-y-6">
     @csrf
 
     <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-6">
 
       <div class="space-y-2">
         <label for="name" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">Topic Name <span class="text-red-500">*</span></label>
-        <input id="name" name="name" type="text" value="{{ old('name') }}"
-               placeholder="e.g., Sustainable Cooking"
-               required
+         <input id="name" name="name" type="text" value="{{ old('name') }}"
+           placeholder="e.g., Sustainable Cooking"
                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">
         <p class="text-xs text-gray-500 dark:text-gray-400">Short, memorable, and searchable.</p>
       </div>
@@ -116,7 +115,7 @@
           </label>
           <span id="descCount" class="text-[11px] text-gray-500 dark:text-gray-400">0/300</span>
         </div>
-        <textarea id="description" name="description" rows="4" maxlength="300"
+        <textarea id="description" name="description" rows="4"
                   placeholder="Describe your topic…"
                   class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-600 shadow-sm">{{ old('description') }}</textarea>
         <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -169,6 +168,13 @@
     </div>
   </div>
 </div>
+
+@include('partials.validation-modal', [
+  'modalId' => 'topicServerValidationModal',
+  'modalTitle' => 'Please fix the following:',
+  'modalErrors' => $errors->all(),
+  'openOnLoad' => $errors->any(),
+])
 
 <script>
   const form = document.getElementById('createTopicForm');

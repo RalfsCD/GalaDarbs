@@ -15,7 +15,7 @@
       <p class="text-sm text-gray-500 dark:text-gray-400">Connect & explore communities you’ll love.</p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+    <form method="POST" action="{{ route('register') }}" novalidate class="space-y-4">
       @csrf
 
       <div>
@@ -26,7 +26,7 @@
           </span>
           <x-text-input id="name"
             class="block w-full pl-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-            type="text" name="name" :value="old('name')" required autocomplete="name" />
+            type="text" name="name" :value="old('name')" autocomplete="name" />
         </div>
         <x-input-error :messages="$errors->get('name')" class="mt-1 text-red-500"/>
       </div>
@@ -39,7 +39,7 @@
           </span>
           <x-text-input id="email"
             class="block w-full pl-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-            type="email" name="email" :value="old('email')" required autocomplete="username" />
+            type="text" inputmode="email" name="email" :value="old('email')" autocomplete="username" />
         </div>
         <x-input-error :messages="$errors->get('email')" class="mt-1 text-red-500"/>
       </div>
@@ -53,7 +53,7 @@
 
           <x-text-input id="password"
             class="block w-full pl-10 pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-            type="password" name="password" required autocomplete="new-password" />
+            type="password" name="password" autocomplete="new-password" />
 
           <button type="button" id="togglePw"
             class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
@@ -104,7 +104,7 @@
         <div class="relative mt-1">
           <x-text-input id="password_confirmation"
             class="block w-full pr-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-            type="password" name="password_confirmation" required autocomplete="new-password" />
+            type="password" name="password_confirmation" autocomplete="new-password" />
           <button type="button" id="togglePw2"
             class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
             aria-label="Toggle confirm password visibility">
@@ -153,6 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const tips = document.getElementById('pw-tips');
   const bar = document.getElementById('pw-bar');
   const matchTip = document.getElementById('match-tip');
+  const form = document.querySelector('form');
+  const overlay = document.getElementById('loading-overlay');
+
+  function passwordErrorText(value) {
+    const issues = [];
+    if (value.length < 8) issues.push('at least 8 characters');
+    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) issues.push('upper and lower case letters');
+    if (!/\d/.test(value)) issues.push('a number');
+    if (!/[^\w\s]/.test(value)) issues.push('a symbol');
+    return issues.length ? `Use ${issues.join(', ')}.` : '';
+  }
 
   const togglePw = document.getElementById('togglePw');
   const pwEyeOpen = document.getElementById('pw-eye-open');
@@ -215,9 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
     matchTip.classList.toggle('text-green-600', same);
     matchTip.classList.toggle('dark:text-green-400', same);
   }
-
-  const form = document.querySelector('form');
-  const overlay = document.getElementById('loading-overlay');
   form.addEventListener('submit', () => {
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');

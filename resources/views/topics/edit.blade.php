@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
-  {{-- Breadcrumb --}}
+  {{-- Maizes drupaču navigācija --}}
   <nav aria-label="Breadcrumb"
        class="rounded-2xl bg-white/70 dark:bg-gray-900/60 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm px-3 sm:px-4 py-2">
     <ol class="flex items-center flex-wrap gap-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
@@ -35,7 +35,7 @@
     </ol>
   </nav>
 
-  {{-- Header --}}
+  {{-- Galvenes bloks --}}
   <header
     class="relative overflow-hidden rounded-3xl p-6 sm:p-8
            bg-gradient-to-br from-yellow-50 via-white to-yellow-100
@@ -77,7 +77,7 @@
     </div>
   </header>
 
-  {{-- Server-side errors --}}
+  {{-- Servera puses kļūdas --}}
   @if ($errors->any())
     <div class="rounded-3xl border border-red-300/60 dark:border-red-600/50 bg-red-50/80 dark:bg-red-900/30 p-4 sm:p-5 text-red-800 dark:text-red-100 shadow-xl">
       <div class="flex items-start gap-3">
@@ -98,21 +98,20 @@
     </div>
   @endif
 
-  {{-- Manage Card --}}
+  {{-- Rediģēšanas sadaļa --}}
   <div class="rounded-3xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-[0_16px_44px_-22px_rgba(0,0,0,0.45)] p-4 sm:p-6 space-y-6">
 
-    {{-- Update form --}}
-    <form id="editTopicForm" action="{{ route('topics.update', $topic) }}" method="POST" class="space-y-6">
+    {{-- Atjaunošanas forma --}}
+    <form id="editTopicForm" action="{{ route('topics.update', $topic) }}" method="POST" novalidate class="space-y-6">
       @csrf
       @method('PATCH')
 
-      {{-- Name --}}
+      {{-- Nosaukums --}}
       <div class="space-y-2">
         <label for="name" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">
           Topic Name <span class="text-red-500">*</span>
         </label>
-        <input id="name" name="name" type="text" value="{{ old('name', $topic->name) }}"
-               required maxlength="255"
+         <input id="name" name="name" type="text" value="{{ old('name', $topic->name) }}"
                class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700
                       bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
                       placeholder-gray-400 focus:outline-none focus:ring-2
@@ -120,7 +119,7 @@
                placeholder="e.g., Sustainable Cooking">
       </div>
 
-      {{-- Description --}}
+      {{-- Apraksts --}}
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label for="description" class="block text-sm font-semibold text-gray-800 dark:text-gray-100">
@@ -128,7 +127,7 @@
           </label>
           <span id="descCount" class="text-[11px] text-gray-500 dark:text-gray-400">0/300</span>
         </div>
-        <textarea id="description" name="description" rows="4" maxlength="300"
+        <textarea id="description" name="description" rows="4"
                   class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700
                          bg-white dark:bg-gray-950/70 text-gray-900 dark:text-gray-100
                          placeholder-gray-400 focus:outline-none focus:ring-2
@@ -136,7 +135,7 @@
                   placeholder="Describe this topic…">{{ old('description', $topic->description) }}</textarea>
       </div>
 
-      {{-- Actions (Save / Cancel / Delete) --}}
+      {{-- Darbības (saglabāt / atcelt / dzēst) --}}
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <a href="{{ route('topics.index') }}"
            class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full
@@ -158,7 +157,7 @@
           Save Changes
         </button>
 
-        {{-- Subtle inline Delete (inside card, not sticking out) --}}
+        {{-- Smalka iekšējā dzēšanas darbība --}}
         <form action="{{ route('topics.destroy', $topic) }}" method="POST"
               onsubmit="return confirm('Delete this topic? This cannot be undone.');"
               class="sm:ml-auto">
@@ -180,7 +179,7 @@
     </form>
   </div>
 
-  {{-- Client-side validation modal (reused pattern, optional) --}}
+  {{-- Klienta puses validācijas modālis (atkārtoti lietots) --}}
   <div id="validationModal"
        class="fixed inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center">
     <div class="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-2xl max-w-lg w-full space-y-4 relative border border-gray-200 dark:border-gray-800">
@@ -208,7 +207,14 @@
 
 </div>
 
-{{-- Scripts --}}
+@include('partials.validation-modal', [
+  'modalId' => 'topicEditServerValidationModal',
+  'modalTitle' => 'Please fix the following:',
+  'modalErrors' => $errors->all(),
+  'openOnLoad' => $errors->any(),
+])
+
+{{-- Skripti --}}
 <script>
   const form = document.getElementById('editTopicForm');
   const nameInput = document.getElementById('name');

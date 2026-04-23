@@ -82,18 +82,19 @@
       <section id="view-overview" class="space-y-6 sm:space-y-8 {{ $initialMode === 'feed' ? 'hidden' : '' }}">
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 
-    <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
+    <div class="rounded-2xl p-5 min-h-32 flex flex-col justify-between gap-3
           bg-white/80 dark:bg-gray-900/70 backdrop-blur
           border border-gray-200/70 dark:border-gray-800/70
           shadow-[0_12px_32px_-20px_rgba(0,0,0,0.35)]">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-start justify-between gap-2">
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Groups Joined</p>
-      <span class="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
+      <span class="mt-1 h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_10px_theme(colors.yellow.300)]"></span>
     </div>
-    <div class="flex items-end justify-between">
-      <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">{{ number_format($groupsCount) }}</h3>
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 leading-none">{{ number_format($groupsCount) }}</h3>
       <a href="{{ route('groups.index', ['mine' => 1]) }}"
-       class="inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
+       class="inline-flex items-center justify-center h-8 px-3 rounded-full text-xs font-semibold
+          self-start sm:self-auto
           bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700
           text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
       Manage
@@ -101,13 +102,13 @@
     </div>
     </div>
 
-    <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
+    <div class="rounded-2xl p-5 min-h-32 flex flex-col justify-between gap-3
           bg-white/80 dark:bg-gray-900/70 backdrop-blur
           border border-gray-200/70 dark:border-gray-800/70
           shadow-[0_12px_32px_-20px_rgba(0,0,0,0.35)]">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-start justify-between gap-2">
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Notifications</p>
-      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold
+      <span class="inline-flex max-w-full items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold whitespace-nowrap leading-none shrink-0
              @if($unreadNotifications>0)
              bg-yellow-100/80 text-yellow-900 border border-yellow-300/60
              dark:bg-yellow-500/20 dark:text-yellow-100 dark:border-yellow-500/30
@@ -115,15 +116,15 @@
              bg-gray-100 text-gray-600 border border-gray-200
              dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700
              @endif">
-      {{ $unreadNotifications > 0 ? $unreadNotifications . ' unread' : 'All caught up' }}
+        {{ $unreadNotifications > 0 ? $unreadNotifications . ' unread' : 'All clear' }}
       </span>
     </div>
-    <div class="flex items-end justify-between">
-      <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <h3 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 leading-none">
       {{ $unreadNotifications > 0 ? number_format($unreadNotifications) : '0' }}
       </h3>
       <a href="{{ route('notifications.index') }}"
-       class="inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
+       class="inline-flex items-center justify-center h-8 px-3 rounded-full text-xs font-semibold self-start sm:self-auto
           {{ $unreadNotifications>0
             ? 'bg-yellow-400/80 border border-yellow-300/70 text-gray-900 hover:bg-yellow-500'
             : 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700' }}
@@ -133,43 +134,43 @@
     </div>
     </div>
 
-    <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
+    <div class="rounded-2xl p-5 min-h-32 flex flex-col justify-between gap-3
           bg-white/80 dark:bg-gray-900/70 backdrop-blur
           border border-gray-200/70 dark:border-gray-800/70
           shadow-[0_12px_32px_-20px_rgba(0,0,0,0.35)]">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-start justify-between gap-2">
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Discover</p>
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0z"/>
       </svg>
     </div>
-    <div class="flex items-end justify-between">
-      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight max-w-[9ch]">
       <span class="block">Explore</span><span class="block">Topics</span>
       </h3>
       <a href="{{ route('topics.index') }}"
-       class="inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
+       class="inline-flex items-center justify-center h-8 px-3 rounded-full text-xs font-semibold self-start sm:self-auto
           bg-yellow-400/80 border border-yellow-300/70 text-gray-900
           hover:bg-yellow-500 transition">Browse</a>
     </div>
     </div>
 
-    <div class="rounded-2xl p-5 h-32 flex flex-col justify-between
+    <div class="rounded-2xl p-5 min-h-32 flex flex-col justify-between gap-3
           bg-white/80 dark:bg-gray-900/70 backdrop-blur
           border border-gray-200/70 dark:border-gray-800/70
           shadow-[0_12px_32px_-20px_rgba(0,0,0,0.35)]">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-start justify-between gap-2">
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Communities</p>
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
       </svg>
     </div>
-    <div class="flex items-end justify-between">
-      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <h3 class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight max-w-[9ch]">
       <span class="block">Explore</span><span class="block">Groups</span>
       </h3>
       <a href="{{ route('groups.index') }}"
-       class="inline-flex items-center h-8 px-3 rounded-full text-xs font-semibold
+       class="inline-flex items-center justify-center h-8 px-3 rounded-full text-xs font-semibold self-start sm:self-auto
           bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700
           text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Browse</a>
     </div>
@@ -196,8 +197,9 @@
       <div class="p-5 sm:p-6 rounded-2xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition">
         <div class="flex items-start justify-between gap-2">
         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $group->name }}</h3>
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-400/15 dark:bg-yellow-500/20 text-yellow-900 dark:text-yellow-100 border border-yellow-300/40 dark:border-yellow-500/40">
-          {{ $group->members->count() }} {{ Str::plural('member', $group->members->count()) }}
+        <span data-badge-adaptive class="adaptive-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-400/15 dark:bg-yellow-500/20 text-yellow-900 dark:text-yellow-100 border border-yellow-300/40 dark:border-yellow-500/40 max-w-[7rem]">
+          <span class="badge-value">{{ $group->members->count() }}</span>
+          <span class="badge-label"> {{ Str::plural('member', $group->members->count()) }}</span>
         </span>
         </div>
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">{{ $group->description ?? 'No description.' }}</p>
@@ -223,8 +225,9 @@
         <div class="p-5 sm:p-6 rounded-2xl bg-white/80 dark:bg-gray-900/70 backdrop-blur border border-gray-200/70 dark:border-gray-800/70 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition">
           <div class="flex items-start justify-between gap-2">
           <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $group->name }}</h3>
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-400/15 dark:bg-yellow-500/20 text-yellow-900 dark:text-yellow-100 border border-yellow-300/40 dark:border-yellow-500/40">
-            {{ $group->members->count() }} {{ Str::plural('member', $group->members->count()) }}
+          <span data-badge-adaptive class="adaptive-badge inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-yellow-400/15 dark:bg-yellow-500/20 text-yellow-900 dark:text-yellow-100 border border-yellow-300/40 dark:border-yellow-500/40 max-w-[7rem]">
+            <span class="badge-value">{{ $group->members->count() }}</span>
+            <span class="badge-label"> {{ Str::plural('member', $group->members->count()) }}</span>
           </span>
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">{{ $group->description ?? 'No description.' }}</p>

@@ -117,7 +117,7 @@
     </div>
   @endif
 
-  <form id="editGroupForm" action="{{ route('groups.update', $group) }}" method="POST" class="space-y-6">
+  <form id="editGroupForm" action="{{ route('groups.update', $group) }}" method="POST" novalidate class="space-y-6">
     @csrf
     @method('PATCH')
 
@@ -272,6 +272,13 @@
     </div>
   </div>
 </div>
+
+@include('partials.validation-modal', [
+  'modalId' => 'groupEditServerValidationModal',
+  'modalTitle' => 'Please fix the following:',
+  'modalErrors' => $errors->all(),
+  'openOnLoad' => $errors->any(),
+])
 
 @section('scripts')
 <script>

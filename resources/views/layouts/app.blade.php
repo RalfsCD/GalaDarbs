@@ -54,6 +54,52 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const html = document.documentElement;
+            let adaptiveBadgeObserver = null;
+            let adaptiveBadgeMutationObserver = null;
+
+            function applyAdaptiveBadges() {
+                document.querySelectorAll('[data-badge-adaptive]').forEach((badge) => {
+                    badge.classList.remove('is-compact');
+
+                    // If the full badge text overflows, collapse to number-only mode.
+                    if (badge.scrollWidth > badge.clientWidth + 1) {
+                        badge.classList.add('is-compact');
+                    }
+                });
+            }
+
+            function initAdaptiveBadgeObserver() {
+                if (!('ResizeObserver' in window)) return;
+
+                if (adaptiveBadgeObserver) {
+                    adaptiveBadgeObserver.disconnect();
+                }
+
+                adaptiveBadgeObserver = new ResizeObserver(() => applyAdaptiveBadges());
+                document.querySelectorAll('[data-badge-adaptive]').forEach((badge) => {
+                    adaptiveBadgeObserver.observe(badge);
+                    const parent = badge.parentElement;
+                    if (parent) adaptiveBadgeObserver.observe(parent);
+                });
+            }
+
+            function initAdaptiveBadgeMutationObserver() {
+                if (!('MutationObserver' in window)) return;
+
+                if (adaptiveBadgeMutationObserver) {
+                    adaptiveBadgeMutationObserver.disconnect();
+                }
+
+                adaptiveBadgeMutationObserver = new MutationObserver(() => {
+                    applyAdaptiveBadges();
+                    initAdaptiveBadgeObserver();
+                });
+
+                adaptiveBadgeMutationObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
 
             function setupToggle(lightIconId, darkIconId, btnId) {
                 const lightIcon = document.getElementById(lightIconId);
@@ -87,6 +133,20 @@
             // Apply to both desktop + mobile buttons
             setupToggle("theme-toggle-light-icon", "theme-toggle-dark-icon", "theme-toggle");
             setupToggle("theme-toggle-light-icon-mobile", "theme-toggle-dark-icon-mobile", "theme-toggle-mobile");
+
+            applyAdaptiveBadges();
+            requestAnimationFrame(applyAdaptiveBadges);
+            requestAnimationFrame(() => requestAnimationFrame(applyAdaptiveBadges));
+
+            if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+                document.fonts.ready.then(() => applyAdaptiveBadges());
+            }
+
+            window.addEventListener('load', applyAdaptiveBadges);
+            window.addEventListener('resize', applyAdaptiveBadges);
+
+            initAdaptiveBadgeObserver();
+            initAdaptiveBadgeMutationObserver();
         });
     </script>
 </body>
