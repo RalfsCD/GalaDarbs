@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="public/images/LogoDark.png" alt="PostPit logo" width="120">
+	<img src="public/images/LogoWhite.png" alt="PostPit logo" width="120">
 </p>
 
 # PostPit
