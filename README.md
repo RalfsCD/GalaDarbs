@@ -1,22 +1,30 @@
+<p align="center">
+	<img src="public/images/LogoDark.png" alt="PostPit logo" width="120">
+</p>
+
 # PostPit
 
-PostPit is a Laravel social community platform created as a qualification exam project. It lets users join interest-based groups, create and read posts, comment, like, report content, follow news updates, manage profiles, and access an admin area for moderation.
+PostPit is a Laravel social community platform built as a qualification exam project. It brings together groups, posts, comments, news, notifications, and moderation tools in one responsive web app.
 
-## Overview
+<p align="center">
+	<em>A clean, exam-ready project focused on real Laravel features and a polished user experience.</em>
+</p>
 
-The project focuses on building a complete, modern web application with authentication, role-based access, content moderation, notifications, and a responsive interface that works well on desktop and mobile devices.
+## What It Does
 
-## Features
+PostPit is designed to show a complete full-stack workflow: users can register, log in, browse topics, create posts, comment, report content, manage profiles, and use the admin area for moderation.
 
-- User registration, login, password reset, and profile management
+## Main Features
+
+- Authentication, password reset, and profile management
 - Groups and topics for organizing communities
-- Post creation with media support
-- Comments, likes, and reporting tools
-- News publishing section
+- Posts with media uploads
+- Comments, likes, and reporting
+- News publishing
 - Notifications for user activity
-- Admin panel for moderation and user management
+- Admin panel for user and report management
 - Responsive UI with dark mode support
-- Server-side validation with modal-based feedback in the app
+- Server-side validation with clear feedback in the app
 
 ## Tech Stack
 
@@ -34,9 +42,9 @@ The project focuses on building a complete, modern web application with authenti
 - Composer
 - Node.js and npm
 - MySQL or MariaDB
-- A web server such as Apache or Nginx
+- Apache or Nginx
 
-## Installation
+## Setup
 
 ```bash
 git clone <repository-url>
@@ -49,18 +57,16 @@ php artisan migrate --seed
 npm run build
 ```
 
-If you prefer to run the app locally during development:
+For local development:
 
 ```bash
 php artisan serve
 npm run dev
 ```
 
-## Environment Setup
+## Environment
 
-Update the `.env` file with your local database credentials and application URL. The default setup uses MySQL.
-
-Example:
+Update the `.env` file with your local database credentials and application URL.
 
 ```env
 APP_URL=http://localhost
@@ -78,10 +84,10 @@ DB_PASSWORD=
 php artisan test
 ```
 
-## Project Notes
+## Project Note
 
-This project was built for a qualification exam, so the focus is on demonstrating full-stack Laravel development, user flow, validation, and a polished interface rather than minimal functionality.
+This project was created for a qualification exam, so the goal is to demonstrate practical Laravel development, structured validation, and a thoughtful interface rather than only a minimal demo.
 
 ## License
 
-This project is open-source under the MIT license.
+MIT License
