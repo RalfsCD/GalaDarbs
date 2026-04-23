@@ -2,9 +2,11 @@
 	<img src="public/images/LogoDark.png" alt="PostPit logo" width="120">
 </p>
 
-# PostPit
+<h1 align="center">PostPit</h1>
 
-PostPit is a Laravel social community platform built as a qualification exam project. It brings together groups, posts, comments, news, notifications, and moderation tools in one responsive web app.
+<p align="center">
+	PostPit is a Laravel social community platform built as a qualification exam project.
+</p>
 
 <p align="center">
 	<em>A clean, exam-ready project focused on real Laravel features and a polished user experience.</em>
@@ -12,7 +14,7 @@ PostPit is a Laravel social community platform built as a qualification exam pro
 
 ## What It Does
 
-PostPit is designed to show a complete full-stack workflow: users can register, log in, browse topics, create posts, comment, report content, manage profiles, and use the admin area for moderation.
+PostPit is designed to show a complete full-stack workflow. Users can register, log in, browse topics, create posts, comment, report content, manage profiles, and use the admin area for moderation.
 
 ## Main Features
 
@@ -25,6 +27,13 @@ PostPit is designed to show a complete full-stack workflow: users can register, 
 - Admin panel for user and report management
 - Responsive UI with dark mode support
 - Server-side validation with clear feedback in the app
+
+## Why It Stands Out
+
+- Clean Laravel structure with practical real-world features
+- Responsive interface designed for desktop and mobile
+- Focus on validation, moderation, and user flow
+- Built to demonstrate qualification-exam level full-stack development
 
 ## Tech Stack
 
