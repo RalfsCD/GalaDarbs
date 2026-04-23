@@ -1,8 +1,6 @@
-<p align="center">
-	<img src="public/images/LogoWhite.png" alt="PostPit logo" width="120">
-</p>
+<p align="center"><img src="public/images/LogoWhite.png" alt="PostPit logo" width="120"></p># PostPit
 
-# PostPit
+
 
 PostPit is a Laravel social community platform built as a qualification exam project. It brings together groups, posts, comments, news, notifications, and moderation tools in one responsive web app.
 
