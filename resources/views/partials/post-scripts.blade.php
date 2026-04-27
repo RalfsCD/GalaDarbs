@@ -3,122 +3,130 @@ document.addEventListener("DOMContentLoaded", () => {
   const token = document.querySelector('meta[name="csrf-token"]')?.content;
   const inFlight = new Set();
   const commentState = new Map();
-  const suppressUntil = new Map();
-  const SUPPRESS_MS = 450;
   const isCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || isCoarse;
-  let lastTouchLikeAt = 0;
+  const lastTapByPost = new Map();
+  const lastActionAtByPost = new Map();
   const commentsAreaSelector = ".comments-toggle, [id^='comments-'], form[data-comment-form], [data-comment-error], [data-comment-submit]";
-  function suppress(postId){ suppressUntil.set(postId, Date.now() + SUPPRESS_MS); }
-  function shouldSuppress(postId){ return (suppressUntil.get(postId) || 0) > Date.now(); }
+  function eventTargetElement(e) {
+    return e.target instanceof Element ? e.target : e.target?.parentElement;
+  }
+  function isDuplicateAction(postId) {
+    const now = Date.now();
+    const last = lastActionAtByPost.get(postId) || 0;
+    if (now - last < 280) return true;
+    lastActionAtByPost.set(postId, now);
+    return false;
+  }
   function isInCommentsArea(target){ return Boolean(target?.closest(commentsAreaSelector)); }
   function isLikedByUI(btn){
     const icon = btn?.querySelector('.like-icon');
     if (!icon) return false;
     return icon.classList.contains('fill-current') || icon.getAttribute('fill') === 'currentColor';
   }
-  document.addEventListener("click", async e => {
-    if (e.target.closest(".expand-image")) return;
-    const btn = e.target.closest(".like-btn");
-    if (!btn) return;
-
-    // On touch devices we process like taps in touchend and ignore the follow-up ghost click.
-    if (isTouch && (Date.now() - lastTouchLikeAt) < 700) return;
-
+  function readLikeCount(btn) {
+    return Number.parseInt(btn?.querySelector(".like-count")?.textContent || "0", 10) || 0;
+  }
+  async function handleLikeButton(btn) {
+    if (!btn) return null;
     const postId = btn.dataset.post;
     const likeUrl = btn.dataset.likeUrl;
-    if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
-    suppress(postId);
-    await toggleLike(postId, btn, likeUrl);
+    if (!postId || inFlight.has(postId) || isDuplicateAction(postId)) return null;
+
+    const previous = { liked: isLikedByUI(btn), likes: readLikeCount(btn) };
+    const optimisticLiked = !previous.liked;
+    const optimisticLikes = Math.max(0, previous.likes + (optimisticLiked ? 1 : -1));
+    updateLikeUI(btn, optimisticLiked, optimisticLikes);
+
+    const data = await toggleLike(postId, likeUrl);
+    if (!data) {
+      updateLikeUI(btn, previous.liked, previous.likes);
+      return null;
+    }
+
+    updateLikeUI(btn, Boolean(data.liked), Number.parseInt(data.likes, 10) || 0);
+    return data;
+  }
+
+  // Like button uses AJAX click only (including keyboard activation).
+  document.addEventListener("click", async e => {
+    const target = eventTargetElement(e);
+    if (!target || target.closest(".expand-image")) return;
+
+    const btn = target.closest(".like-btn");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    await handleLikeButton(btn);
   });
+
+  // Touch double-tap on post card also likes via AJAX.
+  document.addEventListener("touchend", async e => {
+    const target = eventTargetElement(e);
+    if (!target || target.closest(".expand-image") || target.closest(".like-btn") || isInCommentsArea(target)) return;
+
+    const card = target.closest(".post-card");
+    if (!card) return;
+
+    const postId = card.dataset.postId;
+    if (!postId) return;
+
+    const now = Date.now();
+    const last = lastTapByPost.get(postId) || 0;
+    lastTapByPost.set(postId, now);
+
+    if (now - last >= 320) return;
+
+    const likeBtn = card.querySelector(".like-btn");
+    if (!likeBtn || isLikedByUI(likeBtn)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const data = await handleLikeButton(likeBtn);
+    if (data?.liked) popHeart(card);
+  }, { passive: false });
+
   if (!isTouch) {
     document.addEventListener("dblclick", async e => {
-      if (e.target.closest(".like-btn") || e.target.closest(".expand-image") || isInCommentsArea(e.target)) return;
-      const card = e.target.closest(".post-card");
+      const target = eventTargetElement(e);
+      if (!target || target.closest(".like-btn") || target.closest(".expand-image") || isInCommentsArea(target)) return;
+
+      const card = target.closest(".post-card");
       if (!card) return;
-      e.preventDefault(); e.stopPropagation();
+
+      e.preventDefault();
+      e.stopPropagation();
+
       const postId = card.dataset.postId;
-      if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
+      if (!postId || inFlight.has(postId)) return;
+
       const likeBtn = card.querySelector(".like-btn");
-      const likeUrl = likeBtn?.dataset.likeUrl;
       if (isLikedByUI(likeBtn)) return;
-      suppress(postId);
-      const data = await toggleLike(postId, likeBtn, likeUrl);
+
+      const data = await handleLikeButton(likeBtn);
       if (data?.liked) popHeart(card);
     });
-  } else {
-    const lastTapByPost = new Map();
-    document.addEventListener("touchstart", e => {
-      if (e.target.closest(".like-btn")) return;
-      const card = e.target.closest(".post-card");
-      if (!card || e.target.closest(".expand-image") || isInCommentsArea(e.target)) return;
-      const postId = card.dataset.postId;
-      const now = Date.now(), last = lastTapByPost.get(postId) || 0;
-      if (now - last < 300) { e.preventDefault(); e.stopPropagation(); }
-    }, { passive: false });
-    document.addEventListener("touchend", async e => {
-      const likeBtnTap = e.target.closest(".like-btn");
-      if (likeBtnTap) {
-        e.preventDefault(); e.stopPropagation();
-        const postId = likeBtnTap.dataset.post;
-        const likeUrl = likeBtnTap.dataset.likeUrl;
-        if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
-        lastTouchLikeAt = Date.now();
-        suppress(postId);
-        await toggleLike(postId, likeBtnTap, likeUrl);
-        return;
-      }
-
-      const card = e.target.closest(".post-card");
-      if (!card || e.target.closest(".expand-image") || isInCommentsArea(e.target)) return;
-      const postId = card.dataset.postId; if (!postId) return;
-      const now = Date.now(), last = lastTapByPost.get(postId) || 0;
-      lastTapByPost.set(postId, now);
-      if (now - last < 300) {
-        e.preventDefault(); e.stopPropagation();
-        if (inFlight.has(postId) || shouldSuppress(postId)) return;
-        const likeBtn = card.querySelector(".like-btn");
-        const likeUrl = likeBtn?.dataset.likeUrl;
-        if (isLikedByUI(likeBtn)) return;
-        suppress(postId);
-        const data = await toggleLike(postId, likeBtn, likeUrl);
-        if (data?.liked) popHeart(card);
-      }
-    }, { passive: false });
   }
-  async function toggleLike(postId, btn, likeUrl) {
-    if (!postId || !btn || inFlight.has(postId)) return null;
+  async function toggleLike(postId, likeUrl) {
+    if (!postId || inFlight.has(postId)) return null;
     inFlight.add(postId);
     try {
-      const wasLiked = isLikedByUI(btn);
-      const currentCountEl = btn.querySelector(".like-count");
-      const currentCount = Number.parseInt(currentCountEl?.textContent || "0", 10) || 0;
-
       const url = likeUrl || `/posts/${postId}/like`;
       const res = await fetch(url, {
         method: "POST",
         credentials: "same-origin",
         headers: {
+          "Content-Type": "application/json",
           "X-CSRF-TOKEN": token,
           "X-Requested-With": "XMLHttpRequest",
           "Accept": "application/json"
-        }
+        },
+        body: JSON.stringify({})
       });
       if (!res.ok) return null;
 
-      let data = null;
-      try {
-        data = await res.json();
-      } catch (_) {
-        const liked = !wasLiked;
-        data = {
-          liked,
-          likes: Math.max(0, currentCount + (liked ? 1 : -1)),
-        };
-      }
-
-      updateLikeUI(btn, data.liked, data.likes);
-      return data;
+      return await res.json().catch(() => null);
     } catch(_) {
       return null;
     } finally { inFlight.delete(postId); }
