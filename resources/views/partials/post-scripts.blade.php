@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const ignoreButtonClickUntil = new Map();
   const commentsAreaSelector = ".comments-toggle, [id^='comments-'], form[data-comment-form], [data-comment-error], [data-comment-submit]";
   const noDoubleTapSelector = "a, button, input, textarea, select, label, form, .expand-image, .comments-toggle, [data-comment-form], [data-comment-error], [data-comment-submit]";
+  const DOUBLE_TAP_MS = 330;
+  const DOUBLE_TAP_PX = 24;
   function eventTargetElement(e) {
     return e.target instanceof Element ? e.target : e.target?.parentElement;
   }
@@ -64,9 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Touch double-tap on post card also likes via AJAX.
-  document.addEventListener("touchstart", async e => {
+  document.addEventListener("pointerup", async e => {
     const target = eventTargetElement(e);
     if (!target || target.closest(noDoubleTapSelector) || isInCommentsArea(target)) return;
+    if (e.pointerType && e.pointerType !== "touch" && e.pointerType !== "pen") return;
 
     const card = target.closest(".post-card");
     if (!card) return;
@@ -75,10 +78,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!postId) return;
 
     const now = Date.now();
-    const last = lastTapByPost.get(postId) || 0;
-    lastTapByPost.set(postId, now);
+    const tap = {
+      time: now,
+      x: Number.isFinite(e.clientX) ? e.clientX : 0,
+      y: Number.isFinite(e.clientY) ? e.clientY : 0,
+    };
+    const last = lastTapByPost.get(postId);
+    lastTapByPost.set(postId, tap);
 
-    if (now - last >= 320) return;
+    if (!last || (now - last.time) > DOUBLE_TAP_MS) return;
+
+    const distance = Math.hypot(tap.x - last.x, tap.y - last.y);
+    if (distance > DOUBLE_TAP_PX) return;
 
     const likeBtn = card.querySelector(".like-btn");
     if (!likeBtn || isLikedByUI(likeBtn)) return;
