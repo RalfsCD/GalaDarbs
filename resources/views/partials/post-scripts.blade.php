@@ -72,6 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!postId || !btn || inFlight.has(postId)) return null;
     inFlight.add(postId);
     try {
+      const wasLiked = isLikedByUI(btn);
+      const currentCountEl = btn.querySelector(".like-count");
+      const currentCount = Number.parseInt(currentCountEl?.textContent || "0", 10) || 0;
+
       const url = likeUrl || `/posts/${postId}/like`;
       const res = await fetch(url, {
         method: "POST",
@@ -83,7 +87,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
       if (!res.ok) return null;
-      const data = await res.json();
+
+      let data = null;
+      try {
+        data = await res.json();
+      } catch (_) {
+        const liked = !wasLiked;
+        data = {
+          liked,
+          likes: Math.max(0, currentCount + (liked ? 1 : -1)),
+        };
+      }
+
       updateLikeUI(btn, data.liked, data.likes);
       return data;
     } catch(_) {
