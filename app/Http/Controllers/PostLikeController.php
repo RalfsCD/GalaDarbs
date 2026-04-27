@@ -12,8 +12,26 @@ class PostLikeController extends Controller
     {
         $userId = $request->user()->id;
 
-        $toggled = $post->likes()->toggle($userId);
-        $liked = !empty($toggled['attached']);
+        $desiredLiked = filter_var($request->input('liked'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        if ($desiredLiked === null) {
+            $toggled = $post->likes()->toggle($userId);
+            $liked = !empty($toggled['attached']);
+        } else {
+            $alreadyLiked = $post->likes()
+                ->wherePivot('user_id', $userId)
+                ->exists();
+
+            if ($desiredLiked && !$alreadyLiked) {
+                $post->likes()->attach($userId);
+            }
+
+            if (!$desiredLiked && $alreadyLiked) {
+                $post->likes()->detach($userId);
+            }
+
+            $liked = $desiredLiked;
+        }
 
         $post->loadCount('likes');
 

@@ -30,7 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.classList.add('opacity-80', 'pointer-events-none');
 
     const previous = { liked: isLikedByUI(btn), likes: readLikeCount(btn) };
-    const data = await toggleLike(postId, likeUrl, previous);
+    const desiredLiked = !previous.liked;
+    const data = await toggleLike(postId, likeUrl, previous, desiredLiked);
     if (!data) {
       btn.disabled = false;
       btn.classList.remove('opacity-80', 'pointer-events-none');
@@ -113,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data?.liked) popHeart(card);
     });
   }
-  async function toggleLike(postId, likeUrl, previousState) {
+  async function toggleLike(postId, likeUrl, previousState, desiredLiked) {
     if (!postId || inFlight.has(postId)) return null;
     inFlight.add(postId);
     try {
@@ -127,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
           "X-Requested-With": "XMLHttpRequest",
           "Accept": "application/json"
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({ liked: desiredLiked })
       });
       if (!res.ok) return null;
 
@@ -140,11 +141,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (!previousState) return null;
-
-      const liked = !previousState.liked;
       return {
-        liked,
-        likes: Math.max(0, previousState.likes + (liked ? 1 : -1)),
+        liked: desiredLiked,
+        likes: Math.max(0, previousState.likes + (desiredLiked ? 1 : -1)),
       };
     } catch(_) {
       return null;
