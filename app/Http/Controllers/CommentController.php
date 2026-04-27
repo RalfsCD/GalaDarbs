@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Notifications\PostCommentedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -50,6 +51,13 @@ class CommentController extends Controller
         ]);
 
         $comment->load('user');
+
+        if ($post->user_id !== $request->user()->id) {
+            $post->user->notify(new PostCommentedNotification(
+                $request->user()->name,
+                (string) $post->title
+            ));
+        }
 
         return response()->json([
             'comment' => [

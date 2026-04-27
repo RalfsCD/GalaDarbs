@@ -9,8 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const ignoreButtonClickUntil = new Map();
   const commentsAreaSelector = ".comments-toggle, [id^='comments-'], form[data-comment-form], [data-comment-error], [data-comment-submit]";
   const noDoubleTapSelector = "a, button, input, textarea, select, label, form, .expand-image, .comments-toggle, [data-comment-form], [data-comment-error], [data-comment-submit]";
-  const DOUBLE_TAP_MS = 330;
-  const DOUBLE_TAP_PX = 24;
+  const DOUBLE_TAP_MS = 340;
+  const DOUBLE_TAP_PX = 28;
   function eventTargetElement(e) {
     return e.target instanceof Element ? e.target : e.target?.parentElement;
   }
@@ -66,10 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Touch double-tap on post card also likes via AJAX.
-  document.addEventListener("pointerup", async e => {
+  document.addEventListener("touchstart", async e => {
     const target = eventTargetElement(e);
     if (!target || target.closest(noDoubleTapSelector) || isInCommentsArea(target)) return;
-    if (e.pointerType && e.pointerType !== "touch" && e.pointerType !== "pen") return;
 
     const card = target.closest(".post-card");
     if (!card) return;
@@ -77,12 +76,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const postId = card.dataset.postId;
     if (!postId) return;
 
+    const touch = e.touches?.[0] || e.changedTouches?.[0];
+    const x = Number.isFinite(touch?.clientX) ? touch.clientX : 0;
+    const y = Number.isFinite(touch?.clientY) ? touch.clientY : 0;
+
     const now = Date.now();
-    const tap = {
-      time: now,
-      x: Number.isFinite(e.clientX) ? e.clientX : 0,
-      y: Number.isFinite(e.clientY) ? e.clientY : 0,
-    };
+    const tap = { time: now, x, y };
     const last = lastTapByPost.get(postId);
     lastTapByPost.set(postId, tap);
 
@@ -97,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     e.stopPropagation();
 
-    ignoreButtonClickUntil.set(postId, Date.now() + 500);
+    ignoreButtonClickUntil.set(postId, Date.now() + 600);
 
     const data = await handleLikeButton(likeBtn);
     if (data?.liked) popHeart(card);
