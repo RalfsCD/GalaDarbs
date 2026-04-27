@@ -6,17 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const isCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || isCoarse;
   const lastTapByPost = new Map();
-  const lastActionAtByPost = new Map();
+  const ignoreButtonClickUntil = new Map();
   const commentsAreaSelector = ".comments-toggle, [id^='comments-'], form[data-comment-form], [data-comment-error], [data-comment-submit]";
   function eventTargetElement(e) {
     return e.target instanceof Element ? e.target : e.target?.parentElement;
-  }
-  function isDuplicateAction(postId) {
-    const now = Date.now();
-    const last = lastActionAtByPost.get(postId) || 0;
-    if (now - last < 280) return true;
-    lastActionAtByPost.set(postId, now);
-    return false;
   }
   function isInCommentsArea(target){ return Boolean(target?.closest(commentsAreaSelector)); }
   function isLikedByUI(btn){
@@ -31,12 +24,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return null;
     const postId = btn.dataset.post;
     const likeUrl = btn.dataset.likeUrl;
-    if (!postId || inFlight.has(postId) || isDuplicateAction(postId)) return null;
+    if (!postId || inFlight.has(postId)) return null;
+
+    btn.disabled = true;
+    btn.classList.add('opacity-80', 'pointer-events-none');
+
     const previous = { liked: isLikedByUI(btn), likes: readLikeCount(btn) };
     const data = await toggleLike(postId, likeUrl, previous);
-    if (!data) return null;
+    if (!data) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-80', 'pointer-events-none');
+      return null;
+    }
 
     updateLikeUI(btn, Boolean(data.liked), Number.parseInt(data.likes, 10) || 0);
+
+    btn.disabled = false;
+    btn.classList.remove('opacity-80', 'pointer-events-none');
+
     return data;
   }
 
@@ -47,6 +52,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const btn = target.closest(".like-btn");
     if (!btn) return;
+
+    const postId = btn.dataset.post;
+    if (postId && Date.now() < (ignoreButtonClickUntil.get(postId) || 0)) return;
+
     e.preventDefault();
     e.stopPropagation();
     await handleLikeButton(btn);
@@ -75,6 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     e.stopPropagation();
 
+    ignoreButtonClickUntil.set(postId, Date.now() + 500);
+
     const data = await handleLikeButton(likeBtn);
     if (data?.liked) popHeart(card);
   }, { passive: false });
@@ -95,6 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const likeBtn = card.querySelector(".like-btn");
       if (isLikedByUI(likeBtn)) return;
+
+      ignoreButtonClickUntil.set(postId, Date.now() + 350);
 
       const data = await handleLikeButton(likeBtn);
       if (data?.liked) popHeart(card);
@@ -120,7 +133,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const payload = await res.json().catch(() => null);
       if (payload && typeof payload === 'object' && ('liked' in payload) && ('likes' in payload)) {
-        return payload;
+        return {
+          liked: Boolean(payload.liked),
+          likes: Number.parseInt(payload.likes, 10) || 0,
+        };
       }
 
       if (!previousState) return null;
