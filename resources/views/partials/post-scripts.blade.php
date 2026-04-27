@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPPRESS_MS = 450;
   const isCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || isCoarse;
+  let lastTouchLikeAt = 0;
   const commentsAreaSelector = ".comments-toggle, [id^='comments-'], form[data-comment-form], [data-comment-error], [data-comment-submit]";
   function suppress(postId){ suppressUntil.set(postId, Date.now() + SUPPRESS_MS); }
   function shouldSuppress(postId){ return (suppressUntil.get(postId) || 0) > Date.now(); }
@@ -20,6 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.closest(".expand-image")) return;
     const btn = e.target.closest(".like-btn");
     if (!btn) return;
+
+    // On touch devices we process like taps in touchend and ignore the follow-up ghost click.
+    if (isTouch && (Date.now() - lastTouchLikeAt) < 700) return;
+
     const postId = btn.dataset.post;
     const likeUrl = btn.dataset.likeUrl;
     if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
@@ -44,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     const lastTapByPost = new Map();
     document.addEventListener("touchstart", e => {
+      if (e.target.closest(".like-btn")) return;
       const card = e.target.closest(".post-card");
       if (!card || e.target.closest(".expand-image") || isInCommentsArea(e.target)) return;
       const postId = card.dataset.postId;
@@ -51,6 +57,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (now - last < 300) { e.preventDefault(); e.stopPropagation(); }
     }, { passive: false });
     document.addEventListener("touchend", async e => {
+      const likeBtnTap = e.target.closest(".like-btn");
+      if (likeBtnTap) {
+        e.preventDefault(); e.stopPropagation();
+        const postId = likeBtnTap.dataset.post;
+        const likeUrl = likeBtnTap.dataset.likeUrl;
+        if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
+        lastTouchLikeAt = Date.now();
+        suppress(postId);
+        await toggleLike(postId, likeBtnTap, likeUrl);
+        return;
+      }
+
       const card = e.target.closest(".post-card");
       if (!card || e.target.closest(".expand-image") || isInCommentsArea(e.target)) return;
       const postId = card.dataset.postId; if (!postId) return;
