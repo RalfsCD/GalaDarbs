@@ -21,9 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = e.target.closest(".like-btn");
     if (!btn) return;
     const postId = btn.dataset.post;
+    const likeUrl = btn.dataset.likeUrl;
     if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
     suppress(postId);
-    await toggleLike(postId, btn);
+    await toggleLike(postId, btn, likeUrl);
   });
   if (!isTouch) {
     document.addEventListener("dblclick", async e => {
@@ -34,9 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const postId = card.dataset.postId;
       if (!postId || inFlight.has(postId) || shouldSuppress(postId)) return;
       const likeBtn = card.querySelector(".like-btn");
+      const likeUrl = likeBtn?.dataset.likeUrl;
       if (isLikedByUI(likeBtn)) return;
       suppress(postId);
-      const data = await toggleLike(postId, likeBtn);
+      const data = await toggleLike(postId, likeBtn, likeUrl);
       if (data?.liked) popHeart(card);
     });
   } else {
@@ -58,18 +60,28 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault(); e.stopPropagation();
         if (inFlight.has(postId) || shouldSuppress(postId)) return;
         const likeBtn = card.querySelector(".like-btn");
+        const likeUrl = likeBtn?.dataset.likeUrl;
         if (isLikedByUI(likeBtn)) return;
         suppress(postId);
-        const data = await toggleLike(postId, likeBtn);
+        const data = await toggleLike(postId, likeBtn, likeUrl);
         if (data?.liked) popHeart(card);
       }
     }, { passive: false });
   }
-  async function toggleLike(postId, btn) {
+  async function toggleLike(postId, btn, likeUrl) {
     if (!postId || !btn || inFlight.has(postId)) return null;
     inFlight.add(postId);
     try {
-      const res = await fetch(`/posts/${postId}/like`, { method: "POST", headers: { "X-CSRF-TOKEN": token, "Accept": "application/json" } });
+      const url = likeUrl || `/posts/${postId}/like`;
+      const res = await fetch(url, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRF-TOKEN": token,
+          "X-Requested-With": "XMLHttpRequest",
+          "Accept": "application/json"
+        }
+      });
       if (!res.ok) return null;
       const data = await res.json();
       updateLikeUI(btn, data.liked, data.likes);

@@ -21,9 +21,13 @@ class PostLikeController extends Controller
         if ($liked && $post->user_id !== $userId) {
             $exists = $post->user->notifications()
                 ->where('type', PostLikedNotification::class)
-                ->where('data->post_id', $post->id)
-                ->where('data->user_id', $userId)
-                ->exists();
+                ->get()
+                ->contains(function ($notification) use ($post, $userId) {
+                    $data = (array) ($notification->data ?? []);
+
+                    return (int) ($data['post_id'] ?? 0) === (int) $post->id
+                        && (int) ($data['user_id'] ?? 0) === (int) $userId;
+                });
 
             if (!$exists) {
                 $post->user->notify(
@@ -35,8 +39,14 @@ class PostLikeController extends Controller
         if (!$liked && $post->user_id !== $userId) {
             $post->user->notifications()
                 ->where('type', PostLikedNotification::class)
-                ->where('data->post_id', $post->id)
-                ->where('data->user_id', $userId)
+                ->get()
+                ->filter(function ($notification) use ($post, $userId) {
+                    $data = (array) ($notification->data ?? []);
+
+                    return (int) ($data['post_id'] ?? 0) === (int) $post->id
+                        && (int) ($data['user_id'] ?? 0) === (int) $userId;
+                })
+                ->each
                 ->delete();
         }
 

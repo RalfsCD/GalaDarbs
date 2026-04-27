@@ -68,7 +68,7 @@
   @endif
 
   <div class="flex items-center gap-4 sm:gap-6 mt-3 flex-wrap">
-    <button type="button" class="like-btn flex items-center gap-2 group" data-post="{{ $post->id }}">
+    <button type="button" class="like-btn flex items-center gap-2 group" data-post="{{ $post->id }}" data-like-url="{{ route('posts.like', $post) }}">
       <svg xmlns="http://www.w3.org/2000/svg"
            class="like-icon w-6 h-6 transition-colors {{ $liked ? 'fill-current text-red-600 dark:text-red-500' : 'text-gray-500 dark:text-gray-400 group-hover:text-pink-500' }}"
            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="{{ $liked ? 'currentColor' : 'none' }}">

@@ -76,7 +76,7 @@
             $isAdmin = auth()->check() && auth()->user()->role === 'admin';
         @endphp
 
-        <button type="button" class="like-btn flex items-center gap-2 group" data-post="{{ $post->id }}">
+        <button type="button" class="like-btn flex items-center gap-2 group" data-post="{{ $post->id }}" data-like-url="{{ route('posts.like', $post) }}">
             <svg xmlns="http://www.w3.org/2000/svg"
                  class="like-icon w-6 h-6 transition-colors
                         {{ $liked ? 'fill-current text-red-600 dark:text-red-500' : 'text-gray-500 dark:text-gray-400 group-hover:text-pink-500' }}"

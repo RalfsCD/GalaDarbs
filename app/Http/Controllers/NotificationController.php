@@ -12,14 +12,21 @@ class NotificationController extends Controller
         $user = auth()->user();
 
         $notifications = $user->notifications()->latest()->get();
-        $user->unreadNotifications->markAsRead();
 
         return view('notifications.index', compact('notifications'));
     }
 
     public function markAsRead(DatabaseNotification $notification)
     {
+        if (
+            $notification->notifiable_id !== auth()->id()
+            || $notification->notifiable_type !== get_class(auth()->user())
+        ) {
+            abort(403);
+        }
+
         $notification->markAsRead();
+
         return back();
     }
 }
