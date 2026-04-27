@@ -32,17 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const postId = btn.dataset.post;
     const likeUrl = btn.dataset.likeUrl;
     if (!postId || inFlight.has(postId) || isDuplicateAction(postId)) return null;
-
     const previous = { liked: isLikedByUI(btn), likes: readLikeCount(btn) };
-    const optimisticLiked = !previous.liked;
-    const optimisticLikes = Math.max(0, previous.likes + (optimisticLiked ? 1 : -1));
-    updateLikeUI(btn, optimisticLiked, optimisticLikes);
-
-    const data = await toggleLike(postId, likeUrl);
-    if (!data) {
-      updateLikeUI(btn, previous.liked, previous.likes);
-      return null;
-    }
+    const data = await toggleLike(postId, likeUrl, previous);
+    if (!data) return null;
 
     updateLikeUI(btn, Boolean(data.liked), Number.parseInt(data.likes, 10) || 0);
     return data;
@@ -108,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data?.liked) popHeart(card);
     });
   }
-  async function toggleLike(postId, likeUrl) {
+  async function toggleLike(postId, likeUrl, previousState) {
     if (!postId || inFlight.has(postId)) return null;
     inFlight.add(postId);
     try {
@@ -126,7 +118,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (!res.ok) return null;
 
-      return await res.json().catch(() => null);
+      const payload = await res.json().catch(() => null);
+      if (payload && typeof payload === 'object' && ('liked' in payload) && ('likes' in payload)) {
+        return payload;
+      }
+
+      if (!previousState) return null;
+
+      const liked = !previousState.liked;
+      return {
+        liked,
+        likes: Math.max(0, previousState.likes + (liked ? 1 : -1)),
+      };
     } catch(_) {
       return null;
     } finally { inFlight.delete(postId); }
