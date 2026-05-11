@@ -39,6 +39,9 @@ class DemoContentSeeder extends Seeder
         $extra = User::factory()->count(12)->create();
         $users = $users->concat($extra)->values();
 
+        // prepare faker and download profile photos for users (if missing)
+        $faker = \Faker\Factory::create();
+
         // download profile photos for users (if missing)
         foreach ($users as $user) {
             if (empty($user->profile_photo_path)) {
@@ -109,7 +112,7 @@ class DemoContentSeeder extends Seeder
                     'group_id' => $group->id,
                     'user_id' => $author->id,
                     'title' => $title,
-                    'content' => fake()->paragraphs(rand(1, 4), true),
+                    'content' => $faker->paragraphs(rand(1, 4), true),
                     'media_path' => $mediaPath,
                 ]);
 
@@ -120,7 +123,7 @@ class DemoContentSeeder extends Seeder
                     Comment::create([
                         'post_id' => $post->id,
                         'user_id' => $commentUser->id,
-                        'content' => fake()->sentences(rand(1, 3), true),
+                        'content' => $faker->sentences(rand(1, 3), true),
                     ]);
                 }
 
@@ -153,6 +156,6 @@ class DemoContentSeeder extends Seeder
     private function randomTitle(string $groupName): string
     {
         $verbs = ['Discussing', 'Thoughts on', 'Best of', 'New', 'Top', 'Quick take:'];
-        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' — ' . Str::title(fake()->words(rand(1, 3), true));
+        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' — ' . Str::title(\Faker\Factory::create()->words(rand(1, 3), true));
     }
 }
