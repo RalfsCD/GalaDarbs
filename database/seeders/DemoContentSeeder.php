@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DemoContentSeeder extends Seeder
@@ -34,8 +35,24 @@ class DemoContentSeeder extends Seeder
             User::updateOrCreate(['email' => 'laura@test.lv'], ['name' => 'Laura', 'password' => Hash::make('Demo123!')]),
         ]);
 
+        // add some additional random users to populate likes/comments
+        $extra = User::factory()->count(12)->create();
+        $users = $users->concat($extra)->values();
+
+        // download profile photos for users (if missing)
+        foreach ($users as $user) {
+            if (empty($user->profile_photo_path)) {
+                $url = 'https://i.pravatar.cc/300?u=' . urlencode($user->email);
+                $path = $this->downloadToStorage($url, 'avatars');
+                if ($path) {
+                    $user->update(['profile_photo_path' => $path]);
+                }
+            }
+        }
+
         $topics = Topic::query()->orderBy('id')->get();
 
+        // create ~10 group definitions for lively demo content
         $groupDefinitions = [
             ['name' => 'Weekend Beats', 'description' => 'New music drops, concert tips, and playlist swaps.'],
             ['name' => 'Pitch Side', 'description' => 'Sports talk, match reactions, and predictions.'],
@@ -45,6 +62,8 @@ class DemoContentSeeder extends Seeder
             ['name' => 'Table Talk', 'description' => 'Food finds, recipes, and local restaurant recommendations.'],
             ['name' => 'Level Up', 'description' => 'Gaming communities, tips, and co-op plans.'],
             ['name' => 'Page Turners', 'description' => 'Books, authors, and what people are reading right now.'],
+            ['name' => 'Green Thumb', 'description' => 'Gardening tips, plant swaps, and seasonal care.'],
+            ['name' => 'City Sketches', 'description' => 'Local photography, urban life, and hidden gems.'],
         ];
 
         $groupModels = [];
@@ -72,62 +91,68 @@ class DemoContentSeeder extends Seeder
         }
 
         foreach ($groupModels as $index => $group) {
-            $primaryAuthor = $users[$index % $users->count()];
-            $secondaryAuthor = $users[($index + 1) % $users->count()];
+            // create several posts per group with optional images
+            $postCount = rand(2, 5);
+            for ($p = 0; $p < $postCount; $p++) {
+                $author = $users[array_rand($users->toArray())];
+                $title = $p === 0 ? ($group->name . ' weekly thread') : Str::limit($this->randomTitle($group->name), 60);
 
-            $postA = Post::updateOrCreate(
-                [
+                $attachImage = rand(1, 100) <= 40; // 40% chance
+                $mediaPath = null;
+                if ($attachImage) {
+                    $seed = Str::slug($group->name) . '-' . $p . '-' . rand(1, 9999);
+                    $url = 'https://picsum.photos/seed/' . $seed . '/1200/800';
+                    $mediaPath = $this->downloadToStorage($url, 'posts');
+                }
+
+                $post = Post::create([
                     'group_id' => $group->id,
-                    'title' => $group->name . ' weekly thread',
-                ],
-                [
-                    'user_id' => $primaryAuthor->id,
-                    'content' => 'A fresh demo post to make the feed feel alive with real conversation starters.',
-                    'media_path' => null,
-                ]
-            );
+                    'user_id' => $author->id,
+                    'title' => $title,
+                    'content' => fake()->paragraphs(rand(1, 4), true),
+                    'media_path' => $mediaPath,
+                ]);
 
-            $postB = Post::updateOrCreate(
-                [
-                    'group_id' => $group->id,
-                    'title' => 'Quick take: ' . Str::limit($group->name, 24, ''),
-                ],
-                [
-                    'user_id' => $secondaryAuthor->id,
-                    'content' => 'Short demo content keeps the homepage from looking empty on first load.',
-                    'media_path' => null,
-                ]
-            );
-
-            foreach ([$postA, $postB] as $post) {
-                Comment::updateOrCreate(
-                    [
+                // add random comments
+                $commentCount = rand(0, 6);
+                for ($c = 0; $c < $commentCount; $c++) {
+                    $commentUser = $users[array_rand($users->toArray())];
+                    Comment::create([
                         'post_id' => $post->id,
-                        'user_id' => $users[($index + 2) % $users->count()]->id,
-                        'content' => 'Looks good. This is exactly the kind of demo activity the app needs.',
-                    ],
-                    []
-                );
+                        'user_id' => $commentUser->id,
+                        'content' => fake()->sentences(rand(1, 3), true),
+                    ]);
+                }
 
-                Comment::updateOrCreate(
-                    [
-                        'post_id' => $post->id,
-                        'user_id' => $users[($index + 3) % $users->count()]->id,
-                        'content' => 'I would join this conversation immediately.',
-                    ],
-                    []
-                );
-
-                DB::table('post_likes')->updateOrInsert(
-                    ['post_id' => $post->id, 'user_id' => $admin->id],
-                    ['created_at' => now(), 'updated_at' => now()]
-                );
-
-                DB::table('post_likes')->updateOrInsert(
-                    ['post_id' => $post->id, 'user_id' => $users[($index + 4) % $users->count()]->id],
-                    ['created_at' => now(), 'updated_at' => now()]
-                );
+                // add random likes
+                $likeCount = rand(0, min(8, $users->count()));
+                if ($likeCount > 0) {
+                    $likeUsers = $users->random($likeCount)->pluck('id')->all();
+                    $post->likes()->syncWithoutDetaching($likeUsers);
+                }
             }
         }
+    }
+
+    private function downloadToStorage(string $url, string $folder): ?string
+    {
+        try {
+            $contents = @file_get_contents($url);
+            if ($contents === false) {
+                return null;
+            }
+
+            $filename = $folder . '/' . Str::random(12) . '.jpg';
+            Storage::disk('public')->put($filename, $contents);
+            return $filename;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function randomTitle(string $groupName): string
+    {
+        $verbs = ['Discussing', 'Thoughts on', 'Best of', 'New', 'Top', 'Quick take:'];
+        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' — ' . Str::title(fake()->words(rand(1, 3), true));
     }
 }
