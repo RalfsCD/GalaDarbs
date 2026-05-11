@@ -98,7 +98,7 @@ class DemoContentSeeder extends Seeder
             $postCount = rand(2, 5);
             for ($p = 0; $p < $postCount; $p++) {
                 $author = $users[array_rand($users->toArray())];
-                $title = $p === 0 ? ($group->name . ' weekly thread') : Str::limit($this->randomTitle($group->name), 60);
+                $title = $p === 0 ? ($group->name . ' weekly thread') : Str::limit($this->randomTitle($group->name, $faker), 60);
 
                 $attachImage = rand(1, 100) <= 40; // 40% chance
                 $mediaPath = null;
@@ -153,9 +153,9 @@ class DemoContentSeeder extends Seeder
         }
     }
 
-    private function randomTitle(string $groupName): string
+    private function randomTitle(string $groupName, \Faker\Generator $faker): string
     {
         $verbs = ['Discussing', 'Thoughts on', 'Best of', 'New', 'Top', 'Quick take:'];
-        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' — ' . Str::title(\Faker\Factory::create()->words(rand(1, 3), true));
+        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' - ' . Str::title($faker->words(rand(1, 3), true));
     }
 }
