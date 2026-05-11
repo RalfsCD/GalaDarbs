@@ -39,9 +39,6 @@ class DemoContentSeeder extends Seeder
         $extra = User::factory()->count(12)->create();
         $users = $users->concat($extra)->values();
 
-        // prepare faker and download profile photos for users (if missing)
-        $faker = \Faker\Factory::create();
-
         // download profile photos for users (if missing)
         foreach ($users as $user) {
             if (empty($user->profile_photo_path)) {
@@ -98,7 +95,7 @@ class DemoContentSeeder extends Seeder
             $postCount = rand(2, 5);
             for ($p = 0; $p < $postCount; $p++) {
                 $author = $users[array_rand($users->toArray())];
-                $title = $p === 0 ? ($group->name . ' weekly thread') : Str::limit($this->randomTitle($group->name, $faker), 60);
+                $title = $p === 0 ? ($group->name . ' weekly thread') : Str::limit($this->randomTitle($group->name), 60);
 
                 $attachImage = rand(1, 100) <= 40; // 40% chance
                 $mediaPath = null;
@@ -112,7 +109,7 @@ class DemoContentSeeder extends Seeder
                     'group_id' => $group->id,
                     'user_id' => $author->id,
                     'title' => $title,
-                    'content' => $faker->paragraphs(rand(1, 4), true),
+                    'content' => $this->randomParagraphs(rand(1, 4)),
                     'media_path' => $mediaPath,
                 ]);
 
@@ -123,7 +120,7 @@ class DemoContentSeeder extends Seeder
                     Comment::create([
                         'post_id' => $post->id,
                         'user_id' => $commentUser->id,
-                        'content' => $faker->sentences(rand(1, 3), true),
+                        'content' => $this->randomSentences(rand(1, 3)),
                     ]);
                 }
 
@@ -153,9 +150,48 @@ class DemoContentSeeder extends Seeder
         }
     }
 
-    private function randomTitle(string $groupName, \Faker\Generator $faker): string
+    private function randomTitle(string $groupName): string
     {
         $verbs = ['Discussing', 'Thoughts on', 'Best of', 'New', 'Top', 'Quick take:'];
-        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' - ' . Str::title($faker->words(rand(1, 3), true));
+        return $verbs[array_rand($verbs)] . ' ' . $groupName . ' - ' . Str::title($this->randomWords(rand(1, 3)));
+    }
+
+    private function randomParagraphs(int $count): string
+    {
+        $paragraphs = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $paragraphs[] = $this->randomSentences(rand(2, 4));
+        }
+
+        return implode("\n\n", $paragraphs);
+    }
+
+    private function randomSentences(int $count): string
+    {
+        $sentences = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $sentences[] = Str::ucfirst($this->randomWords(rand(6, 12))) . '.';
+        }
+
+        return implode(' ', $sentences);
+    }
+
+    private function randomWords(int $count): string
+    {
+        $pool = [
+            'fresh', 'local', 'update', 'preview', 'launch', 'hidden', 'trend', 'weekly', 'ideas', 'gallery',
+            'community', 'discussion', 'highlight', 'playlist', 'route', 'feature', 'match', 'recipe', 'scene', 'build',
+            'share', 'discover', 'favorite', 'comment', 'photo', 'moment', 'quick', 'take', 'open', 'window',
+            'travel', 'music', 'sports', 'books', 'games', 'food', 'city', 'cloud', 'story', 'evening',
+        ];
+
+        $words = [];
+        for ($i = 0; $i < $count; $i++) {
+            $words[] = $pool[array_rand($pool)];
+        }
+
+        return implode(' ', $words);
     }
 }

@@ -23,11 +23,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = \Faker\Factory::create(config('app.faker_locale', 'en_US'));
+        $firstNames = ['Anna', 'Alise', 'Janis', 'Eva', 'Martins', 'Laura', 'Markus', 'Elina', 'Roberts', 'Krista'];
+        $lastNames = ['Berzins', 'Ozols', 'Kalnins', 'Lacis', 'Ziedins', 'Krumins', 'Petersone', 'Bergs', 'Vitolins', 'Dumbrava'];
+        $domains = ['example.com', 'test.lv', 'mail.test', 'demo.local'];
+        $name = $firstNames[array_rand($firstNames)] . ' ' . $lastNames[array_rand($lastNames)];
 
         return [
-            'name' => $faker->name(),
-            'email' => $faker->unique()->safeEmail(),
+            'name' => $name,
+            'email' => Str::lower(Str::slug($name, '.')) . '+' . Str::random(5) . '@' . $domains[array_rand($domains)],
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
